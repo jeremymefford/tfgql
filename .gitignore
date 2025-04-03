@@ -52,3 +52,6 @@ apollo-engine-report/
 .vscode/
 .history/
 *.code-workspace
+
+node_modules/
+dist/

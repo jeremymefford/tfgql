@@ -1,0 +1,24 @@
+{
+  "name": "tfe-graphql",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "compile": "tsc",
+    "start": "npm run compile && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "axios": "^1.8.4",
+    "dotenv": "^16.4.7",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,4 +1,4 @@
-/**
+/****
  * Generic types modeling Terraform Enterprise API JSON:API responses.
  */
 
@@ -14,9 +14,31 @@ export interface ResourceRef {
   type: string;
 }
 
+export interface Links {
+  first?: string;
+  last?: string;
+  next?: string | null;
+  prev?: string | null;
+  self?: string;
+}
+
+export interface PaginationMeta {
+  'current-page': number;
+  'next-page': number | null;
+  'page-size': number;
+  'prev-page': number | null;
+  'total-count': number;
+  'total-pages': number;
+}
+
+export interface Meta {
+  pagination?: PaginationMeta;
+}
+
 export interface ListResponse<Resource> {
   data: Resource[];
-  // (Pagination metadata omitted for brevity)
+  meta?: Meta;
+  links?: Links;
 }
 
 export interface SingleResponse<Resource> {

@@ -1,11 +1,11 @@
 import { axiosClient } from '../common/httpClient';
+import { fetchAllPages } from '../common/fetchAllPages';
 import { WorkspaceResource, WorkspaceListResponse, WorkspaceResponse } from './types';
 
 export class WorkspacesAPI {
   /** List all workspaces within a given organization */
   async listWorkspaces(orgName: string): Promise<WorkspaceResource[]> {
-    const res = await axiosClient.get<WorkspaceListResponse>(`/organizations/${orgName}/workspaces`);
-    return res.data.data;
+    return fetchAllPages<WorkspaceResource>(`/organizations/${orgName}/workspaces`);
   }
 
   /** Get a workspace by its workspace ID */

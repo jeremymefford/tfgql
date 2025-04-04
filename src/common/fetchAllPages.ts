@@ -5,7 +5,9 @@ export async function fetchAllPages<T>(
   endpoint: string,
   params: Record<string, any> = {}
 ): Promise<T[]> {
-  const firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params });
+  const baseParams = { ...params, 'page[size]': 100 };
+
+  const firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   const allData = [...firstRes.data.data];
 
   const pagination = firstRes.data.meta?.pagination;
@@ -16,22 +18,26 @@ export async function fetchAllPages<T>(
   const pageSize = pagination['page-size'];
   const totalPages = Math.ceil(pagination['total-count'] / pageSize);
 
-  const requests = [];
-  for (let page = 2; page <= totalPages; page++) {
-    requests.push(
-      axiosClient.get<ListResponse<T>>(endpoint, {
-        params: {
-          ...params,
-          'page[number]': page,
-          'page[size]': pageSize
-        }
-      })
-    );
-  }
+  const BATCH_SIZE = 10;
+  for (let i = 2; i <= totalPages; i += BATCH_SIZE) {
+    const batchEnd = Math.min(i + BATCH_SIZE - 1, totalPages);
+    const batchRequests = [];
 
-  const responses = await Promise.all(requests);
-  for (const res of responses) {
-    allData.push(...res.data.data);
+    for (let page = i; page <= batchEnd; page++) {
+      batchRequests.push(
+        axiosClient.get<ListResponse<T>>(endpoint, {
+          params: {
+            ...baseParams,
+            'page[number]': page
+          }
+        })
+      );
+    }
+
+    const batchResponses = await Promise.all(batchRequests);
+    for (const res of batchResponses) {
+      allData.push(...res.data.data);
+    }
   }
 
   return allData;

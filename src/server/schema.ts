@@ -48,12 +48,6 @@ export const resolvers = {
     ...usersResolvers.Query,
     ...runsResolvers.Query
   },
-  Mutation: {
-    ...organizationsResolvers.Mutation,
-    ...workspacesResolvers.Mutation,
-    ...usersResolvers.Mutation,
-    ...runsResolvers.Mutation
-  },
   Organization: {
     ...organizationsResolvers.Organization
   },

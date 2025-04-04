@@ -37,9 +37,17 @@ export interface RunAttributes {
     'is-discardable': boolean;
     'is-force-cancelable': boolean;
   };
+  relationships?: {
+    workspace?: {
+      data?: {
+        id: string;
+        type: string;
+      };
+    };
+  };
 }
 
-export type RunResource = ResourceObject<RunAttributes> & { relationships?: RunRelationships };
+export type RunResource = ResourceObject<RunAttributes>;
 export type RunListResponse = ListResponse<RunResource>;
 export type RunResponse = SingleResponse<RunResource>;
 
@@ -82,5 +90,5 @@ export interface Run {
     isDiscardable: boolean;
     isForceCancelable: boolean;
   };
-  workspaceId?: string;
+  workspace?: ResourceRef;
 }

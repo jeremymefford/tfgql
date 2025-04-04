@@ -1,36 +1,28 @@
 import { Context } from '../server/context';
 import { Organization } from './types';
 import { Workspace } from '../workspaces/types';
+import { mapWorkspaceResourceToDomain } from '../workspaces/resolvers';
 
 export const resolvers = {
   Query: {
     organizations: async (_: unknown, __: unknown, { dataSources }: Context): Promise<Organization[]> => {
       const orgResources = await dataSources.organizationsAPI.listOrganizations();
-      return orgResources.map(org => transformOrganization(org));
+      return orgResources.map(mapOrganizationResourceToDomain);
     },
     organization: async (_: unknown, { name }: { name: string }, { dataSources }: Context): Promise<Organization | null> => {
       const org = await dataSources.organizationsAPI.getOrganization(name);
-      return org ? transformOrganization(org) : null;
+      return org ? mapOrganizationResourceToDomain(org) : null;
     }
   },
   Organization: {
     workspaces: async (org: Organization, _: unknown, { dataSources }: Context): Promise<Workspace[]> => {
       const wsResources = await dataSources.workspacesAPI.listWorkspaces(org.name);
-      return wsResources.map(ws => ({
-        id: ws.id,
-        name: ws.attributes.name,
-        description: ws.attributes.description,
-        locked: ws.attributes.locked,
-        autoApply: ws.attributes['auto-apply'],
-        createdAt: ws.attributes['created-at'],
-        organizationName: org.name
-      }));
+      return wsResources.map(mapWorkspaceResourceToDomain);
     }
-  },
-  Mutation: {}
+  }
 };
 
-function transformOrganization(org: any): Organization {
+export function mapOrganizationResourceToDomain(org: any): Organization {
   const attrs = org.attributes;
   const permissions = attrs.permissions ?? {};
 
@@ -45,8 +37,8 @@ function transformOrganization(org: any): Organization {
     collaboratorAuthPolicy: attrs['collaborator-auth-policy'],
     planExpired: attrs['plan-expired'],
     planExpiresAt: attrs['plan-expires-at'],
-    planIsTrial: attrs['plan-is-trial'],
-    planIsEnterprise: attrs['plan-is-enterprise'],
+    planIsTrial: attrs['plan-is-trial'] ?? false,
+    planIsEnterprise: attrs['plan-is-enterprise'] ?? false,
     planIdentifier: attrs['plan-identifier'],
     costEstimationEnabled: attrs['cost-estimation-enabled'],
     sendPassingStatusesForUntriggeredSpeculativePlans: attrs['send-passing-statuses-for-untriggered-speculative-plans'],

@@ -6,6 +6,16 @@ const userSchema = gql`
     username: String!
     email: String!
     avatarUrl: String
+    isServiceAccount: Boolean!
+    authMethod: String!
+    v2Only: Boolean!
+    permissions: UserPermissions!
+  }
+
+  type UserPermissions {
+    canCreateOrganizations: Boolean!
+    canChangeEmail: Boolean!
+    canChangeUsername: Boolean!
   }
 
   extend type Query {

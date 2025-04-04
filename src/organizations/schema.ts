@@ -12,9 +12,9 @@ const organizationSchema = gql`
     collaboratorAuthPolicy: String!
     planExpired: Boolean!
     planExpiresAt: DateTime
-    planIsTrial: Boolean!
-    planIsEnterprise: Boolean!
-    planIdentifier: String!
+    planIsTrial: Boolean
+    planIsEnterprise: Boolean
+    planIdentifier: String
     costEstimationEnabled: Boolean!
     sendPassingStatusesForUntriggeredSpeculativePlans: Boolean!
     aggregatedCommitStatusEnabled: Boolean!

@@ -5,22 +5,90 @@ const workspaceSchema = gql`
     id: ID!
     name: String!
     description: String
-    locked: Boolean
-    autoApply: Boolean
-    createdAt: DateTime
-    # Parent organization of this workspace
+    locked: Boolean!
+    lockedReason: String
+    autoApply: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    applyDurationAverage: Int
+    planDurationAverage: Int
+    policyCheckFailures: Int
+    queueAllRuns: Boolean
+    resourceCount: Int
+    runFailures: Int
+    source: String
+    sourceName: String
+    sourceUrl: String
+    speculativeEnabled: Boolean
+    structuredRunOutputEnabled: Boolean
+    tagNames: [String!]!
+    terraformVersion: String
+    triggerPrefixes: [String!]!
+    vcsRepo: JSON
+    vcsRepoIdentifier: String
+    workingDirectory: String
+    workspaceKpisRunsCount: Int
+    executionMode: String
+    environment: String
+    operations: Boolean
+    fileTriggersEnabled: Boolean
+    globalRemoteState: Boolean
+    latestChangeAt: DateTime
+    lastAssessmentResultAt: DateTime
+    autoDestroyAt: DateTime
+    autoDestroyStatus: String
+    autoDestroyActivityDuration: Int
+    inheritsProjectAutoDestroy: Boolean
+    assessmentsEnabled: Boolean
+    allowDestroyPlan: Boolean
+    autoApplyRunTrigger: Boolean
+    oauthClientName: String
+    actions: WorkspaceActions
+    permissions: WorkspacePermissions
+    settingOverwrites: WorkspaceSettingOverwrites
+    organizationName: String
     organization: Organization
-    # Runs within this workspace
     runs: [Run!]!
   }
+
+  type WorkspaceActions {
+    isDestroyable: Boolean!
+  }
+
+  type WorkspacePermissions {
+    canUpdate: Boolean!
+    canDestroy: Boolean!
+    canQueueRun: Boolean!
+    canReadRun: Boolean!
+    canReadVariable: Boolean!
+    canUpdateVariable: Boolean!
+    canReadStateVersions: Boolean!
+    canReadStateOutputs: Boolean!
+    canCreateStateVersions: Boolean!
+    canQueueApply: Boolean!
+    canLock: Boolean!
+    canUnlock: Boolean!
+    canForceUnlock: Boolean!
+    canReadSettings: Boolean!
+    canManageTags: Boolean!
+    canManageRunTasks: Boolean!
+    canForceDelete: Boolean!
+    canManageAssessments: Boolean!
+    canManageEphemeralWorkspaces: Boolean!
+    canReadAssessmentResults: Boolean!
+    canQueueDestroy: Boolean!
+  }
+
+  type WorkspaceSettingOverwrites {
+    executionMode: Boolean
+    agentPool: Boolean
+  }
+
+  scalar JSON
 
   extend type Query {
     workspaces(orgName: String!): [Workspace!]!
     workspace(id: ID!): Workspace
-  }
-
-  extend type Mutation {
-    createWorkspace(orgName: String!, name: String!, description: String): Workspace!
   }
 `;
 export default workspaceSchema;

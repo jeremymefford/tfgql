@@ -4,6 +4,14 @@ export interface UserAttributes {
   username: string;
   email: string;
   'avatar-url'?: string;
+  'is-service-account': boolean;
+  'auth-method': string;
+  'v2-only': boolean;
+  permissions: {
+    'can-create-organizations': boolean;
+    'can-change-email': boolean;
+    'can-change-username': boolean;
+  };
 }
 
 export type UserResource = ResourceObject<UserAttributes>;
@@ -16,4 +24,12 @@ export interface User {
   username: string;
   email: string;
   avatarUrl?: string;
+  isServiceAccount: boolean;
+  authMethod: string;
+  v2Only: boolean;
+  permissions: {
+    canCreateOrganizations: boolean;
+    canChangeEmail: boolean;
+    canChangeUsername: boolean;
+  };
 }

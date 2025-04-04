@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 10;
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));

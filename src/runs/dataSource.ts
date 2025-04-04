@@ -13,31 +13,4 @@ export class RunsAPI {
     const res = await axiosClient.get<RunResponse>(`/runs/${runId}`);
     return res.data.data;
   }
-
-  /** Create (trigger) a new run in the given workspace */
-  async createRun(workspaceId: string, message?: string, isDestroy: boolean = false, configVersionId?: string): Promise<RunResource> {
-    const payload: any = {
-      data: {
-        type: 'runs',
-        attributes: {
-          'is-destroy': isDestroy
-        },
-        relationships: {
-          workspace: {
-            data: { type: 'workspaces', id: workspaceId }
-          }
-        }
-      }
-    };
-    if (message) {
-      payload.data.attributes.message = message;
-    }
-    if (configVersionId) {
-      payload.data.relationships['configuration-version'] = {
-        data: { type: 'configuration-versions', id: configVersionId }
-      };
-    }
-    const res = await axiosClient.post<RunResponse>('/runs', payload);
-    return res.data.data;
-  }
 }

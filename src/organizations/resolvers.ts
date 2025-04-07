@@ -2,6 +2,8 @@ import { Context } from '../server/context';
 import { Organization } from './types';
 import { Workspace } from '../workspaces/types';
 import { mapWorkspaceResourceToDomain } from '../workspaces/resolvers';
+import { mapTeamResourceToDomain } from '../teams/resolver';
+import { Team } from '../teams/types';
 
 export const resolvers = {
   Query: {
@@ -18,6 +20,10 @@ export const resolvers = {
     workspaces: async (org: Organization, _: unknown, { dataSources }: Context): Promise<Workspace[]> => {
       const wsResources = await dataSources.workspacesAPI.listWorkspaces(org.name);
       return wsResources.map(mapWorkspaceResourceToDomain);
+    },
+    teams: async (org: Organization, _: unknown, { dataSources }: Context): Promise<Team[]> => {
+      const teamResources = await dataSources.teamsAPI.listTeams(org.name);
+      return teamResources.map(mapTeamResourceToDomain);
     }
   }
 };

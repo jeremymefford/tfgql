@@ -5,7 +5,7 @@ export async function fetchAllPages<T>(
   endpoint: string,
   params: Record<string, any> = {}
 ): Promise<T[]> {
-  const baseParams = { ...params, 'page[size]': 100 };
+  const baseParams = { ...(params || {}), 'page[size]': 100 };
 
   const firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   const allData = [...firstRes.data.data];

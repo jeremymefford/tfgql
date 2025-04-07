@@ -6,10 +6,12 @@ import { resolvers as organizationsResolvers } from '../organizations/resolvers'
 import { resolvers as workspacesResolvers } from '../workspaces/resolvers';
 import { resolvers as usersResolvers } from '../users/resolvers';
 import { resolvers as runsResolvers } from '../runs/resolvers';
+import { resolvers as teamsResolvers } from '../teams/resolver';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
 import userSchema from '../users/schema';
 import runSchema from '../runs/schema';
+import teamSchema from '../teams/schema';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -33,6 +35,7 @@ const baseSchema = gql`
 /** Combined type definitions for the schema */
 export const typeDefs = [
   baseSchema,
+  teamSchema,
   organizationSchema,
   workspaceSchema,
   userSchema,
@@ -43,6 +46,7 @@ export const typeDefs = [
 export const resolvers = {
   DateTime: DateTimeScalar,
   Query: {
+    ...teamsResolvers.Query,
     ...organizationsResolvers.Query,
     ...workspacesResolvers.Query,
     ...usersResolvers.Query,
@@ -53,6 +57,9 @@ export const resolvers = {
   },
   Workspace: {
     ...workspacesResolvers.Workspace
+  },
+  Team: {
+    ...teamsResolvers.Team
   },
   Run: {
     ...runsResolvers.Run

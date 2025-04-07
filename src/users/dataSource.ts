@@ -8,7 +8,7 @@ export class UsersAPI {
   }
 
   async getUser(userId: string): Promise<UserResource> {
-    const res = await axiosClient.get<UserResponse>(`/admin/users/${userId}`);
+    const res = await axiosClient.get<UserResponse>(`/users/${userId}`);
     return res.data.data;
   }
 

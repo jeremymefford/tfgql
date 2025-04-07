@@ -28,6 +28,7 @@ const organizationSchema = gql`
     defaultExecutionMode: String!
     permissions: OrganizationPermissions!
     workspaces: [Workspace!]
+    teams: [Team!]
   }
 
   type OrganizationPermissions {

@@ -46,7 +46,6 @@ const workspaceSchema = gql`
     actions: WorkspaceActions
     permissions: WorkspacePermissions
     settingOverwrites: WorkspaceSettingOverwrites
-    organizationName: String
     organization: Organization
     runs: [Run!]!
   }

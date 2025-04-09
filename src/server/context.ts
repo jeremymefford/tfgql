@@ -3,6 +3,7 @@ import { WorkspacesAPI } from '../workspaces/dataSource';
 import { UsersAPI } from '../users/dataSource';
 import { RunsAPI } from '../runs/dataSource';
 import { TeamsAPI } from '../teams/dataSource';
+import { ConfigurationVersionsAPI } from '../configuration-versions/dataSource';
 
 /** GraphQL context type */
 export interface Context {
@@ -12,6 +13,7 @@ export interface Context {
     usersAPI: UsersAPI;
     runsAPI: RunsAPI;
     teamsAPI: TeamsAPI;
+    configurationVersionsAPI: ConfigurationVersionsAPI;
   };
 }
 
@@ -25,7 +27,8 @@ export async function buildContext(): Promise<Context> {
       workspacesAPI: new WorkspacesAPI(),
       usersAPI: new UsersAPI(),
       runsAPI: new RunsAPI(),
-      teamsAPI: new TeamsAPI()
+      teamsAPI: new TeamsAPI(),
+      configurationVersionsAPI: new ConfigurationVersionsAPI()
     }
   };
 }

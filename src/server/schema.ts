@@ -7,11 +7,14 @@ import { resolvers as workspacesResolvers } from '../workspaces/resolvers';
 import { resolvers as usersResolvers } from '../users/resolvers';
 import { resolvers as runsResolvers } from '../runs/resolvers';
 import { resolvers as teamsResolvers } from '../teams/resolver';
+import { resolvers as configurationVersionResolvers } from '../configuration-versions/resolvers';
+import configurationVersionSchema from '../configuration-versions/schema';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
 import userSchema from '../users/schema';
 import runSchema from '../runs/schema';
 import teamSchema from '../teams/schema';
+import { ConfigurationVersionsAPI } from '../configuration-versions/dataSource';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -39,7 +42,8 @@ export const typeDefs = [
   organizationSchema,
   workspaceSchema,
   userSchema,
-  runSchema
+  runSchema,
+  configurationVersionSchema
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -50,7 +54,8 @@ export const resolvers = {
     ...organizationsResolvers.Query,
     ...workspacesResolvers.Query,
     ...usersResolvers.Query,
-    ...runsResolvers.Query
+    ...runsResolvers.Query,
+    ...configurationVersionResolvers.Query
   },
   Organization: {
     ...organizationsResolvers.Organization

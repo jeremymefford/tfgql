@@ -48,6 +48,7 @@ const workspaceSchema = gql`
     settingOverwrites: WorkspaceSettingOverwrites
     organization: Organization
     runs: [Run!]!
+    configurationVersions: [ConfigurationVersion!]!
   }
 
   type WorkspaceActions {

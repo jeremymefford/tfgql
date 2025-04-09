@@ -2,8 +2,10 @@ import { Context } from '../server/context';
 import { Workspace } from './types';
 import { Organization } from '../organizations/types';
 import { Run } from '../runs/types';
+import { ConfigurationVersion } from '../configuration-versions/types';
 import { mapRunResourceToDomain } from '../runs/resolvers';
 import { mapOrganizationResourceToDomain } from '../organizations/resolvers';
+import { mapConfigurationVersionResourceToDomain } from '../configuration-versions/resolvers';
 
 export function mapWorkspaceResourceToDomain(ws: any): Workspace {
   return {
@@ -104,6 +106,10 @@ export const resolvers = {
     runs: async (workspace: Workspace, _: unknown, { dataSources }: Context): Promise<Run[]> => {
       const runResources = await dataSources.runsAPI.listRuns(workspace.id);
       return runResources.map(mapRunResourceToDomain);
+    },
+    configurationVersions: async (workspace: Workspace, _: unknown, { dataSources }: Context): Promise<ConfigurationVersion[]> => {
+      const resources = await dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
+      return resources.map(mapConfigurationVersionResourceToDomain);
     }
   }
 };

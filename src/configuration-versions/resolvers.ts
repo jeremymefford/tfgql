@@ -27,7 +27,7 @@ export const resolvers = {
             const resource = await dataSources.configurationVersionsAPI.getConfigurationVersion(id);
             return mapConfigurationVersionResourceToDomain(resource);
         },
-        configurationVersionsForWorkspace: async (
+        configurationVersions: async (
             _: unknown,
             { workspaceId }: { workspaceId: string },
             { dataSources }: Context

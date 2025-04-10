@@ -8,9 +8,9 @@ import { ConfigurationVersionsAPI } from '../configuration-versions/dataSource';
 /** GraphQL context type */
 export interface Context {
   dataSources: {
+    usersAPI: UsersAPI;
     organizationsAPI: OrganizationsAPI;
     workspacesAPI: WorkspacesAPI;
-    usersAPI: UsersAPI;
     runsAPI: RunsAPI;
     teamsAPI: TeamsAPI;
     configurationVersionsAPI: ConfigurationVersionsAPI;
@@ -23,9 +23,9 @@ export interface Context {
 export async function buildContext(): Promise<Context> {
   return {
     dataSources: {
+      usersAPI: new UsersAPI(),
       organizationsAPI: new OrganizationsAPI(),
       workspacesAPI: new WorkspacesAPI(),
-      usersAPI: new UsersAPI(),
       runsAPI: new RunsAPI(),
       teamsAPI: new TeamsAPI(),
       configurationVersionsAPI: new ConfigurationVersionsAPI()

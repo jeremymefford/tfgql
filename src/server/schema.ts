@@ -14,7 +14,7 @@ import workspaceSchema from '../workspaces/schema';
 import userSchema from '../users/schema';
 import runSchema from '../runs/schema';
 import teamSchema from '../teams/schema';
-import { ConfigurationVersionsAPI } from '../configuration-versions/dataSource';
+import filterSchema from '../common/filtering/schema';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -38,10 +38,11 @@ const baseSchema = gql`
 /** Combined type definitions for the schema */
 export const typeDefs = [
   baseSchema,
+  filterSchema,
+  userSchema,
   teamSchema,
   organizationSchema,
   workspaceSchema,
-  userSchema,
   runSchema,
   configurationVersionSchema
 ];
@@ -50,10 +51,10 @@ export const typeDefs = [
 export const resolvers = {
   DateTime: DateTimeScalar,
   Query: {
+    ...usersResolvers.Query,
     ...teamsResolvers.Query,
     ...organizationsResolvers.Query,
     ...workspacesResolvers.Query,
-    ...usersResolvers.Query,
     ...runsResolvers.Query,
     ...configurationVersionResolvers.Query
   },

@@ -1,4 +1,8 @@
 import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import {
+  StringComparisonExp,
+  BooleanComparisonExp
+} from '../common/filtering/types';
 
 export interface UserAttributes {
   username: string;
@@ -15,10 +19,8 @@ export interface UserAttributes {
 }
 
 export type UserResource = ResourceObject<UserAttributes>;
-export type UserListResponse = ListResponse<UserResource>;
 export type UserResponse = SingleResponse<UserResource>;
 
-/** Domain model for User (matches GraphQL type fields) */
 export interface User {
   id: string;
   username: string;
@@ -32,4 +34,18 @@ export interface User {
     canChangeEmail: boolean;
     canChangeUsername: boolean;
   };
+}
+
+export interface UserFilter {
+  _and?: UserFilter[];
+  _or?: UserFilter[];
+  _not?: UserFilter;
+
+  id?: StringComparisonExp;
+  username?: StringComparisonExp;
+  email?: StringComparisonExp;
+  avatarUrl?: StringComparisonExp;
+  isServiceAccount?: BooleanComparisonExp;
+  authMethod?: StringComparisonExp;
+  v2Only?: BooleanComparisonExp;
 }

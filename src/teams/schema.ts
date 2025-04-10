@@ -11,7 +11,7 @@ const teamSchema = gql`
     permissions: TeamPermissions!
     organizationAccess: TeamOrganizationAccess!
     organization: Organization!
-    users: [User!]!
+    users(filter: UserFilter): [User!]!
   }
 
   type TeamPermissions {
@@ -44,9 +44,64 @@ const teamSchema = gql`
     manageAgentPools: Boolean
   }
 
+  input TeamFilter {
+    _and: [TeamFilter!]
+    _or: [TeamFilter!]
+    _not: TeamFilter
+
+    id: StringComparisonExp
+    name: StringComparisonExp
+    ssoTeamId: StringComparisonExp
+    usersCount: IntComparisonExp
+    visibility: StringComparisonExp
+    allowMemberTokenManagement: BooleanComparisonExp
+    permissions: TeamPermissionsFilter
+    organizationAccess: TeamOrganizationAccessFilter
+  }
+
+
+  input TeamPermissionsFilter {
+    _and: [TeamPermissionsFilter!]
+    _or: [TeamPermissionsFilter!]
+    _not: TeamPermissionsFilter
+
+    canUpdateMembership: BooleanComparisonExp
+    canDestroy: BooleanComparisonExp
+    canUpdateOrganizationAccess: BooleanComparisonExp
+    canUpdateApiToken: BooleanComparisonExp
+    canUpdateVisibility: BooleanComparisonExp
+    canUpdateName: BooleanComparisonExp
+    canUpdateSsoTeamId: BooleanComparisonExp
+    canUpdateMemberTokenManagement: BooleanComparisonExp
+    canViewApiToken: BooleanComparisonExp
+  }
+
+  input TeamOrganizationAccessFilter {
+    _and: [TeamOrganizationAccessFilter!]
+    _or: [TeamOrganizationAccessFilter!]
+    _not: TeamOrganizationAccessFilter
+
+    managePolicies: BooleanComparisonExp
+    manageWorkspaces: BooleanComparisonExp
+    manageVcsSettings: BooleanComparisonExp
+    managePolicyOverrides: BooleanComparisonExp
+    manageModules: BooleanComparisonExp
+    manageProviders: BooleanComparisonExp
+    manageRunTasks: BooleanComparisonExp
+    manageProjects: BooleanComparisonExp
+    manageMembership: BooleanComparisonExp
+    manageTeams: BooleanComparisonExp
+    manageOrganizationAccess: BooleanComparisonExp
+    accessSecretTeams: BooleanComparisonExp
+    readProjects: BooleanComparisonExp
+    readWorkspaces: BooleanComparisonExp
+    manageAgentPools: BooleanComparisonExp
+  }
+
   extend type Query {
-    teams(query: String!): [Team!]!
-    teams(organization: String!, names: [String!]): [Team!]!
+    teams(filter: TeamFilter): [Team!]!
+    teamsByQuery(organization: String!, query: String!, filter: TeamFilter): [Team!]!
+    teamsByName(organization: String!, names: [String!]!, filter: TeamFilter): [Team!]!
     team(id: ID!): Team
   }
 `;

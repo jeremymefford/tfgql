@@ -1,20 +1,43 @@
 import { axiosClient } from '../common/httpClient';
 import { fetchAllPages } from '../common/fetchAllPages';
-import { TeamResource, TeamListResponse, TeamResponse } from './types';
+import { TeamResource, TeamListResponse, TeamResponse, Team, TeamFilter, TeamPermissionsFilter, TeamOrganizationAccessFilter } from './types';
+import { teamMapper } from './mapper';
 
 export class TeamsAPI {
-  async listTeams(organization: string, nameFilter?: Set<string>): Promise<TeamResource[]> {
-    const nameFilterString = nameFilter? Array.from(nameFilter).join(',') : undefined;
-    const params = nameFilterString ? { 'filter[name]': nameFilterString } : undefined;
-    return fetchAllPages<TeamResource>(`/organizations/${organization}/teams`, params);
-  }
+    async listTeams(organization: string, filter?: TeamFilter): Promise<Team[]> {
+        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+            `/organizations/${organization}/teams`,
+            teamMapper,
+            undefined,
+            filter
+        );
+    }
 
-  async queryTeams(organization: string, query: string): Promise<TeamResource[]> {
-    return fetchAllPages<TeamResource>(`/organizations/${organization}/teams`, { 'q': query });
-  }
+    async listTeamsByName(organization: string, nameFilter: Set<string>, filter?: TeamFilter): Promise<Team[]> {
+        const nameFilterString = Array.from(nameFilter).join(',');
+        const params = { 'filter[name]': nameFilterString };
+        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+            `/organizations/${organization}/teams`,
+            teamMapper,
+            params,
+            filter
+        );
+    }
 
-  async getTeam(id: string): Promise<TeamResource> {
-    const res = await axiosClient.get<TeamResponse>(`/teams/${id}`);
-    return res.data.data;
-  }
+    async listTeamsByQuery(organization: string, query: string, filter?: TeamFilter): Promise<Team[]> {
+        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+            `/organizations/${organization}/teams`,
+            teamMapper,
+            { 'q': query },
+            filter
+        );
+    }
+
+    async getTeam(id: string): Promise<Team> {
+        const res = await axiosClient.get<TeamResponse>(`/teams/${id}`);
+        if (!res || !res.data || !res.data.data) {
+            throw new Error(`Failed to fetch team data for team ID: ${id}`);
+        }
+        return teamMapper.map(res.data.data);
+    }
 }

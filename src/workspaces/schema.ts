@@ -86,8 +86,55 @@ const workspaceSchema = gql`
 
   scalar JSON
 
+  input WorkspaceFilter {
+    _and: [WorkspaceFilter!]
+    _or: [WorkspaceFilter!]
+    _not: WorkspaceFilter
+
+    id: StringComparisonExp
+    name: StringComparisonExp
+    description: StringComparisonExp
+    locked: BooleanComparisonExp
+    lockedReason: StringComparisonExp
+    autoApply: BooleanComparisonExp
+    createdAt: DateTimeComparisonExp
+    updatedAt: DateTimeComparisonExp
+    applyDurationAverage: IntComparisonExp
+    planDurationAverage: IntComparisonExp
+    policyCheckFailures: IntComparisonExp
+    queueAllRuns: BooleanComparisonExp
+    resourceCount: IntComparisonExp
+    runFailures: IntComparisonExp
+    source: StringComparisonExp
+    sourceName: StringComparisonExp
+    sourceUrl: StringComparisonExp
+    speculativeEnabled: BooleanComparisonExp
+    structuredRunOutputEnabled: BooleanComparisonExp
+    tagNames: StringComparisonExp
+    terraformVersion: StringComparisonExp
+    triggerPrefixes: StringComparisonExp
+    vcsRepoIdentifier: StringComparisonExp
+    workingDirectory: StringComparisonExp
+    workspaceKpisRunsCount: IntComparisonExp
+    executionMode: StringComparisonExp
+    environment: StringComparisonExp
+    operations: BooleanComparisonExp
+    fileTriggersEnabled: BooleanComparisonExp
+    globalRemoteState: BooleanComparisonExp
+    latestChangeAt: DateTimeComparisonExp
+    lastAssessmentResultAt: DateTimeComparisonExp
+    autoDestroyAt: DateTimeComparisonExp
+    autoDestroyStatus: StringComparisonExp
+    autoDestroyActivityDuration: IntComparisonExp
+    inheritsProjectAutoDestroy: BooleanComparisonExp
+    assessmentsEnabled: BooleanComparisonExp
+    allowDestroyPlan: BooleanComparisonExp
+    autoApplyRunTrigger: BooleanComparisonExp
+    oauthClientName: StringComparisonExp
+  }
+
   extend type Query {
-    workspaces(orgName: String!): [Workspace!]!
+    workspaces(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
     workspace(id: ID!): Workspace
   }
 `;

@@ -24,7 +24,7 @@ export interface OrganizationAttributes {
   'two-factor-conformant': boolean;
   'assessments-enforced': boolean;
   'default-execution-mode': string;
-  permissions?: OrganizationPermissions;
+  permissions: OrganizationPermissions;
 }
 
 export interface OrganizationPermissions {

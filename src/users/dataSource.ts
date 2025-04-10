@@ -1,20 +1,17 @@
 import { axiosClient } from '../common/httpClient';
-import { UserResource, UserListResponse, UserResponse } from './types';
+import { userMapper } from './mapper';
+import { User,  UserResponse } from './types';
 
 export class UsersAPI {
-  async listUsers(): Promise<UserResource[]> {
-    const res = await axiosClient.get<UserListResponse>('/admin/users');
-    return res.data.data;
-  }
 
-  async getUser(userId: string): Promise<UserResource> {
+  async getUser(userId: string): Promise<User> {
     const res = await axiosClient.get<UserResponse>(`/users/${userId}`);
-    return res.data.data;
+    return userMapper.map(res.data.data);
   }
 
   /** Get the current authenticated user (non-admin endpoint) */
-  async getCurrentUser(): Promise<UserResource> {
+  async getCurrentUser(): Promise<User> {
     const res = await axiosClient.get<UserResponse>('/account/details');
-    return res.data.data;
+    return userMapper.map(res.data.data);
   }
 }

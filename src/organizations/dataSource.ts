@@ -1,14 +1,18 @@
 import { axiosClient } from '../common/httpClient';
 import { fetchAllPages } from '../common/fetchAllPages';
-import { OrganizationResource, OrganizationListResponse, OrganizationResponse } from './types';
+import { OrganizationResponse, Organization } from './types';
+import { organizationMapper } from './mapper';
 
 export class OrganizationsAPI {
-  async listOrganizations(): Promise<OrganizationResource[]> {
-    return fetchAllPages<OrganizationResource>('/organizations');
+  async listOrganizations(): Promise<Organization[]> {
+    return fetchAllPages<Organization>('/organizations', organizationMapper);
   }
 
-  async getOrganization(name: string): Promise<OrganizationResource> {
+  async getOrganization(name: string): Promise<Organization> {
     const res = await axiosClient.get<OrganizationResponse>(`/organizations/${name}`);
-    return res.data.data;
+    if (!res || !res.data || !res.data.data) {
+      throw new Error(`Failed to fetch organization data for ${name}`);
+    }
+    return organizationMapper.map(res.data.data);
   }
 }

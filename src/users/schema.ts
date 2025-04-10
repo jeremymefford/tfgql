@@ -18,8 +18,21 @@ const userSchema = gql`
     canChangeUsername: Boolean
   }
 
+  input UserFilter {
+    _and: [UserFilter!]
+    _or: [UserFilter!]
+    _not: UserFilter
+
+    id: StringComparisonExp
+    username: StringComparisonExp
+    email: StringComparisonExp
+    avatarUrl: StringComparisonExp
+    isServiceAccount: BooleanComparisonExp
+    authMethod: StringComparisonExp
+    v2Only: BooleanComparisonExp
+  }
+
   extend type Query {
-    users: [User!]!
     user(id: ID!): User
     me: User
   }

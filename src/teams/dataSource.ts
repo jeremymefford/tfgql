@@ -1,22 +1,22 @@
 import { axiosClient } from '../common/httpClient';
-import { fetchAllPages } from '../common/fetchAllPages';
-import { TeamResource, TeamListResponse, TeamResponse, Team, TeamFilter, TeamPermissionsFilter, TeamOrganizationAccessFilter } from './types';
+import { streamPages } from '../common/streamPages';
+import { TeamResponse, Team, TeamFilter, TeamPermissionsFilter, TeamOrganizationAccessFilter } from './types';
 import { teamMapper } from './mapper';
 
 export class TeamsAPI {
-    async listTeams(organization: string, filter?: TeamFilter): Promise<Team[]> {
-        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+    async *listTeams(organization: string, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
+        yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
             `/organizations/${organization}/teams`,
             teamMapper,
-            undefined,
+            {},
             filter
         );
     }
 
-    async listTeamsByName(organization: string, nameFilter: Set<string>, filter?: TeamFilter): Promise<Team[]> {
+    async *listTeamsByName(organization: string, nameFilter: Set<string>, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
         const nameFilterString = Array.from(nameFilter).join(',');
         const params = { 'filter[name]': nameFilterString };
-        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+        yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
             `/organizations/${organization}/teams`,
             teamMapper,
             params,
@@ -24,8 +24,8 @@ export class TeamsAPI {
         );
     }
 
-    async listTeamsByQuery(organization: string, query: string, filter?: TeamFilter): Promise<Team[]> {
-        return fetchAllPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter; }>(
+    async *listTeamsByQuery(organization: string, query: string, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
+        yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
             `/organizations/${organization}/teams`,
             teamMapper,
             { 'q': query },

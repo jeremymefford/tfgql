@@ -1,12 +1,23 @@
 import { axiosClient } from '../common/httpClient';
-import { fetchAllPages } from '../common/fetchAllPages';
-import { WorkspaceResource, WorkspaceListResponse, WorkspaceResponse, WorkspaceFilter, Workspace } from './types';
+import { streamPages } from '../common/streamPages';
+import {  WorkspaceResponse, WorkspaceFilter, Workspace, WorkspaceActionsFilter, WorkspacePermissionsFilter, WorkspaceSettingOverwritesFilter } from './types';
 import { workspaceMapper } from './mapper';
-import { WhereClause } from '../common/filtering/types';
 
 export class WorkspacesAPI {
-  async listWorkspaces(orgName: string, filter?: WhereClause<Workspace>): Promise<Workspace[]> {
-    return fetchAllPages<Workspace>(`/organizations/${orgName}/workspaces`, workspaceMapper, {}, filter);
+  async *listWorkspaces(
+    orgName: string,
+    filter?: WorkspaceFilter
+  ): AsyncGenerator<Workspace[], void, unknown> {
+    yield* streamPages<Workspace, {
+      actions: WorkspaceActionsFilter;
+      permissions: WorkspacePermissionsFilter;
+      settingOverwrites: WorkspaceSettingOverwritesFilter;
+    }>(
+      `/organizations/${orgName}/workspaces`,
+      workspaceMapper,
+      {},
+      filter
+    );
   }
 
   async getWorkspace(id: string): Promise<Workspace> {

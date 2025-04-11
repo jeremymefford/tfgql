@@ -1,13 +1,17 @@
 import { axiosClient } from '../common/httpClient';
-import { fetchAllPages } from '../common/fetchAllPages';
-import { RunResource, RunListResponse, RunResponse, Run } from './types';
-import { DomainMapper } from '../common/middleware/domainMapper';
+import { streamPages } from '../common/streamPages';
+import { RunResponse, Run, RunFilter, RunPermissionsFilter, RunActionsFilter, RunStatusTimestampsFilter } from './types';
 import { runMapper } from './mapper';
 
 export class RunsAPI {
   /** List all runs for a given workspace */
-  async listRuns(workspaceId: string): Promise<Run[]> {
-    return fetchAllPages<Run>(`/workspaces/${workspaceId}/runs`, runMapper);
+  async *listRuns(workspaceId: string, filter?: RunFilter): AsyncGenerator<Run[], void, unknown> {
+    console.log('fetching runs for workspace', workspaceId);
+    yield* streamPages<Run, {
+      permissions: RunPermissionsFilter;
+      actions: RunActionsFilter;
+      statusTimestamps: RunStatusTimestampsFilter;
+    }>(`/workspaces/${workspaceId}/runs`, runMapper, undefined, filter);
   }
 
   /** Get a single run by ID */

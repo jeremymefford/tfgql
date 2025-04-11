@@ -30,8 +30,7 @@ export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> |
                 value !== null &&
                 !(value instanceof Date) &&
                 !Array.isArray(value) &&
-                typeof filter === 'object' &&
-                ('_and' in filter || '_or' in filter || '_not' in filter)
+                typeof filter === 'object'
             ) {
                 if (!evaluateWhereClause(filter as WhereClause<any>, value)) return false;
                 continue;

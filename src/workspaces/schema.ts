@@ -47,8 +47,8 @@ const workspaceSchema = gql`
     permissions: WorkspacePermissions
     settingOverwrites: WorkspaceSettingOverwrites
     organization: Organization
-    runs: [Run!]!
-    configurationVersions: [ConfigurationVersion!]!
+    runs(filter: RunFilter): [Run!]!
+    configurationVersions(filter: ConfigurationVersionFilter): [ConfigurationVersion!]!
   }
 
   type WorkspaceActions {

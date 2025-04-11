@@ -1,0 +1,33 @@
+export class Config {
+    readonly tfcToken: string;
+    readonly tfeBaseUrl: string;
+    readonly graphqlBatchSize: number;
+    readonly tfcPageSize: number;
+    readonly rateLimitMaxRetries: number = 20;
+
+    constructor(env = process.env) {
+        const token = env.TFC_TOKEN;
+        if (!token) {
+            throw new Error("TFC_TOKEN is required");
+        }
+
+        this.tfcToken = token;
+        this.tfeBaseUrl = env.TFE_BASE_URL || 'https://app.terraform.io';
+        this.graphqlBatchSize = this.parsePositiveNumber(env.GRAPHQL_BATCH_SIZE, 10);
+        const userGivenPageSize = this.parsePositiveNumber(env.TFC_PAGE_SIZE, 0);
+        if (userGivenPageSize < 1 || userGivenPageSize > 100) {
+            this.tfcPageSize = 100;
+        } else {
+            this.tfcPageSize = this.parsePositiveNumber(env.TFC_PAGE_SIZE, 100);
+        }
+        this.rateLimitMaxRetries = this.parsePositiveNumber(env.RATE_LIMIT_MAX_RETRIES, 20);
+    }
+
+    private parsePositiveNumber(value: string | undefined, defaultValue: number): number {
+        const num = Number(value);
+        return isNaN(num) || num < 0 ? defaultValue : num;
+    }
+}
+
+export const applicationConfiguration = new Config();
+ 

@@ -2,20 +2,18 @@ import { Context } from '../server/context';
 import { Team, TeamFilter } from './types';
 import { batchResourceFetch } from '../common/batchResourceFetch';
 import { User, UserFilter } from '../users/types';
+import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 
 export const resolvers = {
     Query: {
-        teams: async (_: unknown, { organizationName, filter }: { organizationName: string, filter?: TeamFilter }, { dataSources }: Context): Promise<Team[]> => {
-            const teams = await dataSources.teamsAPI.listTeams(organizationName, filter);
-            return teams;
+        teams: async (_: unknown, { organization, filter }: { organization: string, filter?: TeamFilter }, { dataSources }: Context): Promise<Promise<Team>[]> => {
+            return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeams(organization, filter));
         },
-        teamsByName: async (_: unknown, { organizationName, names, filter }: { organizationName: string, names: string[], filter?: TeamFilter }, { dataSources }: Context): Promise<Team[]> => {
-            const teams = await dataSources.teamsAPI.listTeamsByName(organizationName, new Set(names), filter);
-            return teams;
+        teamsByName: async (_: unknown, { organization, names, filter }: { organization: string, names: string[], filter?: TeamFilter }, { dataSources }: Context): Promise<Promise<Team>[]> => {
+            return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeamsByName(organization, new Set(names), filter));
         },
-        teamsByQuery: async (_: unknown, { organizationName, query, filter }: { organizationName: string, query: string, filter?: TeamFilter }, { dataSources }: Context): Promise<Team[]> => {
-            const teams = await dataSources.teamsAPI.listTeamsByQuery(organizationName, query, filter);
-            return teams;
+        teamsByQuery: async (_: unknown, { organization, query, filter }: { organization: string, query: string, filter?: TeamFilter }, { dataSources }: Context): Promise<Promise<Team>[]> => {
+            return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeamsByQuery(organization, query, filter));
         },
         team: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<Team | null> => {
             const team = await dataSources.teamsAPI.getTeam(id);

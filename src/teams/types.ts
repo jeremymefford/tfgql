@@ -1,5 +1,4 @@
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
-import { Organization } from '../organizations/types';
 import {
     StringComparisonExp,
     IntComparisonExp,
@@ -34,36 +33,6 @@ export type TeamResource = ResourceObject<TeamAttributes> & {
 export type TeamListResponse = ListResponse<TeamResource>;
 export type TeamResponse = SingleResponse<TeamResource>;
 
-export interface TeamPermissions {
-    canUpdateMembership: boolean;
-    canDestroy: boolean;
-    canUpdateOrganizationAccess: boolean;
-    canUpdateApiToken: boolean;
-    canUpdateVisibility: boolean;
-    canUpdateName: boolean;
-    canUpdateSsoTeamId: boolean;
-    canUpdateMemberTokenManagement: boolean;
-    canViewApiToken: boolean;
-}
-
-export interface TeamOrganizationAccess {
-    managePolicies: boolean;
-    manageWorkspaces: boolean;
-    manageVcsSettings: boolean;
-    managePolicyOverrides: boolean;
-    manageModules: boolean;
-    manageProviders: boolean;
-    manageRunTasks: boolean;
-    manageProjects: boolean;
-    manageMembership: boolean;
-    manageTeams: boolean;
-    manageOrganizationAccess: boolean;
-    accessSecretTeams: boolean;
-    readProjects: boolean;
-    readWorkspaces: boolean;
-    manageAgentPools: boolean;
-}
-
 export interface Team {
     id: string;
     name: string;
@@ -71,13 +40,39 @@ export interface Team {
     usersCount: number;
     visibility: string;
     allowMemberTokenManagement: boolean;
-    permissions: TeamPermissions;
-    organizationAccess: TeamOrganizationAccess;
+    permissions: {
+        canUpdateMembership: boolean;
+        canDestroy: boolean;
+        canUpdateOrganizationAccess: boolean;
+        canUpdateApiToken: boolean;
+        canUpdateVisibility: boolean;
+        canUpdateName: boolean;
+        canUpdateSsoTeamId: boolean;
+        canUpdateMemberTokenManagement: boolean;
+        canViewApiToken: boolean;
+    };
+    organizationAccess: {
+        managePolicies: boolean;
+        manageWorkspaces: boolean;
+        manageVcsSettings: boolean;
+        managePolicyOverrides: boolean;
+        manageModules: boolean;
+        manageProviders: boolean;
+        manageRunTasks: boolean;
+        manageProjects: boolean;
+        manageMembership: boolean;
+        manageTeams: boolean;
+        manageOrganizationAccess: boolean;
+        accessSecretTeams: boolean;
+        readProjects: boolean;
+        readWorkspaces: boolean;
+        manageAgentPools: boolean;
+    };
     organizationId: string;
     userIds: string[];
 }
 
-export interface TeamPermissionsFilter extends WhereClause<TeamPermissions> {
+export interface TeamPermissionsFilter extends WhereClause<Team['permissions']> {
     _and?: TeamPermissionsFilter[];
     _or?: TeamPermissionsFilter[];
     _not?: TeamPermissionsFilter;
@@ -93,7 +88,7 @@ export interface TeamPermissionsFilter extends WhereClause<TeamPermissions> {
     canViewApiToken?: BooleanComparisonExp;
 }
 
-export interface TeamOrganizationAccessFilter extends WhereClause<TeamOrganizationAccess> {
+export interface TeamOrganizationAccessFilter extends WhereClause<Team['organizationAccess']> {
     _and?: TeamOrganizationAccessFilter[];
     _or?: TeamOrganizationAccessFilter[];
     _not?: TeamOrganizationAccessFilter;

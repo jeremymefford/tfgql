@@ -60,7 +60,6 @@ export type OrganizationResource = ResourceObject<OrganizationAttributes>;
 export type OrganizationListResponse = ListResponse<OrganizationResource>;
 export type OrganizationResponse = SingleResponse<OrganizationResource>;
 
-/** Domain model for Organization (matches GraphQL type fields) */
 export interface Organization {
   id: string;
   name: string;

@@ -1,11 +1,14 @@
 import { axiosClient } from '../common/httpClient';
-import { fetchAllPages } from '../common/fetchAllPages';
+import { streamPages } from '../common/streamPages';
 import { OrganizationResponse, Organization } from './types';
 import { organizationMapper } from './mapper';
 
 export class OrganizationsAPI {
-  async listOrganizations(): Promise<Organization[]> {
-    return fetchAllPages<Organization>('/organizations', organizationMapper);
+  async *listOrganizations(): AsyncGenerator<Organization[], void, unknown> {
+    yield* streamPages<Organization>(
+      '/organizations',
+      organizationMapper
+    );
   }
 
   async getOrganization(name: string): Promise<Organization> {

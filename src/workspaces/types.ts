@@ -97,8 +97,8 @@ export interface Workspace {
   locked: boolean;
   lockedReason?: string;
   autoApply: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   applyDurationAverage?: number;
   planDurationAverage?: number;
   policyCheckFailures?: number;
@@ -165,7 +165,53 @@ export interface Workspace {
   organizationName?: string;
 }
 
-export interface WorkspaceFilter extends WhereClause<Workspace> {
+export interface WorkspaceSettingOverwritesFilter extends WhereClause<Workspace['settingOverwrites']> {
+  _and?: WorkspaceSettingOverwritesFilter[];
+  _or?: WorkspaceSettingOverwritesFilter[];
+  _not?: WorkspaceSettingOverwritesFilter;
+
+  executionMode?: BooleanComparisonExp;
+  agentPool?: BooleanComparisonExp;
+}
+
+export interface WorkspaceActionsFilter extends WhereClause<Workspace['actions']> {
+  isDestroyable?: BooleanComparisonExp;
+}
+
+export interface WorkspacePermissionsFilter extends WhereClause<Workspace['permissions']> {
+  _and?: WorkspacePermissionsFilter[];
+  _or?: WorkspacePermissionsFilter[];
+  _not?: WorkspacePermissionsFilter;
+
+  canUpdate?: BooleanComparisonExp;
+  canDestroy?: BooleanComparisonExp;
+  canQueueRun?: BooleanComparisonExp;
+  canReadRun?: BooleanComparisonExp;
+  canReadVariable?: BooleanComparisonExp;
+  canUpdateVariable?: BooleanComparisonExp;
+  canReadStateVersions?: BooleanComparisonExp;
+  canReadStateOutputs?: BooleanComparisonExp;
+  canCreateStateVersions?: BooleanComparisonExp;
+  canQueueApply?: BooleanComparisonExp;
+  canLock?: BooleanComparisonExp;
+  canUnlock?: BooleanComparisonExp;
+  canForceUnlock?: BooleanComparisonExp;
+  canReadSettings?: BooleanComparisonExp;
+  canManageTags?: BooleanComparisonExp;
+  canManageRunTasks?: BooleanComparisonExp;
+  canForceDelete?: BooleanComparisonExp;
+  canManageAssessments?: BooleanComparisonExp;
+  canManageEphemeralWorkspaces?: BooleanComparisonExp;
+  canReadAssessmentResults?: BooleanComparisonExp;
+  canQueueDestroy?: BooleanComparisonExp;
+}
+
+export interface WorkspaceFilter extends WhereClause<
+  Workspace, {
+    actions: WorkspaceActionsFilter;
+    permissions: WorkspacePermissionsFilter;
+    settingOverwrites: WorkspaceSettingOverwritesFilter;
+  }> {
   _and?: WorkspaceFilter[];
   _or?: WorkspaceFilter[];
   _not?: WorkspaceFilter;
@@ -210,4 +256,7 @@ export interface WorkspaceFilter extends WhereClause<Workspace> {
   allowDestroyPlan?: BooleanComparisonExp;
   autoApplyRunTrigger?: BooleanComparisonExp;
   oauthClientName?: StringComparisonExp;
+  actions?: WorkspaceActionsFilter;
+  permissions?: WorkspacePermissionsFilter;
+  settingOverwrites?: WorkspaceSettingOverwritesFilter;
 }

@@ -25,6 +25,7 @@ const runSchema = gql`
     savePlan: Boolean!
     variables: [String!]!
     workspace: Workspace
+    configurationVersion: ConfigurationVersion
   }
 
   type RunPermissions {
@@ -48,8 +49,65 @@ const runSchema = gql`
     planQueueableAt: DateTime
   }
 
+  input RunPermissionsFilter {
+    _and: [RunPermissionsFilter!]
+    _or: [RunPermissionsFilter!]
+    _not: RunPermissionsFilter
+
+    canApply: BooleanComparisonExp
+    canCancel: BooleanComparisonExp
+    canComment: BooleanComparisonExp
+    canDiscard: BooleanComparisonExp
+    canForceExecute: BooleanComparisonExp
+    canForceCancel: BooleanComparisonExp
+    canOverridePolicyCheck: BooleanComparisonExp
+  }
+
+  input RunActionsFilter {
+    _and: [RunActionsFilter!]
+    _or: [RunActionsFilter!]
+    _not: RunActionsFilter
+
+    isCancelable: BooleanComparisonExp
+    isConfirmable: BooleanComparisonExp
+    isDiscardable: BooleanComparisonExp
+    isForceCancelable: BooleanComparisonExp
+  }
+
+  input RunStatusTimestampsFilter {
+    planQueueableAt: DateTimeComparisonExp
+  }
+
+  input RunFilter {
+    _and: [RunFilter!]
+    _or: [RunFilter!]
+    _not: RunFilter
+
+    id: StringComparisonExp
+    status: StringComparisonExp
+    message: StringComparisonExp
+    source: StringComparisonExp
+    triggerReason: StringComparisonExp
+
+    isDestroy: BooleanComparisonExp
+    hasChanges: BooleanComparisonExp
+    autoApply: BooleanComparisonExp
+    allowEmptyApply: BooleanComparisonExp
+    allowConfigGeneration: BooleanComparisonExp
+    planOnly: BooleanComparisonExp
+    refresh: BooleanComparisonExp
+    refreshOnly: BooleanComparisonExp
+    savePlan: BooleanComparisonExp
+    createdAt: DateTimeComparisonExp
+    canceledAt: DateTimeComparisonExp
+
+    permissions: RunPermissionsFilter
+    actions: RunActionsFilter
+    statusTimestamps: RunStatusTimestampsFilter
+  }
+
   extend type Query {
-    runs(workspaceId: ID!): [Run!]!
+    runs(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
   }
 `;

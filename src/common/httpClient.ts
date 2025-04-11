@@ -1,25 +1,16 @@
 import axios, { AxiosInstance } from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
-
-const MAX_RETRIES = 20;
+import { applicationConfiguration } from './conf';
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Base URL for Terraform Enterprise (or Terraform Cloud) API
-const TFE_BASE_URL = process.env.TFE_BASE_URL || 'https://app.terraform.io/api/v2';
-const TFC_TOKEN = process.env.TFC_TOKEN;
-
-if (!TFC_TOKEN) {
-  throw new Error('TFC_TOKEN environment variable is required for API calls.');
-}
-
 export const axiosClient: AxiosInstance = axios.create({
-  baseURL: TFE_BASE_URL,
+  baseURL: applicationConfiguration.tfeBaseUrl,
   headers: {
     'Content-Type': 'application/vnd.api+json',
-    'Authorization': `Bearer ${TFC_TOKEN}`
+    'Authorization': `Bearer ${applicationConfiguration.tfcToken}`,
   }
 });
 
@@ -29,14 +20,12 @@ axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
   if (error.response?.status === 429) {
     config._retryCount = (config._retryCount || 0) + 1;
 
-    if (config._retryCount <= MAX_RETRIES) {
+    if (config._retryCount <= applicationConfiguration.rateLimitMaxRetries) {
       const baseDelay = 1000; 
       const maxDelay = 60000; 
       const backoff = Math.min(Math.pow(2, config._retryCount) * baseDelay + Math.random() * 1000, maxDelay);
 
-      console.debug(
-        `Rate limited (429). Retry attempt #${config._retryCount} in ${Math.round(backoff)}ms`
-      );
+      // console.debug(`Rate limited (429). Retry attempt #${config._retryCount} in ${Math.round(backoff)}ms`);
 
       await sleep(backoff);
       return axiosClient(config);

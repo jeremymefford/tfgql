@@ -1,5 +1,6 @@
 import { Context } from '../server/context';
 import { ConfigurationVersion } from './types';
+import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 
 export const resolvers = {
     Query: {
@@ -11,9 +12,10 @@ export const resolvers = {
             _: unknown,
             { workspaceId }: { workspaceId: string },
             { dataSources }: Context
-        ): Promise<ConfigurationVersion[]> => {
-            const cvs = await dataSources.configurationVersionsAPI.listConfigurationVersions(workspaceId);
-            return cvs;
+        ): Promise<Promise<ConfigurationVersion>[]> => {
+            return gatherAsyncGeneratorPromises(
+                dataSources.configurationVersionsAPI.listConfigurationVersions(workspaceId)
+            );
         }
     }
 };

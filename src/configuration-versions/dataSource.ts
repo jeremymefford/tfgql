@@ -1,7 +1,7 @@
-import { fetchAllPages } from '../common/fetchAllPages';
+import { streamPages } from '../common/streamPages';
 import { axiosClient } from '../common/httpClient';
 import { configurationVersionMapper } from './mapper';
-import { ConfigurationVersionResponse, ConfigurationVersion } from './types';
+import { ConfigurationVersionResponse, ConfigurationVersion, ConfigurationVersionFilter } from './types';
 
 export class ConfigurationVersionsAPI {
     async getConfigurationVersion(id: string): Promise<ConfigurationVersion> {
@@ -12,10 +12,18 @@ export class ConfigurationVersionsAPI {
         return configurationVersionMapper.map(res.data.data);
     }
 
-    async listConfigurationVersions(workspaceId: string): Promise<ConfigurationVersion[]> {
+    async *listConfigurationVersions(
+        workspaceId: string,
+        filter?: ConfigurationVersionFilter
+    ): AsyncGenerator<ConfigurationVersion[], void, unknown> {
         console.log("fetching configuration versions for workspace", workspaceId);
-        return fetchAllPages<ConfigurationVersion>(
+        yield* streamPages<ConfigurationVersion, {
+            statusTimestamps: ConfigurationVersionFilter['statusTimestamps'];
+        }>(
             `/workspaces/${workspaceId}/configuration-versions`,
-            configurationVersionMapper);
+            configurationVersionMapper,
+            {},
+            filter
+        );
     }
 }

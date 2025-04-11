@@ -27,8 +27,8 @@ const organizationSchema = gql`
     assessmentsEnforced: Boolean!
     defaultExecutionMode: String!
     permissions: OrganizationPermissions!
-    workspaces: [Workspace!]
-    teams: [Team!]
+    workspaces(filter: WorkspaceFilter): [Workspace!]
+    teams(filter: TeamFilter): [Team!]
   }
 
   type OrganizationPermissions {
@@ -60,8 +60,74 @@ const organizationSchema = gql`
     canCreateProject: Boolean!
   }
 
+  input OrganizationPermissionsFilter {
+    _and: [OrganizationFilter!]
+    _or: [OrganizationFilter!]
+    _not: OrganizationFilter
+
+    canUpdate: BooleanComparisonExp
+    canDestroy: BooleanComparisonExp
+    canAccessViaTeams: BooleanComparisonExp
+    canCreateModule: BooleanComparisonExp
+    canCreateTeam: BooleanComparisonExp
+    canCreateWorkspace: BooleanComparisonExp
+    canManageUsers: BooleanComparisonExp
+    canManageSubscription: BooleanComparisonExp
+    canManageSso: BooleanComparisonExp
+    canUpdateOauth: BooleanComparisonExp
+    canUpdateSentinel: BooleanComparisonExp
+    canUpdateSshKeys: BooleanComparisonExp
+    canUpdateApiToken: BooleanComparisonExp
+    canTraverse: BooleanComparisonExp
+    canStartTrial: BooleanComparisonExp
+    canUpdateAgentPools: BooleanComparisonExp
+    canManageTags: BooleanComparisonExp
+    canManageVarsets: BooleanComparisonExp
+    canReadVarsets: BooleanComparisonExp
+    canManagePublicProviders: BooleanComparisonExp
+    canCreateProvider: BooleanComparisonExp
+    canManagePublicModules: BooleanComparisonExp
+    canManageCustomProviders: BooleanComparisonExp
+    canManageRunTasks: BooleanComparisonExp
+    canReadRunTasks: BooleanComparisonExp
+    canCreateProject: BooleanComparisonExp
+  }
+
+  input OrganizationFilter {
+    _and: [OrganizationFilter!]
+    _or: [OrganizationFilter!]
+    _not: OrganizationFilter
+
+    id: StringComparisonExp
+    name: StringComparisonExp
+    externalId: StringComparisonExp
+    email: StringComparisonExp
+    createdAt: DateTimeComparisonExp
+    sessionTimeout: IntComparisonExp
+    sessionRemember: IntComparisonExp
+    collaboratorAuthPolicy: StringComparisonExp
+    planExpired: BooleanComparisonExp
+    planExpiresAt: DateTimeComparisonExp
+    planIsTrial: BooleanComparisonExp
+    planIsEnterprise: BooleanComparisonExp
+    planIdentifier: StringComparisonExp
+    costEstimationEnabled: BooleanComparisonExp
+    sendPassingStatusesForUntriggeredSpeculativePlans: BooleanComparisonExp
+    aggregatedCommitStatusEnabled: BooleanComparisonExp
+    speculativePlanManagementEnabled: BooleanComparisonExp
+    allowForceDeleteWorkspaces: BooleanComparisonExp
+    fairRunQueuingEnabled: BooleanComparisonExp
+    samlEnabled: BooleanComparisonExp
+    ownersTeamSamlRoleId: StringComparisonExp
+    twoFactorConformant: BooleanComparisonExp
+    assessmentsEnforced: BooleanComparisonExp
+    defaultExecutionMode: StringComparisonExp
+
+    permissions: OrganizationPermissionsFilter
+  }
+
   extend type Query {
-    organizations: [Organization!]!
+    organizations(filter: OrganizationFilter): [Organization!]!
     organization(name: String!): Organization
   }
 `;

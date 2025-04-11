@@ -14,12 +14,8 @@ export class Config {
         this.tfcToken = token;
         this.tfeBaseUrl = env.TFE_BASE_URL || 'https://app.terraform.io';
         this.graphqlBatchSize = this.parsePositiveNumber(env.GRAPHQL_BATCH_SIZE, 10);
-        const userGivenPageSize = this.parsePositiveNumber(env.TFC_PAGE_SIZE, 0);
-        if (userGivenPageSize < 1 || userGivenPageSize > 100) {
-            this.tfcPageSize = 100;
-        } else {
-            this.tfcPageSize = this.parsePositiveNumber(env.TFC_PAGE_SIZE, 100);
-        }
+        const userGivenPageSize = this.parsePositiveNumber(env.TFC_PAGE_SIZE, 100);
+        this.tfcPageSize = userGivenPageSize > 100 || userGivenPageSize == 0 ? 100 : userGivenPageSize;
         this.rateLimitMaxRetries = this.parsePositiveNumber(env.RATE_LIMIT_MAX_RETRIES, 20);
     }
 

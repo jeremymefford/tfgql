@@ -41,7 +41,8 @@ export const runMapper: DomainMapper<RunResource, Run> = {
             refreshOnly: run.attributes['refresh-only'],
             savePlan: run.attributes['save-plan'],
             variables: run.attributes.variables,
-            workspace: run.relationships?.workspace?.data
+            workspace: run.relationships?.workspace?.data,
+            configurationVersion: run.relationships?.['configuration-version']?.data
           };
     }
   }

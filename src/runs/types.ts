@@ -141,6 +141,7 @@ export interface Run {
     isForceCancelable: boolean;
   };
   workspace?: ResourceRef;
+  configurationVersion?: ResourceRef;
 }
 
 export interface RunPermissionsFilter extends WhereClause<Run['permissions']> {

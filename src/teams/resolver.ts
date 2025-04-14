@@ -22,7 +22,7 @@ export const resolvers = {
     },
     Team: {
         users: async (team: Team, { filter }: { filter?: UserFilter }, { dataSources }: Context): Promise<User[]> => {
-            const users = await batchResourceFetch(team.userIds, id => dataSources.usersAPI.getUser(id), filter);
+            const users = await batchResourceFetch<string, User, UserFilter>(team.userIds, id => dataSources.usersAPI.getUser(id), filter);
             return users;
         },
         organization: async (team: Team, _: unknown, { dataSources }: Context) => {

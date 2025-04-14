@@ -2,6 +2,8 @@ import { Context } from "../server/context";
 import { Workspace } from "../workspaces/types";
 import { Run } from "./types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
+import { ConfigurationVersionsAPI } from "../configuration-versions/dataSource";
+import { ConfigurationVersion } from "../configuration-versions/types";
 
 export const resolvers = {
   Query: {
@@ -20,7 +22,12 @@ export const resolvers = {
       if (!workspaceId) return null;
       const workspace = await context.dataSources.workspacesAPI.getWorkspace(workspaceId);
       return workspace;
+    },
+    configurationVersion: async (run: Run, args: unknown, context: Context, info: any): Promise<ConfigurationVersion | null> => {
+      const configurationVersionId = run.configurationVersion?.id;
+      if (!configurationVersionId) return null;
+      const configurationVersion = await context.dataSources.configurationVersionsAPI.getConfigurationVersion(configurationVersionId);
+      return configurationVersion;
     }
-    
   }
 };

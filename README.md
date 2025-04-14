@@ -9,7 +9,7 @@ TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise
 - 🌊 Streaming pagination for efficient retrieval of pages
 - 🔐 TFC token-based authentication
 - ⏳ Rate limit protection with exponential backoffs
-- ⚙️ Apollo Server 4
+- 🛠️ Apollo Server 4
 - 🧪 TypeScript-first codebase with strong typings
 
 ## Getting Started
@@ -64,7 +64,7 @@ src/
 
 | File            | Description                                |
 |------------------|--------------------------------------------|
-| `schema.ts`      | GraphQL schema for that domain.  Uses graphql-tag syntax in gql blocks             |
+| `schema.ts`      | GraphQL schema for that domain.  Uses graphql-tag syntax in gql blocks |
 | `resolvers.ts`   | Resolver logic                             |
 | `types.ts`       | TypeScript types and domain models         |
 | `dataSource.ts`  | REST API integration layer                 |
@@ -73,7 +73,7 @@ src/
 
 ### Example Query
 
-"Get me all the runs for the prod workspace or runs from any locked workspace
+"Retrieve runs' id and status for the prod workspace or any locked workspace"
 
 ```graphql
 query Workspaces($orgName: String!) {
@@ -102,6 +102,8 @@ Filtering supports both logical operators and type-specific comparison operators
 In general, filtering is done after retrieving the data from TFC/E.  When supported by the TFC/E API, filtering will be passed
 down to the API for server-side filtering. Be aware that even though the GraphQL return may be small, the query could still be
 retrieving large amounts of data from TFC/E.
+
+When filtering nested entities, it is important to remember that the 
 
 #### Logical Operators (applies to any filter object)
 
@@ -196,5 +198,3 @@ Use the following launch config:
 - [✅] Hasura-style filtering   
 - [ ] Unit testing
 - [ ] Mutations for selected domains
-- [ ] Caching and persisted queries
-

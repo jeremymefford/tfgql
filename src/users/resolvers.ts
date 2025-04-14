@@ -1,7 +1,5 @@
 import { Context } from '../server/context';
-import { User, UserFilter } from './types';
-
-
+import { User } from './types';
 
 export const resolvers = {
   Query: {

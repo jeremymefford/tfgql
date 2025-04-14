@@ -1,6 +1,6 @@
 import { axiosClient } from '../common/httpClient';
 import { userMapper } from './mapper';
-import { User,  UserResponse } from './types';
+import { User, UserResponse } from './types';
 
 export class UsersAPI {
 
@@ -9,7 +9,6 @@ export class UsersAPI {
     return userMapper.map(res.data.data);
   }
 
-  /** Get the current authenticated user (non-admin endpoint) */
   async getCurrentUser(): Promise<User> {
     const res = await axiosClient.get<UserResponse>('/account/details');
     return userMapper.map(res.data.data);

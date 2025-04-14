@@ -73,6 +73,8 @@ Each domain folder typically contains:
 
 ### Example Query
 
+"Get me all the runs for the prod workspace or any locked runs
+
 ```graphql
 query Workspaces($orgName: String!) {
   workspaces(orgName: $orgName, filter: {
@@ -93,13 +95,75 @@ query Workspaces($orgName: String!) {
 
 ### Filtering
 
-Filtering supports a variety of operators:
+This project implements Hasura-style filtering to allow expressive and efficient queries against the TFC/E API. You can apply filters at any query level, including nested fields.
 
-- `_eq`, `_neq`, `_gt`, `_gte`, `_lt`, `_lte`
-- `_like`, `_ilike`, `_in`, `_nin`
-- Logical operators: `_and`, `_or`, `_not`
+Filtering supports both logical operators and type-specific comparison operators.
 
-Supports nested filters (e.g., `teams.users` or `workspace.runs`).
+In general, filtering is done after retrieving the data from TFC/E.  When supported by the TFC/E API, filtering will be passed
+down to the API for server-side filtering. Be aware that even though the GraphQL return may be small, the query could still be
+retrieving large amounts of data from TFC/E.
+
+#### Logical Operators (applies to any filter object)
+
+| Operator | Description                        |
+|----------|------------------------------------|
+| `_and`   | Match if all filters are true      |
+| `_or`    | Match if any filter is true        |
+| `_not`   | Negate the result of the subfilter |
+
+#### Type-Specific Comparison Operators
+
+| Attribute Type | Operators Supported                                                                 |
+|----------------|--------------------------------------------------------------------------------------|
+| `String`       | `_eq`, `_neq`, `_like`, `_ilike`, `_in`, `_nin`, `_is_null`                          |
+| `Number`       | `_eq`, `_neq`, `_gt`, `_gte`, `_lt`, `_lte`, `_in`, `_nin`, `_is_null`               |
+| `Boolean`      | `_eq`, `_neq`, `_is_null`                                                            |
+| `DateTime`     | `_eq`, `_neq`, `_gt`, `_gte`, `_lt`, `_lte`, `_in`, `_nin`, `_is_null`               |
+| `Enum`         | `_eq`, `_neq`, `_in`, `_nin`, `_is_null`                                             |
+
+#### Examples
+
+**Filter by name or locked workspaces:**
+```graphql
+filter: {
+  _or: [
+    { name: { _eq: "prod-app" } },
+    { locked: { _eq: true } }
+  ]
+}
+```
+
+**Filter users by username with pattern matching:**
+```graphql
+filter: {
+  username: { _ilike: "%admin%" }
+}
+```
+
+**Filter runs by status and creation date:**
+```graphql
+filter: {
+  status: { _in: ["planned", "applied"] },
+  createdAt: { _gt: "2024-01-01T00:00:00Z" }
+}
+```
+
+Generally, filters can be applied to nested fields:
+```graphql
+organization(name: "team-rts") {
+  teams {
+    users(filter: {
+      _or: [
+        { username: { _eq: "alice" }},
+        { username: { _like: "bob%" }}
+      ]
+    }) {
+      id
+      username
+    }
+  }
+}
+```
 
 ## Development
 

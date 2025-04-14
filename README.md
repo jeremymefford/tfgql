@@ -133,6 +133,7 @@ filter: {
 }
 ```
 
+
 **Filter users by username with pattern matching:**
 ```graphql
 filter: {

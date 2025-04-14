@@ -196,3 +196,4 @@ Use the following launch config:
 - [ ] Unit testing
 - [ ] Mutations for selected domains
 - [ ] Caching and persisted queries
+

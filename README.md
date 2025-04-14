@@ -8,7 +8,7 @@ TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise
 - 🔍 Advanced Hasura-style filtering
 - 🌊 Streaming pagination for efficient retrieval of pages
 - 🔐 TFC token-based authentication
-- 🧩 Modular architecture with domain-driven separation
+- ⏳ Rate limit protection with exponential backoffs
 - ⚙️ Apollo Server 4
 - 🧪 TypeScript-first codebase with strong typings
 
@@ -32,7 +32,7 @@ npm install
 Ensure the runtime enviornment has the proper values 
 
 ```env
-TFC_TOKEN=<your-tfc/e-token>             # REQUIRED
+TFC_TOKEN=<your-tfc/e-token>           # REQUIRED
 TFE_BASE_URL=https://app.terraform.io  # optional, defaults to TFC
 GRAPHQL_BATCH_SIZE=10                  # optional, default: 10
 TFC_PAGE_SIZE=100                      # optional, max: 100
@@ -62,18 +62,18 @@ src/
   index.ts              # Entry point
 ```
 
-Each domain folder typically contains:
-
-- `schema.graphql` – GraphQL schema for that domain
-- `resolvers.ts` – Resolver logic
-- `types.ts` – TypeScript types and domain models
-- `dataSource.ts` – REST API integration layer
+| File            | Description                                |
+|------------------|--------------------------------------------|
+| `schema.ts`      | GraphQL schema for that domain.  Uses graphql-tag syntax in gql blocks             |
+| `resolvers.ts`   | Resolver logic                             |
+| `types.ts`       | TypeScript types and domain models         |
+| `dataSource.ts`  | REST API integration layer                 |
 
 ## Usage
 
 ### Example Query
 
-"Get me all the runs for the prod workspace or any locked runs
+"Get me all the runs for the prod workspace or runs from any locked workspace
 
 ```graphql
 query Workspaces($orgName: String!) {
@@ -170,7 +170,7 @@ organization(name: "team-rts") {
 ### Compile
 
 ```bash
-npm run compile
+npm start
 ```
 
 ### Debug with VSCode
@@ -190,12 +190,9 @@ Use the following launch config:
 
 ## Roadmap
 
-- [x] Pagination and streaming batch fetching
-- [x] Full nested resolver support
-- [x] Hasura-style filtering    
+- [✅] Pagination and streaming batch fetching
+- [✅] Full nested resolver support
+- [✅] Hasura-style filtering   
+- [ ] Unit testing
 - [ ] Mutations for selected domains
 - [ ] Caching and persisted queries
-
-## License
-
-MIT

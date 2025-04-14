@@ -192,7 +192,7 @@ Use the following launch config:
 
 - [x] Pagination and streaming batch fetching
 - [x] Full nested resolver support
-- [x] Hasura-style filtering
+- [x] Hasura-style filtering    
 - [ ] Mutations for selected domains
 - [ ] Caching and persisted queries
 

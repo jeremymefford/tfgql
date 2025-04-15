@@ -1,6 +1,6 @@
 import { Context } from '../server/context';
 import { Team, TeamFilter } from './types';
-import { fetchResources } from '../common/batchResourceFetch';
+import { fetchResources } from '../common/fetchResources';
 import { User, UserFilter } from '../users/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 

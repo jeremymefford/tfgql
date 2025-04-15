@@ -4,7 +4,7 @@ import { Workspace, WorkspaceFilter } from '../workspaces/types';
 import { Team, TeamFilter } from '../teams/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { User, UserFilter } from '../users/types';
-import { fetchResources } from '../common/batchResourceFetch';
+import { fetchResources } from '../common/fetchResources';
 
 export const resolvers = {
   Query: {

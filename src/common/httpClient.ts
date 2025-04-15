@@ -2,10 +2,6 @@ import axios, { AxiosInstance } from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import { applicationConfiguration } from './conf';
 
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export const axiosClient: AxiosInstance = axios.create({
   baseURL: applicationConfiguration.tfeBaseUrl,
   headers: {
@@ -25,10 +21,13 @@ axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
       const maxDelay = 60000; 
       const backoff = Math.min(Math.pow(2, config._retryCount) * baseDelay + Math.random() * 1000, maxDelay);
 
-      // console.debug(`Rate limited (429). Retry attempt #${config._retryCount} in ${Math.round(backoff)}ms`);
+      console.debug(`Rate limited (429). Retry attempt #${config._retryCount} in ${Math.round(backoff)}ms`);
 
-      await sleep(backoff);
-      return axiosClient(config);
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(axiosClient(config));
+        }, backoff);
+      });
     }
   }
 

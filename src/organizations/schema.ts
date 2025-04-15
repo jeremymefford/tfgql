@@ -29,6 +29,7 @@ const organizationSchema = gql`
     permissions: OrganizationPermissions!
     workspaces(filter: WorkspaceFilter): [Workspace!]
     teams(filter: TeamFilter): [Team!]
+    users(filter: UserFilter): [User!]
   }
 
   type OrganizationPermissions {

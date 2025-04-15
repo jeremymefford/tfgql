@@ -1,6 +1,6 @@
 import { Context } from '../server/context';
 import { Team, TeamFilter } from './types';
-import { batchResourceFetch } from '../common/batchResourceFetch';
+import { fetchResources } from '../common/batchResourceFetch';
 import { User, UserFilter } from '../users/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 
@@ -22,8 +22,10 @@ export const resolvers = {
     },
     Team: {
         users: async (team: Team, { filter }: { filter?: UserFilter }, { dataSources }: Context): Promise<User[]> => {
-            const users = await batchResourceFetch<string, User, UserFilter>(team.userIds, id => dataSources.usersAPI.getUser(id), filter);
-            return users;
+            return fetchResources<string, User, UserFilter>(
+                team.userIds, 
+                id => dataSources.usersAPI.getUser(id), 
+                filter);
         },
         organization: async (team: Team, _: unknown, { dataSources }: Context) => {
             const organization = await dataSources.organizationsAPI.getOrganization(team.organizationId);

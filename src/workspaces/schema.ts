@@ -137,6 +137,7 @@ const workspaceSchema = gql`
   extend type Query {
     workspaces(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
     workspace(id: ID!): Workspace
+    workspaceByName(orgName: String!, workspaceName: String!): Workspace
   }
 `;
 export default workspaceSchema;

@@ -2,6 +2,8 @@
 
 TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise (TFE) and HCP Terraform (TFC) REST API. It enables clients to query TFE data using a flexible and powerful GraphQL schema, with support for filtering, nested relationships, pagination, rate-limiting, and request batching and management.
 
+https://developer.hashicorp.com/terraform/enterprise/api-docs/changelog
+
 ## Features
 
 - 🚀 GraphQL interface over the TFE REST API

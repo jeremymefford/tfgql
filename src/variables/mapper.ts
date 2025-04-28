@@ -13,7 +13,7 @@ export const variablesMapper: DomainMapper<VariableResource, Variable> = {
             description: resource.attributes.description,
             createdAt: resource.attributes['created-at'],
             versionId: resource.attributes['version-id'],
-            workspaceId: resource.attributes.relationships.workspace?.data?.id,
+            workspaceId: resource.relationships?.workspace?.data?.id,
         };
     }
 };

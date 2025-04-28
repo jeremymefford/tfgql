@@ -10,7 +10,6 @@ export interface VariableAttributes {
     description: string;
     'created-at': string;
     'version-id': string;
-    relationships: VariableRelationships;
 }
 
 export interface VariableRelationships {
@@ -19,7 +18,7 @@ export interface VariableRelationships {
     };
 }
 
-export type VariableResource = ResourceObject<VariableAttributes>;
+export type VariableResource = ResourceObject<VariableAttributes> & { relationships?: VariableRelationships };
 export type VariableResponse = SingleResponse<VariableResource>;
 export type VariableListResponse = ListResponse<VariableResource>;
 
@@ -33,7 +32,7 @@ export interface Variable {
     description: string;
     createdAt: string;
     versionId: string;
-    workspaceId?: string; // Added workspaceId to reflect its relationship
+    workspaceId?: string; 
 }
 
 export interface VariableFilter extends WhereClause<Variable> {

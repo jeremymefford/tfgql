@@ -24,4 +24,9 @@ export class WorkspacesAPI {
     const res = await axiosClient.get<WorkspaceResponse>(`/workspaces/${id}`);
     return workspaceMapper.map(res.data.data);
   }
+
+  async getWorkspaceByName(orgName: string, workspaceName: string): Promise<Workspace> {
+    const res = await axiosClient.get<WorkspaceResponse>(`/organizations/${orgName}/workspaces/${workspaceName}`);
+    return workspaceMapper.map(res.data.data);
+  }
 }

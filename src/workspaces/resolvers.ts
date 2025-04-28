@@ -11,10 +11,15 @@ export const resolvers = {
     workspaces: (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, { dataSources }: Context): Promise<Promise<Workspace>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.workspacesAPI.listWorkspaces(orgName, filter));
     },
+    workspaceByName: async (_: unknown, { orgName, workspaceName }: { orgName: string, workspaceName: string }, { dataSources }: Context): Promise<Workspace | null> => {
+      const workspace = await dataSources.workspacesAPI.getWorkspaceByName(orgName, workspaceName);
+      if (!workspace) return null;
+      return workspace;
+    },
     workspace: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<Workspace | null> => {
-      const wsResource = await dataSources.workspacesAPI.getWorkspace(id);
-      if (!wsResource) return null;
-      return wsResource;
+      const workspace = await dataSources.workspacesAPI.getWorkspace(id);
+      if (!workspace) return null;
+      return workspace;
     }
   },
   Workspace: {

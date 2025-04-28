@@ -4,7 +4,7 @@ import { TeamResponse, Team, TeamFilter, TeamPermissionsFilter, TeamOrganization
 import { teamMapper } from './mapper';
 
 export class TeamsAPI {
-    async *listTeams(organization: string, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
+    async *listTeams(organization: string, filter?: TeamFilter): AsyncGenerator<Team[]> {
         yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
             `/organizations/${organization}/teams`,
             teamMapper,
@@ -13,7 +13,7 @@ export class TeamsAPI {
         );
     }
 
-    async *listTeamsByName(organization: string, nameFilter: Set<string>, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
+    async *listTeamsByName(organization: string, nameFilter: Set<string>, filter?: TeamFilter): AsyncGenerator<Team[]> {
         const nameFilterString = Array.from(nameFilter).join(',');
         const params = { 'filter[name]': nameFilterString };
         yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
@@ -24,7 +24,7 @@ export class TeamsAPI {
         );
     }
 
-    async *listTeamsByQuery(organization: string, query: string, filter?: TeamFilter): AsyncGenerator<Team[], void, unknown> {
+    async *listTeamsByQuery(organization: string, query: string, filter?: TeamFilter): AsyncGenerator<Team[]> {
         yield* streamPages<Team, { permissions: TeamPermissionsFilter; organizationAccess: TeamOrganizationAccessFilter }>(
             `/organizations/${organization}/teams`,
             teamMapper,

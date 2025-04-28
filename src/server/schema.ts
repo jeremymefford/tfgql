@@ -8,6 +8,9 @@ import { resolvers as usersResolvers } from '../users/resolvers';
 import { resolvers as runsResolvers } from '../runs/resolvers';
 import { resolvers as teamsResolvers } from '../teams/resolver';
 import { resolvers as configurationVersionResolvers } from '../configuration-versions/resolvers';
+import { resolvers as variableSetResolvers } from '../variable-sets/resolvers';
+import { resolvers as projectsResolvers } from '../projects/resolvers';
+import { resolvers as variableResolvers } from '../variables/resolvers';
 import configurationVersionSchema from '../configuration-versions/schema';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
@@ -15,6 +18,9 @@ import userSchema from '../users/schema';
 import runSchema from '../runs/schema';
 import teamSchema from '../teams/schema';
 import filterSchema from '../common/filtering/schema';
+import variableSetSchema from '../variable-sets/schema';
+import variableSchema from '../variables/schema';
+import projectsSchema from '../projects/schema';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -44,7 +50,10 @@ export const typeDefs = [
   organizationSchema,
   workspaceSchema,
   runSchema,
-  configurationVersionSchema
+  configurationVersionSchema,
+  variableSetSchema,
+  variableSchema,
+  projectsSchema
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -56,7 +65,10 @@ export const resolvers = {
     ...organizationsResolvers.Query,
     ...workspacesResolvers.Query,
     ...runsResolvers.Query,
-    ...configurationVersionResolvers.Query
+    ...configurationVersionResolvers.Query,
+    ...variableSetResolvers.Query,
+    ...variableResolvers.Query,
+    ...projectsResolvers.Query
   },
   Organization: {
     ...organizationsResolvers.Organization
@@ -69,5 +81,11 @@ export const resolvers = {
   },
   Run: {
     ...runsResolvers.Run
-  }
+  },
+  VariableSet: {
+    ...variableSetResolvers.VariableSet
+  },
+  // Projects: {
+  //   ...projectsResolvers.
+  // }
 };

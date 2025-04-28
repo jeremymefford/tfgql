@@ -49,6 +49,7 @@ const workspaceSchema = gql`
     organization: Organization
     runs(filter: RunFilter): [Run!]!
     configurationVersions(filter: ConfigurationVersionFilter): [ConfigurationVersion!]!
+    variables(filter: VariableFilter): [Variable!]!
   }
 
   type WorkspaceActions {

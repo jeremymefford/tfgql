@@ -4,7 +4,7 @@ import { OrganizationResponse, Organization } from './types';
 import { organizationMapper } from './mapper';
 
 export class OrganizationsAPI {
-  async *listOrganizations(): AsyncGenerator<Organization[], void, unknown> {
+  async *listOrganizations(): AsyncGenerator<Organization[]> {
     yield* streamPages<Organization>(
       '/organizations',
       organizationMapper

@@ -4,6 +4,7 @@ import { Organization } from '../organizations/types';
 import { Run, RunFilter } from '../runs/types';
 import { ConfigurationVersion, ConfigurationVersionFilter } from '../configuration-versions/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { Variable, VariableFilter } from '../variables/types';
 
 export const resolvers = {
   Query: {
@@ -28,6 +29,10 @@ export const resolvers = {
     },
     configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, { dataSources }: Context): Promise<Promise<ConfigurationVersion>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter));
+    },
+    variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
+      console.log(`fetching variables for workspace ${workspace.id}`);
+      return dataSources.variablesAPI.getVariablesForWorkspace(workspace.id, filter);
     }
   }
 };

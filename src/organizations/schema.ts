@@ -30,6 +30,7 @@ const organizationSchema = gql`
     workspaces(filter: WorkspaceFilter): [Workspace!]
     teams(filter: TeamFilter): [Team!]
     users(filter: UserFilter): [User!]
+    variableSets(filter: VariableSetFilter): [VariableSet!]
   }
 
   type OrganizationPermissions {

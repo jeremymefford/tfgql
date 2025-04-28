@@ -15,7 +15,7 @@ export class ConfigurationVersionsAPI {
     async *listConfigurationVersions(
         workspaceId: string,
         filter?: ConfigurationVersionFilter
-    ): AsyncGenerator<ConfigurationVersion[], void, unknown> {
+    ): AsyncGenerator<ConfigurationVersion[]> {
         console.log("fetching configuration versions for workspace", workspaceId);
         yield* streamPages<ConfigurationVersion, {
             statusTimestamps: ConfigurationVersionFilter['statusTimestamps'];

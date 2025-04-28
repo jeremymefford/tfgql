@@ -5,6 +5,7 @@ import { Team, TeamFilter } from '../teams/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { User, UserFilter } from '../users/types';
 import { fetchResources } from '../common/fetchResources';
+import { VariableSet, VariableSetFilter } from '../variable-sets/types';
 
 export const resolvers = {
   Query: {
@@ -22,6 +23,9 @@ export const resolvers = {
     },
     teams: async (org: Organization, { filter }: { filter?: TeamFilter }, { dataSources }: Context): Promise<Promise<Team>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeams(org.name, filter));
+    },
+    variableSets: async (org: Organization, { filter }: { filter?: VariableSetFilter }, { dataSources }: Context): Promise<Promise<VariableSet>[]> => {
+      return gatherAsyncGeneratorPromises(dataSources.variableSetsAPI.getOrgsVariableSets(org.name, filter));
     },
     users: async (org: Organization, { filter }: { filter?: UserFilter }, { dataSources }: Context): Promise<User[]> => {
       console.log("fetching teams");

@@ -7,6 +7,7 @@ import { ConfigurationVersionsAPI } from '../configuration-versions/dataSource';
 import { VariableSetsAPI } from '../variable-sets/dataSource';
 import { ProjectsAPI } from '../projects/dataSource';
 import { VariablesAPI } from '../variables/dataSource';
+import { RequestCache } from '../common/requestCache';
 
 /** GraphQL context type */
 export interface Context {
@@ -21,12 +22,15 @@ export interface Context {
     projectsAPI: ProjectsAPI;
     variablesAPI: VariablesAPI;
   };
+  requestCache: RequestCache; 
 }
 
 /**
  * Build the context for each GraphQL request, including data source instances.
  */
 export async function buildContext(): Promise<Context> {
+  const requestCache = new RequestCache();
+  
   return {
     dataSources: {
       usersAPI: new UsersAPI(),
@@ -38,6 +42,7 @@ export async function buildContext(): Promise<Context> {
       variableSetsAPI: new VariableSetsAPI(),
       projectsAPI: new ProjectsAPI(),
       variablesAPI: new VariablesAPI(),
-    }
+    },
+    requestCache
   };
 }

@@ -48,11 +48,14 @@ export async function* streamResources<T, R, RFilter>(
 
 export async function fetchResources<T, R, RFilter>(
   resources: Iterable<T>,
-  operation: (resource: T) => Promise<R>,
+  operation: (resource: T) => Promise<R | null>,
   filter?: WhereClause<R, RFilter>
 ): Promise<R[]> {
   const results: R[] = [];
   for await (const item of streamResources(resources, operation, filter)) {
+    if (item === null) {
+      continue;
+    }
     results.push(item);
   }
   return results;

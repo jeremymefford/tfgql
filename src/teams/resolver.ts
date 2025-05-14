@@ -21,10 +21,10 @@ export const resolvers = {
         }
     },
     Team: {
-        users: async (team: Team, { filter }: { filter?: UserFilter }, { dataSources }: Context): Promise<User[]> => {
+        users: async (team: Team, { filter }: { filter?: UserFilter }, ctx: Context): Promise<User[]> => {
             return fetchResources<string, User, UserFilter>(
                 team.userIds, 
-                id => dataSources.usersAPI.getUser(id), 
+                id => ctx.dataSources.usersAPI.getUser(id, ctx.requestCache), 
                 filter);
         },
         organization: async (team: Team, _: unknown, { dataSources }: Context) => {

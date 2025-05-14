@@ -5,6 +5,9 @@ import { Run, RunFilter } from '../runs/types';
 import { ConfigurationVersion, ConfigurationVersionFilter } from '../configuration-versions/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { Variable, VariableFilter } from '../variables/types';
+import { fetchResources } from '../common/fetchResources';
+import { applicationConfiguration } from '../common/conf';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
   Query: {
@@ -20,6 +23,22 @@ export const resolvers = {
       const workspace = await dataSources.workspacesAPI.getWorkspace(id);
       if (!workspace) return null;
       return workspace;
+    },
+    workspacesWithNoResources: async (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, { dataSources }: Context): Promise<Workspace[]> => {
+      const workspaceGenerator = dataSources.workspacesAPI.listWorkspaces(orgName, filter);
+      const workspacesWithNoResources: Workspace[] = [];
+      for await (const workspacePage of workspaceGenerator) {
+        await parallelizeBounded(workspacePage, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+          const resourcesGenerator = dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined, 1);
+          for await (const resources of resourcesGenerator) {
+            if (resources.length > 0) {
+              break;
+            }
+            workspacesWithNoResources.push(workspace);
+          }
+        });
+      }
+      return workspacesWithNoResources;
     }
   },
   Workspace: {

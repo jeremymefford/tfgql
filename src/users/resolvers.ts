@@ -3,8 +3,8 @@ import { User } from './types';
 
 export const resolvers = {
   Query: {
-    user: async (_: unknown, { id }: { id: string }, { dataSources, requestCache }: Context): Promise<User | null> => {
-      const userResource = await dataSources.usersAPI.getUser(id, requestCache);
+    user: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<User | null> => {
+      const userResource = await dataSources.usersAPI.getUser(id);
       return userResource;
     },
     me: async (_: unknown, __: unknown, { dataSources }: Context): Promise<User> => {

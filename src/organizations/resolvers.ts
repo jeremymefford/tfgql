@@ -42,7 +42,7 @@ export const resolvers = {
 
       return fetchResources<string, User, UserFilter>(
         Array.from(userIdSet),
-        id => dataSources.usersAPI.getUser(id, requestCache),
+        id => dataSources.usersAPI.getUser(id),
         filter
       );
     }

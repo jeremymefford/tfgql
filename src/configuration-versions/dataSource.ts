@@ -4,6 +4,7 @@ import { configurationVersionMapper } from './mapper';
 import { ConfigurationVersionResponse, ConfigurationVersion, ConfigurationVersionFilter } from './types';
 
 export class ConfigurationVersionsAPI {
+
     async getConfigurationVersion(id: string): Promise<ConfigurationVersion> {
         const res = await axiosClient.get<ConfigurationVersionResponse>(`/configuration-versions/${id}`);
         if (!res || !res.data || !res.data.data) {
@@ -16,10 +17,7 @@ export class ConfigurationVersionsAPI {
         workspaceId: string,
         filter?: ConfigurationVersionFilter
     ): AsyncGenerator<ConfigurationVersion[]> {
-        console.log("fetching configuration versions for workspace", workspaceId);
-        yield* streamPages<ConfigurationVersion, {
-            statusTimestamps: ConfigurationVersionFilter['statusTimestamps'];
-        }>(
+        yield* streamPages<ConfigurationVersion, ConfigurationVersionFilter>(
             `/workspaces/${workspaceId}/configuration-versions`,
             configurationVersionMapper,
             {},

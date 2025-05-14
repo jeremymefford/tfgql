@@ -8,6 +8,7 @@ import { VariableSetsAPI } from '../variable-sets/dataSource';
 import { ProjectsAPI } from '../projects/dataSource';
 import { VariablesAPI } from '../variables/dataSource';
 import { RequestCache } from '../common/requestCache';
+import { WorkspaceResourcesAPI } from '../workspace-resources/dataSource';
 
 /** GraphQL context type */
 export interface Context {
@@ -21,6 +22,7 @@ export interface Context {
     variableSetsAPI: VariableSetsAPI;
     projectsAPI: ProjectsAPI;
     variablesAPI: VariablesAPI;
+    workspaceResourcesAPI: WorkspaceResourcesAPI;
   };
   requestCache: RequestCache; 
 }
@@ -33,7 +35,7 @@ export async function buildContext(): Promise<Context> {
   
   return {
     dataSources: {
-      usersAPI: new UsersAPI(),
+      usersAPI: new UsersAPI(requestCache),
       organizationsAPI: new OrganizationsAPI(),
       workspacesAPI: new WorkspacesAPI(),
       runsAPI: new RunsAPI(),
@@ -42,6 +44,7 @@ export async function buildContext(): Promise<Context> {
       variableSetsAPI: new VariableSetsAPI(),
       projectsAPI: new ProjectsAPI(),
       variablesAPI: new VariablesAPI(),
+      workspaceResourcesAPI: new WorkspaceResourcesAPI()
     },
     requestCache
   };

@@ -24,7 +24,7 @@ export const resolvers = {
         users: async (team: Team, { filter }: { filter?: UserFilter }, ctx: Context): Promise<User[]> => {
             return fetchResources<string, User, UserFilter>(
                 team.userIds, 
-                id => ctx.dataSources.usersAPI.getUser(id, ctx.requestCache), 
+                id => ctx.dataSources.usersAPI.getUser(id), 
                 filter);
         },
         organization: async (team: Team, _: unknown, { dataSources }: Context) => {

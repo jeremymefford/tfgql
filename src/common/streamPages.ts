@@ -12,7 +12,7 @@ export async function* streamPages<T, TFilter = {}>(
   params: Record<string, any> = {},
   filter?: WhereClause<T, TFilter>
 ): AsyncGenerator<T[], void, unknown> {
-  const baseParams = { ...(params || {}), 'page[size]': applicationConfiguration.tfcPageSize};
+  const baseParams = { 'page[size]': applicationConfiguration.tfcPageSize, ...(params || {}) };
 
   const firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   const pagination = firstRes.data.meta?.pagination;

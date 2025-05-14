@@ -15,15 +15,21 @@ export class RequestCache {
             console.debug(`Cache hit for key: ${key}`);
             return this.cache.get(key) as T;
         }
-        const valuePromise = valueFactory(); // start fetching the value 
-        if (this.cache.size >= this.maxSize) { // check cache size and remove the oldest entry if necessary
+        const valuePromise = valueFactory(); 
+        if (this.cache.size >= this.maxSize) { 
             const firstKey = this.cache.keys().next().value;
             if (firstKey) {
                 this.cache.delete(firstKey);
             }
         }
-        const value = await valuePromise;
-        this.cache.set(key, value);
-        return value;
+        try {
+            const value = await valuePromise;
+            this.cache.set(key, value);
+            return value;
+        } catch (error) {
+            console.error(`Error while setting cache for key: ${key}`, error);
+            throw error; 
+        }
     }
+
 }

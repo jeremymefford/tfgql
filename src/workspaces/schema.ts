@@ -138,6 +138,7 @@ const workspaceSchema = gql`
     workspaces(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
     workspace(id: ID!): Workspace
     workspaceByName(orgName: String!, workspaceName: String!): Workspace
+    workspacesWithNoResources(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
   }
 `;
 export default workspaceSchema;

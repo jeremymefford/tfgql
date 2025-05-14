@@ -6,11 +6,12 @@ import { resolvers as organizationsResolvers } from '../organizations/resolvers'
 import { resolvers as workspacesResolvers } from '../workspaces/resolvers';
 import { resolvers as usersResolvers } from '../users/resolvers';
 import { resolvers as runsResolvers } from '../runs/resolvers';
-import { resolvers as teamsResolvers } from '../teams/resolver';
+import { resolvers as teamsResolvers } from '../teams/resolvers';
 import { resolvers as configurationVersionResolvers } from '../configuration-versions/resolvers';
 import { resolvers as variableSetResolvers } from '../variable-sets/resolvers';
 import { resolvers as projectsResolvers } from '../projects/resolvers';
 import { resolvers as variableResolvers } from '../variables/resolvers';
+import { resolvers as workspaceResourceResolvers } from '../workspace-resources/resolvers';
 import configurationVersionSchema from '../configuration-versions/schema';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
@@ -21,6 +22,7 @@ import filterSchema from '../common/filtering/schema';
 import variableSetSchema from '../variable-sets/schema';
 import variableSchema from '../variables/schema';
 import projectsSchema from '../projects/schema';
+import workspaceResourcesSchema from '../workspace-resources/schema';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -53,7 +55,8 @@ export const typeDefs = [
   configurationVersionSchema,
   variableSetSchema,
   variableSchema,
-  projectsSchema
+  projectsSchema,
+  workspaceResourcesSchema
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -68,13 +71,15 @@ export const resolvers = {
     ...configurationVersionResolvers.Query,
     ...variableSetResolvers.Query,
     ...variableResolvers.Query,
-    ...projectsResolvers.Query
+    ...projectsResolvers.Query,
+    ...workspaceResourceResolvers.Query
   },
   Organization: {
     ...organizationsResolvers.Organization
   },
   Workspace: {
-    ...workspacesResolvers.Workspace
+    ...workspacesResolvers.Workspace,
+    ...workspaceResourceResolvers.Workspace
   },
   Team: {
     ...teamsResolvers.Team
@@ -85,7 +90,7 @@ export const resolvers = {
   VariableSet: {
     ...variableSetResolvers.VariableSet
   },
-  // Projects: {
-  //   ...projectsResolvers.
-  // }
+  WorkspaceResource: {
+    ...workspaceResourceResolvers.WorkspaceResource
+  }
 };

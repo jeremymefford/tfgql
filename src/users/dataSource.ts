@@ -4,9 +4,14 @@ import { userMapper } from './mapper';
 import { User, UserResponse } from './types';
 
 export class UsersAPI {
+  private requestCache: RequestCache;
 
-  async getUser(userId: string, cache: RequestCache): Promise<User | null> {
-    return cache.getOrSet<User | null>('user', userId, async () => {
+  constructor(requestCache: RequestCache) {
+    this.requestCache = requestCache;
+  }
+
+  async getUser(userId: string): Promise<User | null> {
+    return this.requestCache.getOrSet<User | null>('user', userId, async () => {
       return axiosClient.get<UserResponse>(`/users/${userId}`).then(res => {
         return userMapper.map(res.data.data);
       }).catch(error => {

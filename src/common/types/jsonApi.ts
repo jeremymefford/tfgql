@@ -6,7 +6,6 @@ export interface ResourceObject<Attributes> {
   id: string;
   type: string;
   attributes: Attributes;
-  // Note: relationships can be added in extending interfaces if needed
 }
 
 export interface ResourceRef {

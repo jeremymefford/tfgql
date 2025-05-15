@@ -30,12 +30,11 @@ export const resolvers = {
       for await (const workspacePage of workspaceGenerator) {
         await parallelizeBounded(workspacePage, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
           const resourcesGenerator = dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined, 1);
-          for await (const resources of resourcesGenerator) {
-            if (resources.length > 0) {
-              break;
-            }
+          const resources = await resourcesGenerator.next();
+          if (!resources.value || resources.value.length === 0) {
             workspacesWithNoResources.push(workspace);
           }
+          resourcesGenerator.return(undefined);
         });
       }
       return workspacesWithNoResources;

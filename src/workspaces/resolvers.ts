@@ -5,7 +5,6 @@ import { Run, RunFilter } from '../runs/types';
 import { ConfigurationVersion, ConfigurationVersionFilter } from '../configuration-versions/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { Variable, VariableFilter } from '../variables/types';
-import { fetchResources } from '../common/fetchResources';
 import { applicationConfiguration } from '../common/conf';
 import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 

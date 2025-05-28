@@ -13,6 +13,8 @@ const configurationVersionSchema = gql`
     statusTimestamps: ConfigurationVersionStatusTimestamps
     changedFiles: [String!]!
     ingressAttributes: IngressAttributes
+    size: Int
+    downloadUrl: String
   }
 
   type ConfigurationVersionStatusTimestamps {
@@ -49,12 +51,14 @@ const configurationVersionSchema = gql`
     speculative: BooleanComparisonExp
     status: StringComparisonExp
     changedFiles: StringComparisonExp
+    size: IntComparisonExp
     statusTimestamps: ConfigurationVersionStatusTimestampsFilter
   }
 
   extend type Query {
     configurationVersion(id: ID!): ConfigurationVersion
     configurationVersions(workspaceId: ID!, filter: ConfigurationVersionFilter): [ConfigurationVersion]!
+    # configurationVersionsLargerThan(organizationName: String!, bytes: Int!): [ConfigurationVersion]!
   }
 `;
 

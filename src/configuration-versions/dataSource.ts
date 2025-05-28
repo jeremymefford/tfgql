@@ -13,6 +13,35 @@ export class ConfigurationVersionsAPI {
         return configurationVersionMapper.map(res.data.data);
     }
 
+async getConfigurationVersionSize(downloadUrl: string): Promise<number | null> {
+    if (!downloadUrl) return null;
+
+    try {
+        const headResponse = await axiosClient.head(downloadUrl);
+        const contentLengthHeader = headResponse.headers['content-length'];
+        const contentLength = parseInt(contentLengthHeader, 10);
+
+        if (!isNaN(contentLength) && contentLength > 0) {
+            return contentLength;
+        }
+
+        // Fallback: Stream and count manually
+        const getResponse = await axiosClient.get(downloadUrl, { responseType: 'stream' });
+        let totalBytes = 0;
+
+        return await new Promise<number>((resolve, reject) => {
+            getResponse.data.on('data', (chunk: Buffer) => {
+                totalBytes += chunk.length;
+            });
+            getResponse.data.on('end', () => resolve(totalBytes));
+            getResponse.data.on('error', reject);
+        });
+    } catch (error) {
+        console.error(`Failed to fetch size for download URL: ${downloadUrl}`, error);
+        return null;
+    }
+}
+
     async *listConfigurationVersions(
         workspaceId: string,
         filter?: ConfigurationVersionFilter

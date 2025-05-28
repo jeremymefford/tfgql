@@ -28,6 +28,9 @@ export interface ConfigurationVersionRelationships {
 
 export type ConfigurationVersionResource = ResourceObject<ConfigurationVersionAttributes> & {
     relationships?: ConfigurationVersionRelationships;
+    links?: {
+        download?: string;
+    }
 };
 
 export type ConfigurationVersionResponse = SingleResponse<ConfigurationVersionResource>;
@@ -47,6 +50,8 @@ export interface ConfigurationVersion {
         uploadedAt?: Date;
     };
     changedFiles: string[];
+    size?: number | null;
+    downloadUrl?: string | null;
     ingressAttributesId?: string;
 }
 

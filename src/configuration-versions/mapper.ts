@@ -18,7 +18,10 @@ export const configurationVersionMapper: DomainMapper<ConfigurationVersionResour
                 uploadedAt: resource.attributes['status-timestamps']?.['uploaded-at']
             },
             changedFiles: resource.attributes['changed-files'],
-            ingressAttributesId: resource.relationships?.['ingress-attributes']?.data?.id
+            ingressAttributesId: resource.relationships?.['ingress-attributes']?.data?.id,
+            downloadUrl: resource.links?.download
+                ? resource.links.download.replace(/^\/api\/v2/, '')
+                : undefined,
         };
     }
 }

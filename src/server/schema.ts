@@ -23,6 +23,7 @@ import variableSetSchema from '../variable-sets/schema';
 import variableSchema from '../variables/schema';
 import projectsSchema from '../projects/schema';
 import workspaceResourcesSchema from '../workspace-resources/schema';
+import { Config } from '../common/conf';
 
 /** Utility to load a schema file as a GraphQL string */
 const loadSchema = (relativePath: string): string => {
@@ -92,5 +93,8 @@ export const resolvers = {
   },
   WorkspaceResource: {
     ...workspaceResourceResolvers.WorkspaceResource
-  }
+  },
+  ConfigurationVersion: {
+    ...configurationVersionResolvers.ConfigurationVersion
+  },
 };

@@ -51,14 +51,14 @@ const configurationVersionSchema = gql`
     speculative: BooleanComparisonExp
     status: StringComparisonExp
     changedFiles: StringComparisonExp
-    size: IntComparisonExp
+    # size cannot be filtered directly, but can be derived from the downloadUrl
     statusTimestamps: ConfigurationVersionStatusTimestampsFilter
   }
 
   extend type Query {
     configurationVersion(id: ID!): ConfigurationVersion
     configurationVersions(workspaceId: ID!, filter: ConfigurationVersionFilter): [ConfigurationVersion]!
-    # configurationVersionsLargerThan(organizationName: String!, bytes: Int!): [ConfigurationVersion]!
+    workspacesWithConfigurationVersionsLargerThan(organizationName: String!, bytes: Int!): [Workspace]!
   }
 `;
 

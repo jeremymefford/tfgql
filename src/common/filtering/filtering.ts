@@ -100,10 +100,10 @@ function evaluateNumber(value: number, filter: FieldComparisonExp): boolean {
     if ('_neq' in filter && value === filter._neq) return false;
     if ('_in' in filter && !(filter._in as number[])?.includes(value)) return false;
     if ('_nin' in filter && (filter._nin as number[])?.includes(value)) return false;
-    if ('_gt' in filter && value <= Number(filter._gt!)) return false;
-    if ('_gte' in filter && value < Number(filter._gte!)) return false;
-    if ('_lt' in filter && value >= Number(filter._lt!)) return false;
-    if ('_lte' in filter && value > Number(filter._lte!)) return false;
+    if ('_gt' in filter && (value === null || value === undefined || value <= Number(filter._gt))) return false;
+    if ('_gte' in filter && (value === null || value === undefined || value < Number(filter._gte))) return false;
+    if ('_lt' in filter && (value === null || value === undefined || value >= Number(filter._lt))) return false;
+    if ('_lte' in filter && (value === null || value === undefined || value > Number(filter._lte))) return false;
     return true;
 }
 

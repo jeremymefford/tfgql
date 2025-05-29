@@ -49,8 +49,8 @@ export const resolvers = {
     runs: async (workspace: Workspace, { filter }: { filter?: RunFilter }, { dataSources }: Context): Promise<Promise<Run>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.runsAPI.listRuns(workspace.id, filter));
     },
-    configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, { dataSources }: Context): Promise<Promise<ConfigurationVersion>[]> => {
-      return gatherAsyncGeneratorPromises(dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter));
+    configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, { dataSources }: Context): Promise<ConfigurationVersion[]> => {
+      return dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter);
     },
     variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
       console.log(`fetching variables for workspace ${workspace.id}`);

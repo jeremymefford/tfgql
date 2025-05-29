@@ -40,7 +40,7 @@ export async function buildContext(): Promise<Context> {
       workspacesAPI: new WorkspacesAPI(),
       runsAPI: new RunsAPI(),
       teamsAPI: new TeamsAPI(),
-      configurationVersionsAPI: new ConfigurationVersionsAPI(),
+      configurationVersionsAPI: new ConfigurationVersionsAPI(requestCache),
       variableSetsAPI: new VariableSetsAPI(),
       projectsAPI: new ProjectsAPI(),
       variablesAPI: new VariablesAPI(),

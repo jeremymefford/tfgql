@@ -31,14 +31,18 @@ npm install
 
 ### Environment Configuration
 
-Ensure the runtime enviornment has the proper values 
+Ensure the runtime environment has the following variables:
 
-```env
-TFC_TOKEN=<your-tfc/e-token>           # REQUIRED
-TFE_BASE_URL=https://app.terraform.io  # optional, defaults to TFC
-GRAPHQL_BATCH_SIZE=10                  # optional, default: 10
-TFC_PAGE_SIZE=100                      # optional, max: 100
-```
+### Environment Configuration
+
+| Variable                          | Description                                | Default                         | Required |
+|----------------------------------|--------------------------------------------|----------------------------------|----------|
+| `TFC_TOKEN`                      | API token for TFC/TFE                      | —                                | ✅       |
+| `TFE_BASE_URL`                   | Base URL for TFE API                      | `https://app.terraform.io`       | ❌       |
+| `TFCE_GRAPHQL_BATCH_SIZE`        | Max items per batch operation              | `10`                             | ❌       |
+| `TFCE_GRAPHQL_PAGE_SIZE`         | Max items per page when paginating         | `100` (max: 100)                 | ❌       |
+| `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` | Max retries after hitting rate limits | `20`                             | ❌       |
+| `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` | Max entries for request-level cache     | `5000`                           | ❌       |
 
 ### Run
 
@@ -189,14 +193,26 @@ Use the following launch config:
   "name": "Debug TFE GraphQL",
   "skipFiles": ["<node_internals>/**"],
   "program": "${workspaceFolder}/dist/index.js",
-  "preLaunchTask": "tsc: build - tsconfig.json"
+  "preLaunchTask": "tsc: build - tsconfig.json",
+  "env": {
+    "TFC_TOKEN": "<token>"
+  }
 }
 ```
 
-## Roadmap
 
-- [✅] Pagination and streaming batch fetching
-- [✅] Full nested resolver support
-- [✅] Hasura-style filtering   
-- [ ] Unit testing
-- [ ] Mutations for selected domains
+## Documentation
+
+This project uses [Docusaurus](https://docusaurus.io/) to host developer documentation.
+
+### Run Docs Locally
+
+To serve the documentation locally:
+
+```bash
+cd docs
+npm install
+npm run start
+```
+
+This will start a local dev server (typically on http://localhost:3000) where you can view and edit the documentation live.

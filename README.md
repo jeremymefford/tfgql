@@ -6,13 +6,33 @@ https://developer.hashicorp.com/terraform/enterprise/api-docs/changelog
 
 ## Features
 
-- 🚀 GraphQL interface over the TFE REST API
+- 🕸️ GraphQL interface over the TFE REST API
 - 🔍 Advanced Hasura-style filtering
 - 🌊 Streaming pagination for efficient retrieval of pages
 - 🔐 TFC token-based authentication
-- ⏳ Rate limit protection with exponential backoffs
-- 🛠️ Apollo Server 4
+- 🚦 Rate limit protection with exponential backoffs
+- 🚀 Apollo Server 4
 - 🧪 TypeScript-first codebase with strong typings
+
+## Documentation
+
+This README is generally kept up-to-date, the docs folder contains a lot more useful information
+and should be considered the primary place to author and consume docs.  It is currently not hosted
+so please build and view locally.
+
+This project uses [Docusaurus](https://docusaurus.io/) to host developer documentation.
+
+### Run Docs Locally
+
+To serve the documentation locally:
+
+```bash
+cd docs
+npm install
+npm run start
+```
+
+This will start a local dev server (typically on http://localhost:3000) where you can view and edit the documentation live.
 
 ## Getting Started
 
@@ -199,20 +219,3 @@ Use the following launch config:
   }
 }
 ```
-
-
-## Documentation
-
-This project uses [Docusaurus](https://docusaurus.io/) to host developer documentation.
-
-### Run Docs Locally
-
-To serve the documentation locally:
-
-```bash
-cd docs
-npm install
-npm run start
-```
-
-This will start a local dev server (typically on http://localhost:3000) where you can view and edit the documentation live.

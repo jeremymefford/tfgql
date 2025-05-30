@@ -12,7 +12,7 @@ export class RequestCache {
     async getOrSet<T>(entityType: string, id: string, valueFactory: () => Promise<T>): Promise<T> {
         const key = `${entityType}:${id}`;
         if (this.cache.has(key)) {
-            console.debug(`Cache hit for key: ${key}`);
+            // console.debug(`Cache hit for key: ${key}`);
             return this.cache.get(key) as T;
         }
         const valuePromise = valueFactory(); 

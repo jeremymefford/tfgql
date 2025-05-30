@@ -29,11 +29,11 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Parallelization Engine',
-    emoji: '⚡️',
+    title: 'Hasura style filtering',
+    emoji: '🔍',
     description: (
       <>
-        Built-in parallel processing for fast, efficient data fetching — safely bounded by configuration.
+        Implements Hasura-style filtering for complex queries, enabling powerful data retrieval.
       </>
     ),
   },
@@ -61,6 +61,33 @@ const FeatureList = [
     description: (
       <>
         Ships as a minimal Docker image with cross-architecture support — deployable anywhere in seconds.
+      </>
+    ),
+  },
+  {
+    title: 'Built on Apollo Server',
+    emoji: '🚀',
+    description: (
+      <>
+        Leverages the power of Apollo Server for robust GraphQL delivery
+      </>
+    ),
+  },
+  {
+    title: 'Parallel Fetching',
+    emoji: '⚡️',
+    description: (
+      <>
+        Built-in parallel processing for fast, efficient data fetching — safely bounded by configuration.
+      </>
+    ),
+  },
+  {
+    title: 'Schema Introspection & Autocompletion',
+    emoji: '🧠',
+    description: (
+      <>
+        Provides a fully introspectable GraphQL schema, enabling rich IDE support with autocompletion, inline docs, and type safety during query composition.
       </>
     ),
   }

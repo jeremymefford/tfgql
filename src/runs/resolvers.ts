@@ -1,9 +1,10 @@
 import { Context } from "../server/context";
 import { Workspace } from "../workspaces/types";
 import { Run } from "./types";
+import { Comment, CommentFilter } from "../comments/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
-import { ConfigurationVersionsAPI } from "../configuration-versions/dataSource";
-import { ConfigurationVersion } from "../configuration-versions/types";
+import { ConfigurationVersionsAPI } from "../configurationVersions/dataSource";
+import { ConfigurationVersion } from "../configurationVersions/types";
 
 export const resolvers = {
   Query: {
@@ -28,6 +29,15 @@ export const resolvers = {
       if (!configurationVersionId) return null;
       const configurationVersion = await context.dataSources.configurationVersionsAPI.getConfigurationVersion(configurationVersionId);
       return configurationVersion;
+    },
+    comments: async (
+      run: Run,
+      { filter }: { filter?: CommentFilter },
+      { dataSources }: Context
+    ): Promise<Promise<Comment>[]> => {
+      return gatherAsyncGeneratorPromises(
+        dataSources.commentsAPI.listComments(run.id, filter)
+      );
     }
   }
 };

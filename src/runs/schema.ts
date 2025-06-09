@@ -110,6 +110,11 @@ const runSchema = gql`
     runs(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
   }
+
+  extend type Run {
+    # List of comments associated with this run
+    comments(filter: CommentFilter): [Comment!]!
+  }
 `;
 
 export default runSchema;

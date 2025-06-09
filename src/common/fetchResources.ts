@@ -48,7 +48,7 @@ export async function* streamResources<T, R, RFilter>(
 
 export async function fetchResources<T, R, RFilter>(
   resources: Iterable<T>,
-  operation: (resource: T) => Promise<R | null>,
+  operation: (resource: T) => Promise<R | null> | Promise<R>,
   filter?: WhereClause<R, RFilter>
 ): Promise<R[]> {
   const results: R[] = [];

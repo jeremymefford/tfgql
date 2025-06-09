@@ -5,7 +5,11 @@ import { Team, TeamFilter } from '../teams/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { User, UserFilter } from '../users/types';
 import { fetchResources } from '../common/fetchResources';
-import { VariableSet, VariableSetFilter } from '../variable-sets/types';
+import { VariableSet, VariableSetFilter } from '../variableSets/types';
+import {
+  OrganizationMembership,
+  OrganizationMembershipFilter,
+} from '../organizationMemberships/types';
 
 export const resolvers = {
   Query: {
@@ -44,6 +48,18 @@ export const resolvers = {
         Array.from(userIdSet),
         id => dataSources.usersAPI.getUser(id),
         filter
+      );
+    },
+    memberships: async (
+      org: Organization,
+      { filter }: { filter?: OrganizationMembershipFilter },
+      { dataSources }: Context
+    ): Promise<Promise<OrganizationMembership>[]> => {
+      return gatherAsyncGeneratorPromises(
+        dataSources.organizationMembershipsAPI.listOrganizationMemberships(
+          org.name,
+          filter
+        )
       );
     }
   }

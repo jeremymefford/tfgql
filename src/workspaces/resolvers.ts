@@ -2,7 +2,7 @@ import { Context } from '../server/context';
 import { Workspace, WorkspaceFilter } from './types';
 import { Organization } from '../organizations/types';
 import { Run, RunFilter } from '../runs/types';
-import { ConfigurationVersion, ConfigurationVersionFilter } from '../configuration-versions/types';
+import { ConfigurationVersion, ConfigurationVersionFilter } from '../configurationVersions/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { Variable, VariableFilter } from '../variables/types';
 import { applicationConfiguration } from '../common/conf';

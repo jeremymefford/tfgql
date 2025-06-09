@@ -86,6 +86,11 @@ src/
   users/                # User schema, resolvers, and datasource
   teams/                # Team schema, resolvers, and datasource
   runs/                 # Run schema, resolvers, and datasource
+  configurationVersions/ # Configuration Version schema, resolvers, and datasource
+  variableSets/         # Variable Set schema, resolvers, and datasource
+  variables/            # Variable schema, resolvers, and datasource
+  projects/             # Project schema, resolvers, and datasource
+  workspaceResources/   # Workspace Resource schema, resolvers, and datasource
   server/               # Apollo server setup
   index.ts              # Entry point
 ```

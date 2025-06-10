@@ -1,12 +1,18 @@
-import { WhereClause } from '../common/filtering/types';
+import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
 
 export interface AgentTokenAttributes {
-  // TODO: define AgentToken attributes based on Terraform Cloud API
+  'created-at': string;
+  'last-used-at': string | null;
+  description: string;
+  token: string | null;
 }
 
 export interface AgentTokenRelationships {
   pool: {
+    data: ResourceRef;
+  };
+  'created-by': {
     data: ResourceRef;
   };
 }
@@ -21,7 +27,11 @@ export type AgentTokenListResponse = ListResponse<AgentTokenResource>;
 export interface AgentToken {
   id: string;
   poolId: string;
-  // TODO: define additional AgentToken domain model fields
+  createdAt: string;
+  lastUsedAt: string | null;
+  description: string;
+  token: string | null;
+  createdById: string;
 }
 
 export interface AgentTokenFilter extends WhereClause<AgentToken> {
@@ -29,5 +39,11 @@ export interface AgentTokenFilter extends WhereClause<AgentToken> {
   _or?: AgentTokenFilter[];
   _not?: AgentTokenFilter;
 
-  // TODO: add AgentToken filter fields
+  id?: StringComparisonExp;
+  poolId?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
+  lastUsedAt?: DateTimeComparisonExp;
+  description?: StringComparisonExp;
+  token?: StringComparisonExp;
+  createdById?: StringComparisonExp;
 }

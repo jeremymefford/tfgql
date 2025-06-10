@@ -175,4 +175,10 @@ export const resolvers = {
   ConfigurationVersion: {
     ...configurationVersionResolvers.ConfigurationVersion
   },
+  Project: {
+    ...projectsResolvers.Project
+  },
+  AgentPool: {
+    ...agentPoolsResolvers.AgentPool
+  },
 };

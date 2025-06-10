@@ -3,7 +3,11 @@ import { gql } from 'graphql-tag';
 const projectTeamAccessSchema = gql`
   type ProjectTeamAccess {
     id: ID!
-    # TODO: add ProjectTeamAccess fields based on Terraform Cloud API
+    access: String!
+    projectAccess: ProjectAccess!
+    workspaceAccess: WorkspaceAccess!
+    projectId: ID!
+    teamId: ID!
   }
 
   input ProjectTeamAccessFilter {
@@ -11,7 +15,27 @@ const projectTeamAccessSchema = gql`
     _or: [ProjectTeamAccessFilter!]
     _not: ProjectTeamAccessFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    access: StringComparisonExp
+    projectId: StringComparisonExp
+    teamId: StringComparisonExp
+  }
+
+  type ProjectAccess {
+    settings: String!
+    teams: String!
+  }
+
+  type WorkspaceAccess {
+    create: Boolean!
+    move: Boolean!
+    locking: Boolean!
+    delete: Boolean!
+    runs: String!
+    variables: String!
+    stateVersions: String!
+    sentinelMocks: String!
+    runTasks: Boolean!
   }
 
   extend type Query {

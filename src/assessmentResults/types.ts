@@ -1,13 +1,14 @@
-import { WhereClause } from '../common/filtering/types';
+import { WhereClause, StringComparisonExp, BooleanComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
 
 export interface AssessmentResultAttributes {
-  // TODO: define AssessmentResult attributes based on Terraform Cloud API
+  drifted: boolean;
+  succeeded: boolean;
+  'error-msg': string | null;
+  'created-at': string;
 }
 
-export interface AssessmentResultRelationships {
-  // TODO: define AssessmentResult relationships based on Terraform Cloud API
-}
+export interface AssessmentResultRelationships {}
 
 export type AssessmentResultResource = ResourceObject<AssessmentResultAttributes> & {
   relationships?: AssessmentResultRelationships;
@@ -18,7 +19,10 @@ export type AssessmentResultListResponse = ListResponse<AssessmentResultResource
 
 export interface AssessmentResult {
   id: string;
-  // TODO: define AssessmentResult domain model fields
+  drifted: boolean;
+  succeeded: boolean;
+  errorMessage: string | null;
+  createdAt: string;
 }
 
 export interface AssessmentResultFilter extends WhereClause<AssessmentResult> {
@@ -26,5 +30,9 @@ export interface AssessmentResultFilter extends WhereClause<AssessmentResult> {
   _or?: AssessmentResultFilter[];
   _not?: AssessmentResultFilter;
 
-  // TODO: add AssessmentResult filter fields
+  id?: StringComparisonExp;
+  drifted?: BooleanComparisonExp;
+  succeeded?: BooleanComparisonExp;
+  errorMessage?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
 }

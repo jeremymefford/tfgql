@@ -1,12 +1,32 @@
-import { WhereClause } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  IntComparisonExp,
+  DateTimeComparisonExp,
+} from '../common/filtering/types';
+import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
 
 export interface PolicyAttributes {
-  // TODO: define Policy attributes based on Terraform Cloud API
+  name: string;
+  description: string | null;
+  kind: string;
+  query?: string;
+  'enforcement-level': string;
+  enforce?: {
+    path: string;
+    mode: string;
+  }[];
+  'policy-set-count': number;
+  'updated-at': string | null;
 }
 
 export interface PolicyRelationships {
-  // TODO: define Policy relationships based on Terraform Cloud API
+  organization: {
+    data: ResourceRef;
+  };
+  'policy-sets': {
+    data: ResourceRef[];
+  };
 }
 
 export type PolicyResource = ResourceObject<PolicyAttributes> & {
@@ -18,7 +38,19 @@ export type PolicyListResponse = ListResponse<PolicyResource>;
 
 export interface Policy {
   id: string;
-  // TODO: define Policy domain model fields
+  name: string;
+  description: string | null;
+  kind: string;
+  query?: string;
+  enforcementLevel: string;
+  enforce?: {
+    path: string;
+    mode: string;
+  }[];
+  policySetCount: number;
+  updatedAt: string | null;
+  organizationId: string;
+  policySetIds: string[];
 }
 
 export interface PolicyFilter extends WhereClause<Policy> {
@@ -26,5 +58,14 @@ export interface PolicyFilter extends WhereClause<Policy> {
   _or?: PolicyFilter[];
   _not?: PolicyFilter;
 
-  // TODO: add Policy filter fields
+  id?: StringComparisonExp;
+  name?: StringComparisonExp;
+  description?: StringComparisonExp;
+  kind?: StringComparisonExp;
+  query?: StringComparisonExp;
+  enforcementLevel?: StringComparisonExp;
+  policySetCount?: IntComparisonExp;
+  updatedAt?: DateTimeComparisonExp;
+  organizationId?: StringComparisonExp;
+  policySetIds?: StringComparisonExp;
 }

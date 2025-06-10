@@ -3,7 +3,13 @@ import { gql } from 'graphql-tag';
 const teamTokensSchema = gql`
   type TeamToken {
     id: ID!
-    # TODO: add TeamToken fields based on Terraform Cloud API
+    teamId: ID!
+    createdAt: DateTime!
+    lastUsedAt: DateTime
+    description: String
+    token: String
+    expiredAt: DateTime
+    createdById: ID!
   }
 
   input TeamTokenFilter {
@@ -11,7 +17,14 @@ const teamTokensSchema = gql`
     _or: [TeamTokenFilter!]
     _not: TeamTokenFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    teamId: StringComparisonExp
+    createdAt: DateTimeComparisonExp
+    lastUsedAt: DateTimeComparisonExp
+    description: StringComparisonExp
+    token: StringComparisonExp
+    expiredAt: DateTimeComparisonExp
+    createdById: StringComparisonExp
   }
 
   extend type Query {

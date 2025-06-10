@@ -3,7 +3,8 @@ import { gql } from 'graphql-tag';
 const teamMembershipsSchema = gql`
   type TeamMembership {
     id: ID!
-    # TODO: add TeamMembership fields based on Terraform Cloud API
+    teamId: ID!
+    userId: ID!
   }
 
   input TeamMembershipFilter {
@@ -11,7 +12,9 @@ const teamMembershipsSchema = gql`
     _or: [TeamMembershipFilter!]
     _not: TeamMembershipFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    teamId: StringComparisonExp
+    userId: StringComparisonExp
   }
 
   extend type Query {

@@ -3,7 +3,9 @@ import { gql } from 'graphql-tag';
 const organizationTagsSchema = gql`
   type OrganizationTag {
     id: ID!
-    # TODO: add OrganizationTag fields based on Terraform Cloud API
+    name: String!
+    createdAt: DateTime!
+    instanceCount: Int!
   }
 
   input OrganizationTagFilter {
@@ -11,7 +13,11 @@ const organizationTagsSchema = gql`
     _or: [OrganizationTagFilter!]
     _not: OrganizationTagFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    name: StringComparisonExp
+    createdAt: DateTimeComparisonExp
+    instanceCount: IntComparisonExp
+    organizationId: StringComparisonExp
   }
 
   extend type Query {

@@ -32,6 +32,7 @@ const organizationSchema = gql`
     users(filter: UserFilter): [User!]
     variableSets(filter: VariableSetFilter): [VariableSet!]
     memberships(filter: OrganizationMembershipFilter): [OrganizationMembership!]!
+    tags(filter: OrganizationTagFilter): [OrganizationTag!]!
   }
 
   type OrganizationPermissions {

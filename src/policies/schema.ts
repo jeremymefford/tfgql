@@ -3,7 +3,13 @@ import { gql } from 'graphql-tag';
 const policiesSchema = gql`
   type Policy {
     id: ID!
-    # TODO: add Policy fields based on Terraform Cloud API
+    name: String!
+    description: String
+    kind: String!
+    query: String
+    enforcementLevel: String!
+    policySetCount: Int!
+    updatedAt: DateTime
   }
 
   input PolicyFilter {
@@ -11,7 +17,16 @@ const policiesSchema = gql`
     _or: [PolicyFilter!]
     _not: PolicyFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    name: StringComparisonExp
+    description: StringComparisonExp
+    kind: StringComparisonExp
+    query: StringComparisonExp
+    enforcementLevel: StringComparisonExp
+    policySetCount: IntComparisonExp
+    updatedAt: DateTimeComparisonExp
+    organizationId: StringComparisonExp
+    policySetIds: StringComparisonExp
   }
 
   extend type Query {

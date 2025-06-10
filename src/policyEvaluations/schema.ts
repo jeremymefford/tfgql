@@ -3,7 +3,13 @@ import { gql } from 'graphql-tag';
 const policyEvaluationsSchema = gql`
   type PolicyEvaluation {
     id: ID!
-    # TODO: add PolicyEvaluation fields based on Terraform Cloud API
+    status: String!
+    policyKind: String!
+    policyToolVersion: String!
+    resultCount: PolicyEvaluationResultCount!
+    statusTimestamps: PolicyEvaluationStatusTimestamps!
+    createdAt: DateTime!
+    updatedAt: DateTime!
   }
 
   input PolicyEvaluationFilter {
@@ -11,11 +17,17 @@ const policyEvaluationsSchema = gql`
     _or: [PolicyEvaluationFilter!]
     _not: PolicyEvaluationFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    status: StringComparisonExp
+    policyKind: StringComparisonExp
+    policyToolVersion: StringComparisonExp
+    createdAt: DateTimeComparisonExp
+    updatedAt: DateTimeComparisonExp
+    policyAttachableId: StringComparisonExp
   }
 
   extend type Query {
-    policyEvaluations(policySetId: ID!, filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
+    policyEvaluations(taskStageId: ID!, filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
     policyEvaluation(id: ID!): PolicyEvaluation
   }
 `;

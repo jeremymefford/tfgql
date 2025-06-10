@@ -4,9 +4,9 @@ import { PolicyEvaluation, PolicyEvaluationFilter, PolicyEvaluationResponse } fr
 import { policyEvaluationMapper } from './mapper';
 
 export class PolicyEvaluationsAPI {
-  async *listPolicyEvaluations(policySetId: string, filter?: PolicyEvaluationFilter): AsyncGenerator<PolicyEvaluation[], void, unknown> {
+  async *listPolicyEvaluations(taskStageId: string, filter?: PolicyEvaluationFilter): AsyncGenerator<PolicyEvaluation[], void, unknown> {
     yield* streamPages<PolicyEvaluation, PolicyEvaluationFilter>(
-      `/policy-sets/${policySetId}/evaluations`,
+      `/task-stages/${taskStageId}/policy-evaluations`,
       policyEvaluationMapper,
       undefined,
       filter

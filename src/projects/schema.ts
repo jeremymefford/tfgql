@@ -28,6 +28,7 @@ const projectsSchema = gql`
         autoDestroyActivityDuration: String
         permissions: ProjectPermissions
         organization: Organization
+        teamAccess(filter: ProjectTeamAccessFilter): [ProjectTeamAccess!]!
     }
 
     extend type Query {

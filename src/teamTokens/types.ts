@@ -1,12 +1,19 @@
-import { WhereClause } from '../common/filtering/types';
+import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
 
 export interface TeamTokenAttributes {
-  // TODO: define TeamToken attributes based on Terraform Cloud API
+  "created-at": string;
+  "last-used-at": string | null;
+  description: string | null;
+  token: string | null;
+  "expired-at": string | null;
 }
 
 export interface TeamTokenRelationships {
-  team?: {
+  team: {
+    data: ResourceRef;
+  };
+  "created-by": {
     data: ResourceRef;
   };
 }
@@ -20,7 +27,13 @@ export type TeamTokenListResponse = ListResponse<TeamTokenResource>;
 
 export interface TeamToken {
   id: string;
-  // TODO: define TeamToken domain model fields
+  teamId: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  description: string | null;
+  token: string | null;
+  expiredAt: string | null;
+  createdById: string;
 }
 
 export interface TeamTokenFilter extends WhereClause<TeamToken> {
@@ -28,5 +41,12 @@ export interface TeamTokenFilter extends WhereClause<TeamToken> {
   _or?: TeamTokenFilter[];
   _not?: TeamTokenFilter;
 
-  // TODO: add TeamToken filter fields
+  id?: StringComparisonExp;
+  teamId?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
+  lastUsedAt?: DateTimeComparisonExp;
+  description?: StringComparisonExp;
+  token?: StringComparisonExp;
+  expiredAt?: DateTimeComparisonExp;
+  createdById?: StringComparisonExp;
 }

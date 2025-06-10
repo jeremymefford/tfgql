@@ -3,7 +3,10 @@ import { gql } from 'graphql-tag';
 const assessmentResultsSchema = gql`
   type AssessmentResult {
     id: ID!
-    # TODO: add AssessmentResult fields based on Terraform Cloud API
+    drifted: Boolean!
+    succeeded: Boolean!
+    errorMessage: String
+    createdAt: DateTime!
   }
 
   input AssessmentResultFilter {
@@ -11,7 +14,11 @@ const assessmentResultsSchema = gql`
     _or: [AssessmentResultFilter!]
     _not: AssessmentResultFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    drifted: BooleanComparisonExp
+    succeeded: BooleanComparisonExp
+    errorMessage: StringComparisonExp
+    createdAt: DateTimeComparisonExp
   }
 
   extend type Query {

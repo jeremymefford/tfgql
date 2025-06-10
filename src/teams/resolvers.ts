@@ -2,6 +2,8 @@ import { Context } from '../server/context';
 import { Team, TeamFilter } from './types';
 import { fetchResources } from '../common/fetchResources';
 import { User, UserFilter } from '../users/types';
+import { TeamMembership, TeamMembershipFilter } from '../teamMemberships/types';
+import { TeamToken, TeamTokenFilter } from '../teamTokens/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 
 export const resolvers = {
@@ -30,6 +32,22 @@ export const resolvers = {
         organization: async (team: Team, _: unknown, { dataSources }: Context) => {
             const organization = await dataSources.organizationsAPI.getOrganization(team.organizationId);
             return organization;
-        }
+        },
+        memberships: async (
+            team: Team,
+            { filter }: { filter?: TeamMembershipFilter },
+            { dataSources }: Context
+        ): Promise<Promise<TeamMembership>[]> =>
+            gatherAsyncGeneratorPromises(
+                dataSources.teamMembershipsAPI.listTeamMemberships(team.id, filter)
+            ),
+        tokens: async (
+            team: Team,
+            { filter }: { filter?: TeamTokenFilter },
+            { dataSources }: Context
+        ): Promise<Promise<TeamToken>[]> =>
+            gatherAsyncGeneratorPromises(
+                dataSources.teamTokensAPI.listTeamTokens(team.id, filter)
+            ),
     }
 };

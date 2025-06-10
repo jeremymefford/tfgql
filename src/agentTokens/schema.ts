@@ -3,7 +3,11 @@ import { gql } from 'graphql-tag';
 const agentTokensSchema = gql`
   type AgentToken {
     id: ID!
-    # TODO: add AgentToken fields based on Terraform Cloud API
+    createdAt: DateTime!
+    lastUsedAt: DateTime
+    description: String!
+    token: String
+    createdById: ID!
   }
 
   input AgentTokenFilter {
@@ -11,7 +15,13 @@ const agentTokensSchema = gql`
     _or: [AgentTokenFilter!]
     _not: AgentTokenFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    poolId: StringComparisonExp
+    createdAt: DateTimeComparisonExp
+    lastUsedAt: DateTimeComparisonExp
+    description: StringComparisonExp
+    token: StringComparisonExp
+    createdById: StringComparisonExp
   }
 
   extend type Query {

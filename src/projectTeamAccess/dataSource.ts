@@ -4,21 +4,22 @@ import { ProjectTeamAccess, ProjectTeamAccessFilter, ProjectTeamAccessResponse }
 import { projectTeamAccessMapper } from './mapper';
 
 export class ProjectTeamAccessAPI {
-  async *listProjectTeamAccess(projectId: string, filter?: ProjectTeamAccessFilter): AsyncGenerator<
-    ProjectTeamAccess[],
-    void,
-    unknown
-  > {
+  async *listProjectTeamAccess(
+    projectId: string,
+    filter?: ProjectTeamAccessFilter
+  ): AsyncGenerator<ProjectTeamAccess[], void, unknown> {
     yield* streamPages<ProjectTeamAccess, ProjectTeamAccessFilter>(
-      `/projects/${projectId}/teams`,
+      `/team-projects`,
       projectTeamAccessMapper,
       undefined,
       filter
+        ? { _and: [filter, { projectId: { _eq: projectId } }] }
+        : { projectId: { _eq: projectId } }
     );
   }
 
   async getProjectTeamAccess(id: string): Promise<ProjectTeamAccess> {
-    const res = await axiosClient.get<ProjectTeamAccessResponse>(`/project-team-access/${id}`);
+    const res = await axiosClient.get<ProjectTeamAccessResponse>(`/team-projects/${id}`);
     return projectTeamAccessMapper.map(res.data.data);
   }
 }

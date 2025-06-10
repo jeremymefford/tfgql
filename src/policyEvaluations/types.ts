@@ -1,13 +1,33 @@
-import { WhereClause } from '../common/filtering/types';
+import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
 
 export interface PolicyEvaluationAttributes {
-  // TODO: define PolicyEvaluation attributes based on Terraform Cloud API
+  status: string;
+  "policy-kind": string;
+  "policy-tool-version": string;
+  "result-count": {
+    "advisory-failed": number;
+    errored: number;
+    "mandatory-failed": number;
+    passed: number;
+  };
+  "status-timestamps": {
+    "passed-at"?: string;
+    "queued-at"?: string;
+    "running-at"?: string;
+  };
+  "created-at": string;
+  "updated-at": string;
 }
 
 export interface PolicyEvaluationRelationships {
-  policySet?: {
+  "policy-attachable": {
     data: ResourceRef;
+  };
+  "policy-set-outcomes": {
+    links: {
+      related: string;
+    };
   };
 }
 
@@ -20,7 +40,23 @@ export type PolicyEvaluationListResponse = ListResponse<PolicyEvaluationResource
 
 export interface PolicyEvaluation {
   id: string;
-  // TODO: define PolicyEvaluation domain model fields
+  status: string;
+  policyKind: string;
+  policyToolVersion: string;
+  resultCount: {
+    advisoryFailed: number;
+    errored: number;
+    mandatoryFailed: number;
+    passed: number;
+  };
+  statusTimestamps: {
+    passedAt?: string;
+    queuedAt?: string;
+    runningAt?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  policyAttachableId: string;
 }
 
 export interface PolicyEvaluationFilter extends WhereClause<PolicyEvaluation> {
@@ -28,5 +64,11 @@ export interface PolicyEvaluationFilter extends WhereClause<PolicyEvaluation> {
   _or?: PolicyEvaluationFilter[];
   _not?: PolicyEvaluationFilter;
 
-  // TODO: add PolicyEvaluation filter fields
+  id?: StringComparisonExp;
+  status?: StringComparisonExp;
+  policyKind?: StringComparisonExp;
+  policyToolVersion?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
+  updatedAt?: DateTimeComparisonExp;
+  policyAttachableId?: StringComparisonExp;
 }

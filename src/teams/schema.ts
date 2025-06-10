@@ -12,6 +12,8 @@ const teamSchema = gql`
     organizationAccess: TeamOrganizationAccess!
     organization: Organization!
     users(filter: UserFilter): [User!]!
+    memberships(filter: TeamMembershipFilter): [TeamMembership!]!
+    tokens(filter: TeamTokenFilter): [TeamToken!]!
   }
 
   type TeamPermissions {

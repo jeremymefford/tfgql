@@ -1,8 +1,15 @@
-import { WhereClause } from '../common/filtering/types';
+import {
+  WhereClause,
+  StringComparisonExp,
+  IntComparisonExp,
+  DateTimeComparisonExp,
+} from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
 
 export interface OrganizationTagAttributes {
-  // TODO: define OrganizationTag attributes based on Terraform Cloud API
+  name: string;
+  'created-at': string;
+  'instance-count': number;
 }
 
 export interface OrganizationTagRelationships {
@@ -20,7 +27,10 @@ export type OrganizationTagListResponse = ListResponse<OrganizationTagResource>;
 
 export interface OrganizationTag {
   id: string;
-  // TODO: define OrganizationTag domain model fields
+  name: string;
+  createdAt: string;
+  instanceCount: number;
+  organizationId: string;
 }
 
 export interface OrganizationTagFilter extends WhereClause<OrganizationTag> {
@@ -28,5 +38,9 @@ export interface OrganizationTagFilter extends WhereClause<OrganizationTag> {
   _or?: OrganizationTagFilter[];
   _not?: OrganizationTagFilter;
 
-  // TODO: add OrganizationTag filter fields
+  id?: StringComparisonExp;
+  name?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
+  instanceCount?: IntComparisonExp;
+  organizationId?: StringComparisonExp;
 }

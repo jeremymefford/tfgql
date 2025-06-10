@@ -6,11 +6,11 @@ export const resolvers = {
   Query: {
     policyEvaluations: async (
       _: unknown,
-      { policySetId, filter }: { policySetId: string; filter?: PolicyEvaluationFilter },
+      { taskStageId, filter }: { taskStageId: string; filter?: PolicyEvaluationFilter },
       { dataSources }: Context
     ): Promise<Promise<PolicyEvaluation>[]> => {
       return gatherAsyncGeneratorPromises(
-        dataSources.policyEvaluationsAPI.listPolicyEvaluations(policySetId, filter)
+        dataSources.policyEvaluationsAPI.listPolicyEvaluations(taskStageId, filter)
       );
     },
     policyEvaluation: async (

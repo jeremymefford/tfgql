@@ -5,7 +5,8 @@ export const teamMembershipMapper: DomainMapper<TeamMembershipResource, TeamMemb
   map(resource: TeamMembershipResource): TeamMembership {
     return {
       id: resource.id,
-      // TODO: map additional fields from resource.attributes and resource.relationships
+      teamId: resource.relationships!.team.data.id,
+      userId: resource.relationships!.user.data.id,
     };
-  }
+  },
 };

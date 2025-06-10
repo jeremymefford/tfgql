@@ -3,7 +3,12 @@ import { gql } from 'graphql-tag';
 const stateVersionOutputsSchema = gql`
   type StateVersionOutput {
     id: ID!
-    # TODO: add StateVersionOutput fields based on Terraform Cloud API
+    name: String!
+    sensitive: Boolean!
+    type: String!
+    value: JSON!
+    detailedType: JSON!
+    stateVersionId: ID
   }
 
   input StateVersionOutputFilter {
@@ -11,7 +16,11 @@ const stateVersionOutputsSchema = gql`
     _or: [StateVersionOutputFilter!]
     _not: StateVersionOutputFilter
 
-    # TODO: add filter fields based on Terraform Cloud API
+    id: StringComparisonExp
+    name: StringComparisonExp
+    sensitive: BooleanComparisonExp
+    type: StringComparisonExp
+    stateVersionId: StringComparisonExp
   }
 
   extend type Query {

@@ -10,6 +10,10 @@ import {
   OrganizationMembership,
   OrganizationMembershipFilter,
 } from '../organizationMemberships/types';
+import {
+  OrganizationTag,
+  OrganizationTagFilter,
+} from '../organizationTags/types';
 
 export const resolvers = {
   Query: {
@@ -61,6 +65,14 @@ export const resolvers = {
           filter
         )
       );
-    }
+    },
+    tags: async (
+      org: Organization,
+      { filter }: { filter?: OrganizationTagFilter },
+      { dataSources }: Context
+    ): Promise<Promise<OrganizationTag>[]> =>
+      gatherAsyncGeneratorPromises(
+        dataSources.organizationTagsAPI.listOrganizationTags(org.name, filter)
+      )
   }
 };

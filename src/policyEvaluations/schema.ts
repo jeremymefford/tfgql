@@ -1,6 +1,25 @@
 import { gql } from 'graphql-tag';
 
 const policyEvaluationsSchema = gql`
+  """
+  Counts of policy evaluation results, grouped by outcome.
+  """
+  type PolicyEvaluationResultCount {
+    advisoryFailed: Int!
+    errored: Int!
+    mandatoryFailed: Int!
+    passed: Int!
+  }
+
+  """
+  Timestamps for each policy evaluation status transition.
+  """
+  type PolicyEvaluationStatusTimestamps {
+    queuedAt: DateTime
+    runningAt: DateTime
+    passedAt: DateTime
+  }
+
   type PolicyEvaluation {
     id: ID!
     status: String!

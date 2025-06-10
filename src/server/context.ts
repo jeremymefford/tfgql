@@ -24,7 +24,6 @@ import { PolicyEvaluationsAPI } from '../policyEvaluations/dataSource';
 import { PolicySetParametersAPI } from '../policySetParameters/dataSource';
 import { ProjectTeamAccessAPI } from '../projectTeamAccess/dataSource';
 import { StateVersionOutputsAPI } from '../stateVersionOutputs/dataSource';
-import { TeamMembershipsAPI } from '../teamMemberships/dataSource';
 import { TeamTokensAPI } from '../teamTokens/dataSource';
 import { TeamAccessAPI } from '../teamAccess/dataSource';
 
@@ -56,7 +55,6 @@ export interface Context {
     policySetParametersAPI: PolicySetParametersAPI;
     projectTeamAccessAPI: ProjectTeamAccessAPI;
     stateVersionOutputsAPI: StateVersionOutputsAPI;
-    teamMembershipsAPI: TeamMembershipsAPI;
     teamTokensAPI: TeamTokensAPI;
     teamAccessAPI: TeamAccessAPI;
   };
@@ -96,7 +94,6 @@ export async function buildContext(): Promise<Context> {
       policySetParametersAPI: new PolicySetParametersAPI(),
       projectTeamAccessAPI: new ProjectTeamAccessAPI(),
       stateVersionOutputsAPI: new StateVersionOutputsAPI(),
-      teamMembershipsAPI: new TeamMembershipsAPI(),
       teamTokensAPI: new TeamTokensAPI(),
       teamAccessAPI: new TeamAccessAPI()
     },

@@ -27,7 +27,6 @@ import { resolvers as policyEvaluationsResolvers } from '../policyEvaluations/re
 import { resolvers as policySetParametersResolvers } from '../policySetParameters/resolvers';
 import { resolvers as projectTeamAccessResolvers } from '../projectTeamAccess/resolvers';
 import { resolvers as stateVersionOutputsResolvers } from '../stateVersionOutputs/resolvers';
-import { resolvers as teamMembershipsResolvers } from '../teamMemberships/resolvers';
 import { resolvers as teamTokensResolvers } from '../teamTokens/resolvers';
 import { resolvers as teamAccessResolvers } from '../teamAccess/resolvers';
 import configurationVersionSchema from '../configurationVersions/schema';
@@ -56,7 +55,6 @@ import policyEvaluationsSchema from '../policyEvaluations/schema';
 import policySetParametersSchema from '../policySetParameters/schema';
 import projectTeamAccessSchema from '../projectTeamAccess/schema';
 import stateVersionOutputsSchema from '../stateVersionOutputs/schema';
-import teamMembershipsSchema from '../teamMemberships/schema';
 import teamTokensSchema from '../teamTokens/schema';
 import teamAccessSchema from '../teamAccess/schema';
 import { Config } from '../common/conf';
@@ -109,7 +107,6 @@ export const typeDefs = [
   policySetParametersSchema,
   projectTeamAccessSchema,
   stateVersionOutputsSchema,
-  teamMembershipsSchema,
   teamTokensSchema,
   teamAccessSchema
 ];
@@ -143,7 +140,6 @@ export const resolvers = {
     ...policySetParametersResolvers.Query,
     ...projectTeamAccessResolvers.Query,
     ...stateVersionOutputsResolvers.Query,
-    ...teamMembershipsResolvers.Query,
     ...teamTokensResolvers.Query,
     ...teamAccessResolvers.Query
   },

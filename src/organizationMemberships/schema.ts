@@ -4,6 +4,9 @@ const organizationMembershipsSchema = gql`
   type OrganizationMembership {
     id: ID!
     status: String!
+    organizationId: ID!
+    userId: ID!
+    teamIds: [ID!]!
   }
 
   input OrganizationMembershipFilter {

@@ -249,7 +249,7 @@ Below is the current implementation status of the TFC API endpoint categories in
 | State Versions                   |       |           |
 | State Version Outputs            |   ✓   |           |
 | Subscriptions                    |       |           |
-| Team Membership                  |   ✓   |           |
+| Team Membership                  |       |           |
 | Team Tokens                      |   ✓   |           |
 | Teams                            |   ✓   |           |
 | User Tokens                      |       |           |

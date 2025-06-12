@@ -8,8 +8,13 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 1. **Fork the repository** and clone it to your local machine.
 2. Run `npm install` to install dependencies.
-3. Copy `.env.example` to `.env` and update with necessary values.
-4. Build the project with `npm run build` or run in dev mode with `npm run dev`.
+3. Create a `.env` file in the project root and configure required environment variables (e.g., `TFC_TOKEN`, `TFE_BASE_URL`, etc.).
+4. Build and start the project with:
+
+   ```bash
+   npm install
+   npm start
+   ```
 
 ---
 
@@ -41,8 +46,8 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 ## GraphQL Schema
 
 - Use the `schema.ts` files with `gql` template literals for defining types.
-- Use `filter` for scalar-based filters and `where` for nested entity filters.
-- Register resolvers via the **resolver registry** using `registerResolver()`.
+* Use the `filter` argument for all entity filters (nested filters are supported via composed `*Filter` types).
+* Define type definitions in the `schema.ts` files and register them along with resolvers in `src/server/schema.ts`.
 
 ---
 
@@ -64,9 +69,15 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 ## Documentation
 
-- Project uses **Docusaurus (TypeScript)** for documentation under `/docs`.
-- Add or edit pages in the relevant folder under `docs/docs/`.
-- Run the docs locally with `npm run docs:dev`.
+* Project uses **Docusaurus** for documentation under `/docs`.
+* Add or edit pages in the relevant folder under `docs/docs/`.
+* Run the docs locally with:
+
+  ```bash
+  cd docs
+  npm install
+  npm start
+  ```
 
 ---
 

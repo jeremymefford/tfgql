@@ -35,7 +35,7 @@ export const typeDefs = gql`
 
 If the new entity can be resolved as a nested entity to other entities, make sure to add it to their schema as well.
 
-If the new nested relationship returns a list of entities, make sure to add the filter as a paramter in the attribute
+If the new nested relationship returns a list of entities, make sure to add the `filter` argument in the attribute definition.
 ---
 
 ## 2. Create TypeScript Types

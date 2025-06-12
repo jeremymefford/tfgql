@@ -144,6 +144,24 @@ export interface Run {
   configurationVersion?: ResourceRef;
 }
 
+/**
+ * Raw event records emitted by a run (used for trigger/dependency graphs).
+ */
+export interface RunEventAttributes {
+  [key: string]: any;
+}
+
+export type RunEventResource = ResourceObject<RunEventAttributes>;
+export type RunEventListResponse = ListResponse<RunEventResource>;
+
+/**
+ * Domain model for RunEvent exposed via GraphQL.
+ */
+export interface RunEvent {
+  id: string;
+  body: Record<string, any>;
+}
+
 export interface RunPermissionsFilter extends WhereClause<Run['permissions']> {
   _and?: RunPermissionsFilter[];
   _or?: RunPermissionsFilter[];

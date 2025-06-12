@@ -27,6 +27,8 @@ import { resolvers as policyEvaluationsResolvers } from '../policyEvaluations/re
 import { resolvers as policySetParametersResolvers } from '../policySetParameters/resolvers';
 import { resolvers as projectTeamAccessResolvers } from '../projectTeamAccess/resolvers';
 import { resolvers as stateVersionOutputsResolvers } from '../stateVersionOutputs/resolvers';
+import { resolvers as stateVersionsResolvers } from '../stateVersions/resolvers';
+import { resolvers as runTriggersResolvers } from '../runTriggers/resolvers';
 import { resolvers as teamTokensResolvers } from '../teamTokens/resolvers';
 import { resolvers as teamAccessResolvers } from '../teamAccess/resolvers';
 import configurationVersionSchema from '../configurationVersions/schema';
@@ -55,8 +57,10 @@ import policyEvaluationsSchema from '../policyEvaluations/schema';
 import policySetParametersSchema from '../policySetParameters/schema';
 import projectTeamAccessSchema from '../projectTeamAccess/schema';
 import stateVersionOutputsSchema from '../stateVersionOutputs/schema';
+import runTriggersSchema from '../runTriggers/schema';
 import teamTokensSchema from '../teamTokens/schema';
 import teamAccessSchema from '../teamAccess/schema';
+import stateVersionsSchema from '../stateVersions/schema';
 import { Config } from '../common/conf';
 
 /** Utility to load a schema file as a GraphQL string */
@@ -107,6 +111,8 @@ export const typeDefs = [
   policySetParametersSchema,
   projectTeamAccessSchema,
   stateVersionOutputsSchema,
+  stateVersionsSchema,
+  runTriggersSchema,
   teamTokensSchema,
   teamAccessSchema
 ];
@@ -140,6 +146,8 @@ export const resolvers = {
     ...policySetParametersResolvers.Query,
     ...projectTeamAccessResolvers.Query,
     ...stateVersionOutputsResolvers.Query,
+    ...stateVersionsResolvers.Query,
+    ...runTriggersResolvers.Query,
     ...teamTokensResolvers.Query,
     ...teamAccessResolvers.Query
   },

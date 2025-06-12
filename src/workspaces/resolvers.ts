@@ -37,6 +37,24 @@ export const resolvers = {
         });
       }
       return workspacesWithNoResources;
+    },
+    workspacesWithOpenRuns: async (
+      _: unknown,
+      { orgName, filter, runFilter }: { orgName: string; filter?: WorkspaceFilter; runFilter: RunFilter },
+      { dataSources }: Context
+    ): Promise<Workspace[]> => {
+      const result: Workspace[] = [];
+      for await (const page of dataSources.workspacesAPI.listWorkspaces(orgName, filter)) {
+        await parallelizeBounded(page, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+          const runsIterator = dataSources.runsAPI.listRuns(workspace.id, runFilter);
+          const { value: runs } = await runsIterator.next();
+          if (runs && runs.length > 0) {
+            result.push(workspace);
+          }
+          runsIterator.return(undefined);
+        });
+      }
+      return result;
     }
   },
   Workspace: {

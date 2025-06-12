@@ -26,6 +26,31 @@ export interface ConfigurationVersionRelationships {
     };
 }
 
+/**
+ * Commit metadata for VCS-based configuration versions.
+ */
+export interface IngressAttributes {
+    id: string;
+    branch?: string;
+    cloneUrl?: string;
+    commitMessage?: string;
+    commitSha?: string;
+    commitUrl?: string;
+    compareUrl?: string;
+    identifier?: string;
+    isPullRequest?: boolean;
+    onDefaultBranch?: boolean;
+    pullRequestNumber?: number;
+    pullRequestUrl?: string;
+    pullRequestTitle?: string;
+    pullRequestBody?: string;
+    tag?: string;
+    senderUsername?: string;
+    senderAvatarUrl?: string;
+    senderHtmlUrl?: string;
+    createdBy?: string;
+}
+
 export type ConfigurationVersionResource = ResourceObject<ConfigurationVersionAttributes> & {
     relationships?: ConfigurationVersionRelationships;
     links?: {
@@ -53,6 +78,7 @@ export interface ConfigurationVersion {
     size?: number | null;
     downloadUrl?: string | null;
     ingressAttributesId?: string;
+    ingressAttributes?: IngressAttributes;
 }
 
 export interface ConfigurationVersionStatusTimestampsFilter extends WhereClause<ConfigurationVersion['statusTimestamps']> {

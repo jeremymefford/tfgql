@@ -114,6 +114,16 @@ const runSchema = gql`
   extend type Run {
     # List of comments associated with this run
     comments(filter: CommentFilter): [Comment!]!
+    # Sequence of low-level run events (run-triggers, workspace dependencies, etc.)
+    runEvents: [RunEvent!]!
+  }
+
+  """
+  Low-level run event data for building workspace trigger graphs.
+  """
+  type RunEvent {
+    id: ID!
+    body: JSON!
   }
 `;
 

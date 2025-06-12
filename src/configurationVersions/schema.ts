@@ -23,8 +23,29 @@ const configurationVersionSchema = gql`
     uploadedAt: DateTime
   }
 
+  """
+  Commit metadata for VCS-based configuration versions.
+  """
   type IngressAttributes {
     id: ID!
+    branch: String
+    cloneUrl: String
+    commitMessage: String
+    commitSha: String
+    commitUrl: String
+    compareUrl: String
+    identifier: String
+    isPullRequest: Boolean
+    onDefaultBranch: Boolean
+    pullRequestNumber: Int
+    pullRequestUrl: String
+    pullRequestTitle: String
+    pullRequestBody: String
+    tag: String
+    senderUsername: String
+    senderAvatarUrl: String
+    senderHtmlUrl: String
+    createdBy: String
   }
 
   input ConfigurationVersionStatusTimestampsFilter {

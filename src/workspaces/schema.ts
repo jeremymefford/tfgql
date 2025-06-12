@@ -139,6 +139,14 @@ const workspaceSchema = gql`
     workspace(id: ID!): Workspace
     workspaceByName(orgName: String!, workspaceName: String!): Workspace
     workspacesWithNoResources(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
+    """
+    List all workspaces in an organization that have at least one run matching the given runFilter (e.g. non-terminal states).
+    """
+    workspacesWithOpenRuns(
+      orgName: String!
+      filter: WorkspaceFilter
+      runFilter: RunFilter
+    ): [Workspace!]!
   }
 `;
 export default workspaceSchema;

@@ -1,6 +1,6 @@
 import { Context } from "../server/context";
 import { Workspace } from "../workspaces/types";
-import { Run } from "./types";
+import { Run, RunEvent } from "./types";
 import { Comment, CommentFilter } from "../comments/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { ConfigurationVersionsAPI } from "../configurationVersions/dataSource";
@@ -18,26 +18,31 @@ export const resolvers = {
     }
   },
   Run: {
-    workspace: async (run: Run, args: unknown, context: Context, info: any): Promise<Workspace | null> => {
+    workspace: async (run: Run, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
       const workspaceId = run.workspace?.id;
       if (!workspaceId) return null;
-      const workspace = await context.dataSources.workspacesAPI.getWorkspace(workspaceId);
-      return workspace;
+      return dataSources.workspacesAPI.getWorkspace(workspaceId);
     },
-    configurationVersion: async (run: Run, args: unknown, context: Context, info: any): Promise<ConfigurationVersion | null> => {
-      const configurationVersionId = run.configurationVersion?.id;
-      if (!configurationVersionId) return null;
-      const configurationVersion = await context.dataSources.configurationVersionsAPI.getConfigurationVersion(configurationVersionId);
-      return configurationVersion;
+    configurationVersion: async (run: Run, _: unknown, { dataSources }: Context): Promise<ConfigurationVersion | null> => {
+      const cvId = run.configurationVersion?.id;
+      if (!cvId) return null;
+      return dataSources.configurationVersionsAPI.getConfigurationVersion(cvId);
     },
     comments: async (
       run: Run,
       { filter }: { filter?: CommentFilter },
       { dataSources }: Context
-    ): Promise<Promise<Comment>[]> => {
-      return gatherAsyncGeneratorPromises(
+    ): Promise<Promise<Comment>[]> =>
+      gatherAsyncGeneratorPromises(
         dataSources.commentsAPI.listComments(run.id, filter)
-      );
-    }
+      ),
+    runEvents: async (
+      run: Run,
+      _: unknown,
+      { dataSources }: Context
+    ): Promise<Promise<RunEvent>[]> =>
+      gatherAsyncGeneratorPromises(
+        dataSources.runsAPI.listRunEvents(run.id)
+      )
   }
 };

@@ -1,4 +1,4 @@
-import { Run, RunResource } from './types';
+import { Run, RunResource, RunEvent, RunEventResource } from './types';
 import { DomainMapper } from '../common/middleware/domainMapper';
 
 export const runMapper: DomainMapper<RunResource, Run> = {
@@ -44,5 +44,14 @@ export const runMapper: DomainMapper<RunResource, Run> = {
             workspace: run.relationships?.workspace?.data,
             configurationVersion: run.relationships?.['configuration-version']?.data
           };
-    }
   }
+};
+
+/**
+ * Mapper for low-level run events emitted by a run.
+ */
+export const runEventMapper: DomainMapper<RunEventResource, RunEvent> = {
+  map(evt: RunEventResource): RunEvent {
+    return { id: evt.id, body: evt.attributes };
+  }
+};

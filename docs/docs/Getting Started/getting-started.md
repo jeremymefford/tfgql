@@ -200,7 +200,7 @@ query {
 }
 ```
 
-See the [Concepts](../Concepts/concepts) page for filter operators.
+See the [Concepts](../Concepts/) page for filter operators.
 
 ---
 
@@ -233,7 +233,7 @@ TFCE GraphQL automatically handles Terraform API rate limits and server errors w
 - `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES`
 - `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY`
 
-Refer to the [Concepts](../Concepts/concepts) page for details on rate-limit strategies.
+Refer to the [Concepts](../Concepts/) page for details on rate-limit strategies.
 
 ---
 
@@ -258,7 +258,7 @@ query {
 ## Resources
 
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
-- [TFCE GraphQL Concepts](../Concepts/concepts)
+- [TFCE GraphQL Concepts](../Concepts/)
 - [Implementation Status](../implementation-status)
-- [Contributing Guide](../Contributing/contributing)
+- [Contributing Guide](../Contributing/)
 - [Full Schema Reference (playground)](http://localhost:4000/graphql)

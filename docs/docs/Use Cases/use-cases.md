@@ -94,8 +94,8 @@ Our resolvers automatically page through large result sets (`variables` is fetch
 The GraphQL schema already supports bi‑directional mapping between policy sets and workspaces.  To see which workspaces each policy set applies to:
 
 ```graphql
-query PolicySetWorkspaces {
-  policySets {
+query PolicySetWorkspaces($org: String!) {
+  policySets(organization: $org) {
     id
     name
     workspaces {

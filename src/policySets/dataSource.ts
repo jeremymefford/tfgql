@@ -4,9 +4,9 @@ import { PolicySet, PolicySetFilter, PolicySetResponse } from './types';
 import { policySetMapper } from './mapper';
 
 export class PolicySetsAPI {
-  async *listPolicySets(filter?: PolicySetFilter): AsyncGenerator<PolicySet[], void, unknown> {
+  async *listPolicySets(organization: string, filter?: PolicySetFilter): AsyncGenerator<PolicySet[], void, unknown> {
     yield* streamPages<PolicySet, PolicySetFilter>(
-      `/policy-sets`,
+      `/organizations/${organization}/policy-sets`,
       policySetMapper,
       undefined,
       filter

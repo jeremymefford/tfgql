@@ -11,10 +11,10 @@ export const resolvers = {
   Query: {
     policySets: async (
       _: unknown,
-      { filter }: { filter?: PolicySetFilter },
+      { organization, filter }: { organization: string, filter?: PolicySetFilter },
       { dataSources }: Context
     ): Promise<Promise<PolicySet>[]> =>
-      gatherAsyncGeneratorPromises(dataSources.policySetsAPI.listPolicySets(filter)),
+      gatherAsyncGeneratorPromises(dataSources.policySetsAPI.listPolicySets(organization, filter)),
     policySet: async (
       _: unknown,
       { id }: { id: string },

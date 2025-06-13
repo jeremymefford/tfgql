@@ -14,6 +14,7 @@ import {
   OrganizationTag,
   OrganizationTagFilter,
 } from '../organizationTags/types';
+import { PolicySet, PolicySetFilter } from '../policySets/types';
 
 export const resolvers = {
   Query: {
@@ -28,6 +29,9 @@ export const resolvers = {
   Organization: {
     workspaces: async (org: Organization, { filter }: { filter?: WorkspaceFilter }, { dataSources }: Context): Promise<Promise<Workspace>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.workspacesAPI.listWorkspaces(org.name, filter));
+    },
+    policySets: async (org: Organization, { filter }: { filter?: PolicySetFilter }, { dataSources }: Context): Promise<Promise<PolicySet>[]> => {
+      return gatherAsyncGeneratorPromises(dataSources.policySetsAPI.listPolicySets(org.name, filter));
     },
     teams: async (org: Organization, { filter }: { filter?: TeamFilter }, { dataSources }: Context): Promise<Promise<Team>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeams(org.name, filter));

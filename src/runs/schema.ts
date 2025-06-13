@@ -116,6 +116,8 @@ const runSchema = gql`
     comments(filter: CommentFilter): [Comment!]!
     # Sequence of low-level run events (run-triggers, workspace dependencies, etc.)
     runEvents: [RunEvent!]!
+    # Inbound or outbound workspace run triggers for the run's workspace
+    runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
   }
 
   """

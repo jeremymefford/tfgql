@@ -9,4 +9,5 @@ Explore the sections below to get started:
 - [Implementation Status](implementation-status)
 - [Contributing](Contributing/contributing)
 - [Deployment](Deployment/docker)
+- [Use Cases](Use%20Cases/use-cases)
 - [Architecture Decision Records](Architecture%20Decision%20Records/index)

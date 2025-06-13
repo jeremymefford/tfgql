@@ -3,6 +3,7 @@ import { Workspace } from "../workspaces/types";
 import { Run, RunEvent } from "./types";
 import { Comment, CommentFilter } from "../comments/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
+import { RunTrigger, RunTriggerFilter } from "../runTriggers/types";
 import { ConfigurationVersionsAPI } from "../configurationVersions/dataSource";
 import { ConfigurationVersion } from "../configurationVersions/types";
 
@@ -43,6 +44,14 @@ export const resolvers = {
     ): Promise<Promise<RunEvent>[]> =>
       gatherAsyncGeneratorPromises(
         dataSources.runsAPI.listRunEvents(run.id)
+      ),
+    runTriggers: async (
+      run: Run,
+      { filter }: { filter?: RunTriggerFilter },
+      { dataSources }: Context
+    ): Promise<Promise<RunTrigger>[]> =>
+      gatherAsyncGeneratorPromises(
+        dataSources.runTriggersAPI.listRunTriggers(run.workspace?.id ?? "", filter)
       )
   }
 };

@@ -1,5 +1,23 @@
 import { DomainMapper } from '../common/middleware/domainMapper';
-import { RunTriggerResource, RunTrigger } from './types';
+import { RunTriggerResource, RunTrigger, WorkspaceRunTrigger } from './types';
+
+export const inboundRunTriggerMapper: DomainMapper<RunTriggerResource, WorkspaceRunTrigger> = {
+  map(resource: RunTriggerResource): WorkspaceRunTrigger {
+    return {
+      ...runTriggerMapper.map({ ...resource }),
+      inbound: true
+    };
+  }
+}
+
+export const outboundRunTriggerMapper: DomainMapper<RunTriggerResource, WorkspaceRunTrigger> = {
+  map(resource: RunTriggerResource): WorkspaceRunTrigger {
+    return {
+      ...runTriggerMapper.map(resource),
+      inbound: false
+    };
+  }
+};
 
 export const runTriggerMapper: DomainMapper<RunTriggerResource, RunTrigger> = {
   map(resource: RunTriggerResource): RunTrigger {

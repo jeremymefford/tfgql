@@ -4,7 +4,7 @@ const userSchema = gql`
   type User {
     id: ID!
     username: String!
-    email: String!
+    email: String
     avatarUrl: String
     isServiceAccount: Boolean!
     authMethod: String!

@@ -4,13 +4,32 @@ const runTriggersSchema = gql`
   """
   Inbound or outbound run-trigger connections between workspaces.
   """
-  type RunTrigger {
+  interface AbstractRunTrigger {
     id: ID!
     workspaceName: String!
     sourceableName: String!
     createdAt: DateTime!
     workspace: Workspace!
     sourceable: Workspace!
+  }
+
+  type RunTrigger implements AbstractRunTrigger {
+    id: ID!
+    workspaceName: String!
+    sourceableName: String!
+    createdAt: DateTime!
+    workspace: Workspace!
+    sourceable: Workspace!
+  }
+
+  type WorkspaceRunTrigger implements AbstractRunTrigger {
+    id: ID!
+    workspaceName: String!
+    sourceableName: String!
+    createdAt: DateTime!
+    workspace: Workspace!
+    sourceable: Workspace!
+    inbound: Boolean! # true if this is an inbound trigger, false if outbound
   }
 
   input RunTriggerFilter {
@@ -25,10 +44,7 @@ const runTriggersSchema = gql`
   }
 
   extend type Query {
-    runTriggers(
-      workspaceId: ID!
-      filter: RunTriggerFilter
-    ): [RunTrigger!]!
+    runTriggers(workspaceId: ID!, filter: RunTriggerFilter): [WorkspaceRunTrigger!]!
     runTrigger(id: ID!): RunTrigger
   }
 `;

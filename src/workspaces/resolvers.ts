@@ -7,6 +7,9 @@ import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { Variable, VariableFilter } from '../variables/types';
 import { applicationConfiguration } from '../common/conf';
 import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
+import { RunTrigger, WorkspaceRunTrigger } from '../runTriggers/types';
+import { StateVersion, StateVersionFilter } from '../stateVersions/types';
+import { AxiosError } from 'axios';
 
 export const resolvers = {
   Query: {
@@ -56,6 +59,22 @@ export const resolvers = {
       }
       return result;
     }
+    ,
+    stackGraph: async (
+      _: unknown,
+      { orgName }: { orgName: string },
+      { dataSources }: Context
+    ): Promise<WorkspaceRunTrigger[]> => {
+      const edges: WorkspaceRunTrigger[] = [];
+      for await (const page of dataSources.workspacesAPI.listWorkspaces(orgName)) {
+        await parallelizeBounded(page, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+          for await (const triggers of dataSources.runTriggersAPI.listRunTriggers(workspace.id)) {
+            edges.push(...triggers);
+          }
+        });
+      }
+      return edges;
+    }
   },
   Workspace: {
     organization: async (workspace: Workspace, _: unknown, { dataSources }: Context): Promise<Organization | null> => {
@@ -73,6 +92,27 @@ export const resolvers = {
     variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
       console.log(`fetching variables for workspace ${workspace.id}`);
       return dataSources.variablesAPI.getVariablesForWorkspace(workspace.id, filter);
+    },
+    stateVersions: async (workspace: Workspace, { filter }: { filter?: StateVersionFilter }, { dataSources }: Context): Promise<Promise<StateVersion>[]> => {
+      if (!workspace.organizationName) {
+        throw new Error(`Workspace ${workspace.id} does not have an organizationName set, cannot fetch state versions.`);
+      }
+      return gatherAsyncGeneratorPromises(dataSources.stateVersionsAPI.listStateVersions(workspace.organizationName, workspace.id, filter));
+    },
+    currentStateVersion: async (workspace: Workspace, _: unknown, { dataSources }: Context): Promise<StateVersion | null> => {
+      try {
+        const currentStateVersion = await dataSources.stateVersionsAPI.getCurrentStateVersion(workspace.id);
+        return currentStateVersion;
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response && error.response.status === 404) {
+            // If the current state version does not exist, return null
+            return null;
+          }
+          console.error(`Error fetching current state version for workspace ${workspace.id}:`, error);
+        }
+        throw error;
+      }
     }
   }
 };

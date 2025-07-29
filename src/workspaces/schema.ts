@@ -50,6 +50,8 @@ const workspaceSchema = gql`
     runs(filter: RunFilter): [Run!]!
     configurationVersions(filter: ConfigurationVersionFilter): [ConfigurationVersion!]!
     variables(filter: VariableFilter): [Variable!]!
+    stateVersions(filter: StateVersionFilter): [StateVersion!]!
+    currentStateVersion: StateVersion
   }
 
   type WorkspaceActions {
@@ -147,6 +149,10 @@ const workspaceSchema = gql`
       filter: WorkspaceFilter
       runFilter: RunFilter
     ): [Workspace!]!
+    """
+    List all run-trigger edges (workspace dependency graph) in the given organization.
+    """
+    stackGraph(orgName: String!): [WorkspaceRunTrigger!]!
   }
 `;
 export default workspaceSchema;

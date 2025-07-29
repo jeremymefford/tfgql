@@ -28,6 +28,10 @@ export interface RunTrigger {
   sourceable?: ResourceRef;
 }
 
+export interface WorkspaceRunTrigger extends RunTrigger{
+  inbound: boolean; // true if this is an inbound trigger, false if outbound
+}
+
 export interface RunTriggerFilter extends WhereClause<RunTrigger> {
   _and?: RunTriggerFilter[];
   _or?: RunTriggerFilter[];

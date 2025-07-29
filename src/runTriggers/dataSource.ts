@@ -1,7 +1,7 @@
 import { axiosClient } from '../common/httpClient';
 import { streamPages } from '../common/streamPages';
-import { runTriggerMapper } from './mapper';
-import { RunTrigger, RunTriggerFilter, RunTriggerResponse } from './types';
+import { inboundRunTriggerMapper, outboundRunTriggerMapper, runTriggerMapper } from './mapper';
+import { RunTrigger, RunTriggerFilter, RunTriggerResponse, WorkspaceRunTrigger } from './types';
 
 export class RunTriggersAPI {
   /**
@@ -9,18 +9,19 @@ export class RunTriggersAPI {
    */
   async *listRunTriggers(
     workspaceId: string,
-    typeFilter?: RunTriggerFilter
-  ): AsyncGenerator<RunTrigger[], void, unknown> {
-    const params: Record<string, any> = {};
-    if (typeFilter) {
-      // filter run-trigger[type]=inbound|outbound
-      params['filter[run-trigger][type]'] = (typeFilter as any).type?._eq;
-    }
-    yield* streamPages<RunTrigger, RunTriggerFilter>(
+    filter?: RunTriggerFilter
+  ): AsyncGenerator<WorkspaceRunTrigger[], void, unknown> {
+    yield* streamPages<WorkspaceRunTrigger>(
       `/workspaces/${workspaceId}/run-triggers`,
-      runTriggerMapper,
-      params,
-      typeFilter
+      inboundRunTriggerMapper,
+      {"filter[run-trigger][type]": "inbound"},
+      filter
+    );
+    yield* streamPages<WorkspaceRunTrigger>(
+      `/workspaces/${workspaceId}/run-triggers`,
+      outboundRunTriggerMapper,
+      {"filter[run-trigger][type]": "outbound"},
+      filter
     );
   }
 

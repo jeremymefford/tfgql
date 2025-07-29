@@ -156,25 +156,11 @@ query WorkspaceDrift($org: String!) {
 
 ## 7. Generate Terraform “stack graph”
 
-Modeling workspace dependencies requires ingesting run‑trigger events from `/runs/:run_id/run-events`.
-
-We’ve added a new `runEvents` connection on `Run` so you can build the full dependency graph.  You can also query inbound/outbound run triggers on a workspace:
+Fetch the full workspace dependency graph in a single call using the new `stackGraph` query:
 
 ```graphql
-query RunEvents($runId: ID!) {
-  run(id: $runId) {
-    id
-    runEvents {
-      id
-      body
-    }
-  }
-}
-```
-
-```graphql
-query RunTriggers($workspaceId: ID!, $dir: String!) {
-  runTriggers(workspaceId: $workspaceId, filter: { type: { _eq: $dir } }) {
+query StackGraph($org: String!) {
+  stackGraph(orgName: $org) {
     id
     workspaceName
     sourceableName
@@ -182,6 +168,8 @@ query RunTriggers($workspaceId: ID!, $dir: String!) {
   }
 }
 ```
+
+The `stackGraph` query returns a list of run-trigger edges (workspace dependencies) across all workspaces in the specified organization.
 
 ## 8. Export workspace inputs & outputs
 

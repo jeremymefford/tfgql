@@ -18,7 +18,12 @@ export async function* streamPages<T, TFilter = {}>(
   const pagination = firstRes.data.meta?.pagination;
   const totalPages = pagination?.['total-pages'] ?? 1;
 
-  const firstMapped = firstRes.data.data.map(mapper.map);
+  // some APIs return a single object instead of an array
+  // in those cases, subsequent pages shouldn't need to load
+  const responseData = Array.isArray(firstRes.data.data) ?
+    firstRes.data.data :
+    [firstRes.data.data];
+  const firstMapped = responseData.map(mapper.map);
   const firstFiltered = filter
     ? firstMapped.filter(item => evaluateWhereClause(filter, item))
     : firstMapped;

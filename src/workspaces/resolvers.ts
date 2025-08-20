@@ -30,7 +30,7 @@ export const resolvers = {
       const workspaceGenerator = dataSources.workspacesAPI.listWorkspaces(orgName, filter);
       const workspacesWithNoResources: Workspace[] = [];
       for await (const workspacePage of workspaceGenerator) {
-        await parallelizeBounded(workspacePage, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+        await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
           const resourcesGenerator = dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined, 1);
           const resources = await resourcesGenerator.next();
           if (!resources.value || resources.value.length === 0) {
@@ -48,7 +48,7 @@ export const resolvers = {
     ): Promise<Workspace[]> => {
       const result: Workspace[] = [];
       for await (const page of dataSources.workspacesAPI.listWorkspaces(orgName, filter)) {
-        await parallelizeBounded(page, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+        await parallelizeBounded(page, async (workspace: Workspace) => {
           const runsIterator = dataSources.runsAPI.listRuns(workspace.id, runFilter);
           const { value: runs } = await runsIterator.next();
           if (runs && runs.length > 0) {
@@ -67,7 +67,7 @@ export const resolvers = {
     ): Promise<WorkspaceRunTrigger[]> => {
       const edges: WorkspaceRunTrigger[] = [];
       for await (const page of dataSources.workspacesAPI.listWorkspaces(orgName)) {
-        await parallelizeBounded(page, applicationConfiguration.graphqlBatchSize, async (workspace: Workspace) => {
+        await parallelizeBounded(page, async (workspace: Workspace) => {
           for await (const triggers of dataSources.runTriggersAPI.listRunTriggers(workspace.id)) {
             edges.push(...triggers);
           }

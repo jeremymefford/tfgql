@@ -24,11 +24,10 @@ export const resolvers = {
             { dataSources }: Context
         ): Promise<Workspace[]> => {
             const workspacesWithLargeCVs: Workspace[] = [];
-            const batchSize = applicationConfiguration.graphqlBatchSize / 2; // divide by 2 to account for nested calls
             for await (const workspacePage of dataSources.workspacesAPI.listWorkspaces(organizationName)) {
-                await parallelizeBounded(workspacePage, batchSize, async (workspace: Workspace) => {
+                await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
                     const cvs = await dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
-                    await parallelizeBounded(cvs, batchSize, async (cv: ConfigurationVersion) => {
+                    await parallelizeBounded(cvs, async (cv: ConfigurationVersion) => {
                         const size = await resolvers.ConfigurationVersion.size(cv, {}, { dataSources } as Context);
                         if (size && size > bytes) {
                             workspacesWithLargeCVs.push(workspace);

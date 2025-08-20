@@ -1,7 +1,9 @@
+import { applicationConfiguration } from "../conf";
+
 export async function parallelizeBounded<T, R>(
   iterableItems: Iterable<T>,
-  concurrency: number,
-  operation: (item: T) => Promise<R>
+  operation: (item: T) => Promise<R>,
+  concurrency: number = applicationConfiguration.graphqlBatchSize
 ): Promise<R[]> {
   const items = Array.isArray(iterableItems) ? iterableItems : Array.from(iterableItems);
   const results: R[] = new Array(items.length);

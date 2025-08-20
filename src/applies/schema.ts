@@ -3,21 +3,18 @@ import { gql } from 'graphql-tag';
 const appliesSchema = gql`
   type Apply {
     id: ID!
-    mode: String!
-    agentId: String
-    agentName: String
-    agentPoolId: String
-    agentPoolName: String
+    mode: String
     status: String!
-    queuedAt: DateTime!
-    startedAt: DateTime!
-    finishedAt: DateTime!
+    queuedAt: DateTime
+    startedAt: DateTime
+    finishedAt: DateTime
     logReadUrl: String!
-    resourceAdditions: Int!
-    resourceChanges: Int!
-    resourceDestructions: Int!
-    resourceImports: Int!
-    stateVersionIds: [ID!]!
+    structuredRunOutputEnabled: Boolean!
+    resourceAdditions: Int
+    resourceChanges: Int
+    resourceDestructions: Int
+    resourceImports: Int
+    stateVersionIds: [ID]!
   }
 
   input ApplyFilter {
@@ -27,10 +24,6 @@ const appliesSchema = gql`
 
     id: StringComparisonExp
     mode: StringComparisonExp
-    agentId: StringComparisonExp
-    agentName: StringComparisonExp
-    agentPoolId: StringComparisonExp
-    agentPoolName: StringComparisonExp
     status: StringComparisonExp
     queuedAt: DateTimeComparisonExp
     startedAt: DateTimeComparisonExp
@@ -44,8 +37,11 @@ const appliesSchema = gql`
   }
 
   extend type Query {
-    applies(runId: ID!, filter: ApplyFilter): [Apply!]!
+    applyForRun(runId: ID!): Apply
     apply(id: ID!): Apply
+    appliesForWorkspace(workspaceId: ID!, filter: ApplyFilter): [Apply!]!
+    appliesForProject(projectId: ID!, filter: ApplyFilter): [Apply!]!
+    appliesForOrganization(organizationId: ID!, filter: ApplyFilter): [Apply!]!
   }
 `;
 

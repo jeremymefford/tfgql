@@ -6,13 +6,9 @@ export const applyMapper: DomainMapper<ApplyResource, Apply> = {
     const attrs = resource.attributes;
     return {
       id: resource.id,
-      mode: attrs['execution-details'].mode,
-      agentId: attrs['execution-details']['agent-id'],
-      agentName: attrs['execution-details']['agent-name'],
-      agentPoolId: attrs['execution-details']['agent-pool-id'],
-      agentPoolName: attrs['execution-details']['agent-pool-name'],
+      mode: attrs['execution-details']?.mode,
       status: attrs.status,
-      queuedAt: attrs['status-timestamps']['queued-at'],
+      queuedAt: attrs['status-timestamps']['agent-queued-at'],
       startedAt: attrs['status-timestamps']['started-at'],
       finishedAt: attrs['status-timestamps']['finished-at'],
       logReadUrl: attrs['log-read-url'],
@@ -20,6 +16,7 @@ export const applyMapper: DomainMapper<ApplyResource, Apply> = {
       resourceChanges: attrs['resource-changes'],
       resourceDestructions: attrs['resource-destructions'],
       resourceImports: attrs['resource-imports'],
+      structuredRunOutputEnabled: attrs['structured-run-output-enabled'],
       stateVersionIds:
         resource.relationships?.['state-versions']?.data.map(rel => rel.id) || [],
     };

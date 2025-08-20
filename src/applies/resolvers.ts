@@ -1,15 +1,19 @@
 import { Context } from '../server/context';
 import { Apply, ApplyFilter } from './types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { run } from 'node:test';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
+import { Run } from '../runs/types';
+import { evaluateWhereClause } from '../common/filtering/filtering';
 
 export const resolvers = {
   Query: {
-    applies: async (
+    applyForRun: async (
       _: unknown,
-      { runId, filter }: { runId: string; filter?: ApplyFilter },
+      { runId }: { runId: string },
       { dataSources }: Context
-    ): Promise<Promise<Apply>[]> => {
-      return gatherAsyncGeneratorPromises(dataSources.appliesAPI.listApplies(runId, filter));
+    ): Promise<Apply | null> => {
+      return dataSources.appliesAPI.getRunApply(runId);
     },
     apply: async (
       _: unknown,
@@ -17,6 +21,41 @@ export const resolvers = {
       { dataSources }: Context
     ): Promise<Apply | null> => {
       return dataSources.appliesAPI.getApply(id);
+    },
+    appliesForWorkspace: async (
+      _: unknown,
+      { workspaceId, filter }: { workspaceId: string; filter: ApplyFilter },
+      { dataSources }: Context
+    ): Promise<Apply[]> => {
+      const results: Apply[] = [];
+      for await (const runPage of dataSources.runsAPI.listRuns(workspaceId)) {
+        if (!runPage || runPage.length === 0) {
+          continue;
+        }
+        await parallelizeBounded(runPage, async (run: Run) => {
+          const apply = await dataSources.appliesAPI.getRunApply(run.id);
+          if (evaluateWhereClause(filter, apply)) {
+            results.push(apply);
+          }
+        });
+      }
+      return results;
+    },
+    appliesForProject: async (
+      _: unknown,
+      { projectId, filter }: { projectId: string; filter: ApplyFilter },
+      { dataSources }: Context
+    ): Promise<Apply[]> => {
+      // TODO: Implement logic to fetch applies for project
+      return [];
+    },
+    appliesForOrganization: async (
+      _: unknown,
+      { organizationId, filter }: { organizationId: string; filter: ApplyFilter },
+      { dataSources }: Context
+    ): Promise<Apply[]> => {
+      // TODO: Implement logic to fetch applies for organization
+      return [];
     }
   }
 };

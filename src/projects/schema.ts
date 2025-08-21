@@ -28,6 +28,7 @@ const projectsSchema = gql`
         autoDestroyActivityDuration: String
         permissions: ProjectPermissions
         organization: Organization
+        #  TODO: Add fields for workspaces, stacks, teams, and varsets
         teamAccess(filter: ProjectTeamAccessFilter): [ProjectTeamAccess!]!
     }
 

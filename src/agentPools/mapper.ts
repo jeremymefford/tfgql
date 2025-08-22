@@ -5,6 +5,7 @@ export const agentPoolMapper: DomainMapper<AgentPoolResource, AgentPool> = {
   map(resource: AgentPoolResource): AgentPool {
     return {
       id: resource.id,
+      type: resource.type,
       name: resource.attributes.name,
       createdAt: resource.attributes['created-at'],
       organizationScoped: resource.attributes['organization-scoped'],

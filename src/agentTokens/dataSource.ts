@@ -5,12 +5,18 @@ import { agentTokenMapper } from './mapper';
 
 export class AgentTokensAPI {
   async *listAgentTokens(poolId: string, filter?: AgentTokenFilter): AsyncGenerator<AgentToken[], void, unknown> {
-    yield* streamPages<AgentToken, AgentTokenFilter>(
+    const agentTokenStream = streamPages<AgentToken, AgentTokenFilter>(
       `/agent-pools/${poolId}/authentication-tokens`,
       agentTokenMapper,
       undefined,
       filter
     );
+    for await (const agentTokenPage of agentTokenStream) {
+      agentTokenPage.forEach(token => {
+        token.poolId = poolId;
+      });
+      yield agentTokenPage;
+    }
   }
 
   async getAgentToken(id: string): Promise<AgentToken> {

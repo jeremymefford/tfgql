@@ -4,7 +4,6 @@ import {
   AgentPool,
   AgentPoolFilter,
   AgentPoolResponse,
-  AgentPoolListResponse
 } from './types';
 import { agentPoolMapper } from './mapper';
 import { Agent, AgentFilter } from '../agents/types';

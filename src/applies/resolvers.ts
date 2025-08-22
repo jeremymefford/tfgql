@@ -73,14 +73,14 @@ export const resolvers = {
         if (!workspacePage || workspacePage.length === 0) {
           continue;
         }
-        await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
+        for (const workspace of workspacePage) {
           const applies = await resolvers.Query.appliesForWorkspace(
-            null,
+            _,
             { workspaceId: workspace.id, filter: filter },
             ctx
           );
           results.push(...applies);
-        });
+        }
       }
       return results;
     }

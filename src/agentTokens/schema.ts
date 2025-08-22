@@ -3,10 +3,10 @@ import { gql } from 'graphql-tag';
 const agentTokensSchema = gql`
   type AgentToken {
     id: ID!
+    poolId: String
     createdAt: DateTime!
     lastUsedAt: DateTime
     description: String!
-    token: String
     createdById: ID!
   }
 
@@ -20,7 +20,6 @@ const agentTokensSchema = gql`
     createdAt: DateTimeComparisonExp
     lastUsedAt: DateTimeComparisonExp
     description: StringComparisonExp
-    token: StringComparisonExp
     createdById: StringComparisonExp
   }
 

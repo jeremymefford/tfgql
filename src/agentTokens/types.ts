@@ -5,13 +5,9 @@ export interface AgentTokenAttributes {
   'created-at': string;
   'last-used-at': string | null;
   description: string;
-  token: string | null;
 }
 
 export interface AgentTokenRelationships {
-  pool: {
-    data: ResourceRef;
-  };
   'created-by': {
     data: ResourceRef;
   };
@@ -26,11 +22,10 @@ export type AgentTokenListResponse = ListResponse<AgentTokenResource>;
 
 export interface AgentToken {
   id: string;
-  poolId: string;
+  poolId: string | null;
   createdAt: string;
   lastUsedAt: string | null;
   description: string;
-  token: string | null;
   createdById: string;
 }
 
@@ -44,6 +39,5 @@ export interface AgentTokenFilter extends WhereClause<AgentToken> {
   createdAt?: DateTimeComparisonExp;
   lastUsedAt?: DateTimeComparisonExp;
   description?: StringComparisonExp;
-  token?: StringComparisonExp;
   createdById?: StringComparisonExp;
 }

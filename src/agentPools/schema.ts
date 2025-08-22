@@ -3,6 +3,7 @@ import { gql } from 'graphql-tag';
 const agentPoolsSchema = gql`
   type AgentPool {
     id: ID!
+    type: String!
     name: String!
     createdAt: DateTime!
     organizationScoped: Boolean!
@@ -19,6 +20,7 @@ const agentPoolsSchema = gql`
     _not: AgentPoolFilter
 
     id: StringComparisonExp
+    type: StringComparisonExp
     name: StringComparisonExp
     createdAt: DateTimeComparisonExp
     organizationScoped: BooleanComparisonExp

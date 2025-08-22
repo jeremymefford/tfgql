@@ -6,11 +6,10 @@ export const agentTokenMapper: DomainMapper<AgentTokenResource, AgentToken> = {
     const attrs = resource.attributes;
     return {
       id: resource.id,
-      poolId: resource.relationships?.pool.data.id || '',
+      poolId: null, // will have to be filled in upstream
       createdAt: attrs['created-at'],
       lastUsedAt: attrs['last-used-at'],
       description: attrs.description,
-      token: attrs.token,
       createdById: resource.relationships?.['created-by'].data.id || '',
     };
   }

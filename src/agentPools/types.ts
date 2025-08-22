@@ -47,6 +47,7 @@ export type AgentPoolListResponse = ListResponse<AgentPoolResource>;
 
 export interface AgentPool {
   id: string;
+  type: string;
   name: string;
   createdAt: string;
   organizationScoped: boolean;
@@ -62,6 +63,7 @@ export interface AgentPoolFilter extends WhereClause<AgentPool> {
 
   id?: StringComparisonExp;
   name?: StringComparisonExp;
+  type?: StringComparisonExp;
   createdAt?: DateTimeComparisonExp;
   organizationScoped?: BooleanComparisonExp;
   agentCount?: IntComparisonExp;

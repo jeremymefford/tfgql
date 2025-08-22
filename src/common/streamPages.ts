@@ -4,6 +4,8 @@ import type { ListResponse } from './types/jsonApi';
 import { evaluateWhereClause } from './filtering/filtering';
 import { DomainMapper } from './middleware/domainMapper';
 import { applicationConfiguration } from './conf';
+import { error } from 'console';
+import { AxiosError } from 'axios';
 
 
 export async function* streamPages<T, TFilter = {}>(
@@ -13,8 +15,17 @@ export async function* streamPages<T, TFilter = {}>(
   filter?: WhereClause<T, TFilter>
 ): AsyncGenerator<T[], void, unknown> {
   const baseParams = { 'page[size]': applicationConfiguration.tfcPageSize, ...(params || {}) };
+  let firstRes;
+  try {
+    firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
+  } catch (error:any) {
+    if (error?.status === 404) {
+      console.log(`No results found for ${endpoint}`);
+      return;
+    }
+    throw error;
+  }
 
-  const firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   const pagination = firstRes.data.meta?.pagination;
   const totalPages = pagination?.['total-pages'] ?? 1;
 

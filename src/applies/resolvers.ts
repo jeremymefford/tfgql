@@ -35,7 +35,7 @@ export const resolvers = {
         }
         await parallelizeBounded(runPage, async (run: Run) => {
           const apply = await ctx.dataSources.appliesAPI.getRunApply(run.id);
-          if (evaluateWhereClause(filter, apply)) {
+          if (apply && evaluateWhereClause(filter, apply)) {
             results.push(apply);
           }
         });

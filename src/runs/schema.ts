@@ -26,6 +26,7 @@ const runSchema = gql`
     variables: [String!]!
     workspace: Workspace
     configurationVersion: ConfigurationVersion
+    apply: Apply
   }
 
   type RunPermissions {

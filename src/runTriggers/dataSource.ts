@@ -28,8 +28,14 @@ export class RunTriggersAPI {
   /**
    * Get a single run trigger by ID.
    */
-  async getRunTrigger(id: string): Promise<RunTrigger> {
-    const res = await axiosClient.get<RunTriggerResponse>(`/run-triggers/${id}`);
-    return runTriggerMapper.map(res.data.data);
+  async getRunTrigger(id: string): Promise<RunTrigger | null> {
+    return axiosClient.get<RunTriggerResponse>(`/run-triggers/${id}`)
+      .then(res => runTriggerMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

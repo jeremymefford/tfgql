@@ -11,11 +11,14 @@ export class OrganizationsAPI {
     );
   }
 
-  async getOrganization(name: string): Promise<Organization> {
-    const res = await axiosClient.get<OrganizationResponse>(`/organizations/${name}`);
-    if (!res || !res.data || !res.data.data) {
-      throw new Error(`Failed to fetch organization data for ${name}`);
-    }
-    return organizationMapper.map(res.data.data);
+  async getOrganization(name: string): Promise<Organization | null> {
+    return axiosClient.get<OrganizationResponse>(`/organizations/${name}`)
+      .then(res => organizationMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

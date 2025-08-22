@@ -13,12 +13,5 @@ export const resolvers = {
         dataSources.policySetParametersAPI.listPolicySetParameters(filter)
       );
     },
-    policySetParameter: async (
-      _: unknown,
-      { id }: { id: string },
-      { dataSources }: Context
-    ): Promise<PolicySetParameter | null> => {
-      return dataSources.policySetParametersAPI.getPolicySetParameter(id);
-    }
   }
 };

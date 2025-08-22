@@ -13,8 +13,14 @@ export class TeamTokensAPI {
     );
   }
 
-  async getTeamToken(id: string): Promise<TeamToken> {
-    const res = await axiosClient.get<TeamTokenResponse>(`/authentication-tokens/${id}`);
-    return teamTokenMapper.map(res.data.data);
+  async getTeamToken(id: string): Promise<TeamToken | null> {
+    return axiosClient.get<TeamTokenResponse>(`/authentication-tokens/${id}`)
+      .then(res => teamTokenMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

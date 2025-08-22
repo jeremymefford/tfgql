@@ -13,8 +13,14 @@ export class CommentsAPI {
     );
   }
 
-  async getComment(id: string): Promise<Comment> {
-    const res = await axiosClient.get<CommentResponse>(`/comments/${id}`);
-    return commentMapper.map(res.data.data);
+  async getComment(id: string): Promise<Comment | null> {
+    return axiosClient.get<CommentResponse>(`/comments/${id}`)
+      .then((res) => commentMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

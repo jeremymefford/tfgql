@@ -15,8 +15,14 @@ export class AppliesAPI {
       });
   }
 
-  async getApply(id: string): Promise<Apply> {
-    const res = await axiosClient.get<ApplyResponse>(`/applies/${id}`);
-    return applyMapper.map(res.data.data);
+  async getApply(id: string): Promise<Apply | null> {
+    return axiosClient.get<ApplyResponse>(`/applies/${id}`)
+      .then((res) => applyMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

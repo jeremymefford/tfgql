@@ -22,7 +22,6 @@ const organizationTagsSchema = gql`
 
   extend type Query {
     organizationTags(orgName: String!, filter: OrganizationTagFilter): [OrganizationTag!]!
-    organizationTag(id: ID!): OrganizationTag
   }
 `;
 

@@ -15,12 +15,15 @@ export class RunsAPI {
   }
 
   /** Get a single run by ID */
-  async getRun(runId: string): Promise<Run> {
-    const res = await axiosClient.get<RunResponse>(`/runs/${runId}`);
-    if (!res || !res.data || !res.data.data) {
-      throw new Error(`Failed to fetch run data for run ID: ${runId}`);
-    }
-    return runMapper.map(res.data.data);
+  async getRun(runId: string): Promise<Run | null> {
+    return axiosClient.get<RunResponse>(`/runs/${runId}`)
+      .then(res => runMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
   /**
    * Stream all run-events for a given run (used for workspace dependency graphs).

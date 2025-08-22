@@ -21,8 +21,14 @@ export class AssessmentResultsAPI {
     );
   }
 
-  async getAssessmentResult(id: string): Promise<AssessmentResult> {
-    const res = await axiosClient.get<AssessmentResultResponse>(`/assessment-results/${id}`);
-    return assessmentResultMapper.map(res.data.data);
+  async getAssessmentResult(id: string): Promise<AssessmentResult | null> {
+    return axiosClient.get<AssessmentResultResponse>(`/assessment-results/${id}`)
+      .then((res) => assessmentResultMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

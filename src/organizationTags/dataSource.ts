@@ -12,9 +12,4 @@ export class OrganizationTagsAPI {
       filter
     );
   }
-
-  async getOrganizationTag(id: string): Promise<OrganizationTag> {
-    const res = await axiosClient.get<OrganizationTagResponse>(`/organization-tags/${id}`);
-    return organizationTagMapper.map(res.data.data);
-  }
 }

@@ -34,8 +34,14 @@ export class AgentPoolsAPI {
     );
   }
 
-  async getAgentPool(id: string): Promise<AgentPool> {
-    const res = await axiosClient.get<AgentPoolResponse>(`/agent-pools/${id}`);
-    return agentPoolMapper.map(res.data.data);
+  async getAgentPool(id: string): Promise<AgentPool | null> {
+    return axiosClient.get<AgentPoolResponse>(`/agent-pools/${id}`)
+      .then((res) => agentPoolMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

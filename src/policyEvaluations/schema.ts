@@ -47,7 +47,6 @@ const policyEvaluationsSchema = gql`
 
   extend type Query {
     policyEvaluations(taskStageId: ID!, filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
-    policyEvaluation(id: ID!): PolicyEvaluation
   }
 `;
 

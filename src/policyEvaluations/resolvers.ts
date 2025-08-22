@@ -13,12 +13,5 @@ export const resolvers = {
         dataSources.policyEvaluationsAPI.listPolicyEvaluations(taskStageId, filter)
       );
     },
-    policyEvaluation: async (
-      _: unknown,
-      { id }: { id: string },
-      { dataSources }: Context
-    ): Promise<PolicyEvaluation | null> => {
-      return dataSources.policyEvaluationsAPI.getPolicyEvaluation(id);
-    }
   }
 };

@@ -13,8 +13,14 @@ export class PolicySetsAPI {
     );
   }
 
-  async getPolicySet(id: string): Promise<PolicySet> {
-    const res = await axiosClient.get<PolicySetResponse>(`/policy-sets/${id}`);
-    return policySetMapper.map(res.data.data);
+  async getPolicySet(id: string): Promise<PolicySet | null> {
+    return axiosClient.get<PolicySetResponse>(`/policy-sets/${id}`)
+      .then(res => policySetMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

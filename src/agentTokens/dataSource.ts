@@ -19,8 +19,14 @@ export class AgentTokensAPI {
     }
   }
 
-  async getAgentToken(id: string): Promise<AgentToken> {
-    const res = await axiosClient.get<AgentTokenResponse>(`/authentication-tokens/${id}`);
-    return agentTokenMapper.map(res.data.data);
+  async getAgentToken(id: string): Promise<AgentToken | null> {
+    return axiosClient.get<AgentTokenResponse>(`/authentication-tokens/${id}`)
+      .then((res) => agentTokenMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

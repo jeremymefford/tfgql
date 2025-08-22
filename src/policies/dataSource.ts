@@ -13,8 +13,14 @@ export class PoliciesAPI {
     );
   }
 
-  async getPolicy(id: string): Promise<Policy> {
-    const res = await axiosClient.get<PolicyResponse>(`/policies/${id}`);
-    return policyMapper.map(res.data.data);
+  async getPolicy(id: string): Promise<Policy | null> {
+    return axiosClient.get<PolicyResponse>(`/policies/${id}`)
+      .then(res => policyMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

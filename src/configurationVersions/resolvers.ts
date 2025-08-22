@@ -7,7 +7,7 @@ import { Workspace } from '../workspaces/types';
 
 export const resolvers = {
     Query: {
-        configurationVersion: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<ConfigurationVersion> => {
+        configurationVersion: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<ConfigurationVersion | null> => {
             const cv = await dataSources.configurationVersionsAPI.getConfigurationVersion(id);
             return cv;
         },

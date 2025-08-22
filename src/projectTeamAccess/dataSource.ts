@@ -18,8 +18,14 @@ export class ProjectTeamAccessAPI {
     );
   }
 
-  async getProjectTeamAccess(id: string): Promise<ProjectTeamAccess> {
-    const res = await axiosClient.get<ProjectTeamAccessResponse>(`/team-projects/${id}`);
-    return projectTeamAccessMapper.map(res.data.data);
+  async getProjectTeamAccess(id: string): Promise<ProjectTeamAccess | null> {
+    return axiosClient.get<ProjectTeamAccessResponse>(`/team-projects/${id}`)
+      .then(res => projectTeamAccessMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

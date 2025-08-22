@@ -3,9 +3,7 @@ import { gql } from 'graphql-tag';
 const commentsSchema = gql`
   type Comment {
     id: ID!
-    # The text body of the comment
     body: String!
-    # ID of the associated run-event
     runEventId: ID
   }
 
@@ -14,9 +12,6 @@ const commentsSchema = gql`
     _or: [CommentFilter!]
     _not: CommentFilter
 
-    # Filter by comment ID
-    id: StringComparisonExp
-    # Filter by comment body text
     body: StringComparisonExp
   }
 

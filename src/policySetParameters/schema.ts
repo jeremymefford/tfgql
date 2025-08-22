@@ -24,7 +24,6 @@ const policySetParametersSchema = gql`
 
   extend type Query {
     policySetParameters(filter: PolicySetParameterFilter): [PolicySetParameter!]!
-    policySetParameter(id: ID!): PolicySetParameter
   }
 `;
 

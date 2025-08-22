@@ -16,8 +16,14 @@ export class AgentsAPI {
     );
   }
 
-  async getAgent(id: string): Promise<Agent> {
-    const res = await axiosClient.get<AgentResponse>(`/agents/${id}`);
-    return agentMapper.map(res.data.data);
+  async getAgent(id: string): Promise<Agent | null> {
+    return axiosClient.get<AgentResponse>(`/agents/${id}`)
+      .then((res) => agentMapper.map(res.data.data))
+      .catch((err) => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

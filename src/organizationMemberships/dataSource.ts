@@ -21,8 +21,14 @@ export class OrganizationMembershipsAPI {
     );
   }
 
-  async getOrganizationMembership(id: string): Promise<OrganizationMembership> {
-    const res = await axiosClient.get<OrganizationMembershipResponse>(`/organization-memberships/${id}`);
-    return organizationMembershipMapper.map(res.data.data);
+  async getOrganizationMembership(id: string): Promise<OrganizationMembership | null> {
+    return axiosClient.get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
+      .then(res => organizationMembershipMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

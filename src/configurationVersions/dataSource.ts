@@ -12,22 +12,24 @@ export class ConfigurationVersionsAPI {
         this.requestCache = requestCache;
     }
 
-    async getConfigurationVersion(id: string): Promise<ConfigurationVersion> {
-        return await this.requestCache.getOrSet<ConfigurationVersion>(
+    async getConfigurationVersion(id: string): Promise<ConfigurationVersion | null> {
+        return this.requestCache.getOrSet<ConfigurationVersion | null>(
             'ConfigurationVersion',
             id,
             async () => {
-                const res = await axiosClient.get<ConfigurationVersionResponse>(
+                return axiosClient.get<ConfigurationVersionResponse>(
                     `/configuration-versions/${id}`, {
-                        params: { 'include': 'run' } // currently doesn't work, but should according to the API docs
+                    params: { 'include': 'run' } // currently doesn't work, but should according to the API docs
+                })
+                    .then(res => configurationVersionMapper.map(res.data.data))
+                    .catch(err => {
+                        if (err.status === 404) {
+                            return null;
+                        }
+                        throw err;
                     });
-                if (!res || !res.data || !res.data.data) {
-                    throw new Error(`Failed to fetch run data for configuration version ID: ${id}`);
-                }
-                return configurationVersionMapper.map(res.data.data);
             }
         );
-
     }
 
     async getConfigurationVersionSize(downloadUrl: string): Promise<number | null> {

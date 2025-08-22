@@ -16,8 +16,14 @@ export class StateVersionOutputsAPI {
     );
   }
 
-  async getStateVersionOutput(id: string): Promise<StateVersionOutput> {
-    const res = await axiosClient.get<StateVersionOutputResponse>(`/state-version-outputs/${id}`);
-    return stateVersionOutputMapper.map(res.data.data);
+  async getStateVersionOutput(id: string): Promise<StateVersionOutput | null> {
+    return axiosClient.get<StateVersionOutputResponse>(`/state-version-outputs/${id}`)
+      .then(res => stateVersionOutputMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

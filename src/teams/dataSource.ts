@@ -33,11 +33,14 @@ export class TeamsAPI {
         );
     }
 
-    async getTeam(id: string): Promise<Team> {
-        const res = await axiosClient.get<TeamResponse>(`/teams/${id}`);
-        if (!res || !res.data || !res.data.data) {
-            throw new Error(`Failed to fetch team data for team ID: ${id}`);
-        }
-        return teamMapper.map(res.data.data);
+    async getTeam(id: string): Promise<Team | null> {
+        return axiosClient.get<TeamResponse>(`/teams/${id}`)
+            .then(res => teamMapper.map(res.data.data))
+            .catch(err => {
+                if (err.status === 404) {
+                    return null;
+                }
+                throw err;
+            });
     }
 }

@@ -13,8 +13,4 @@ export class PolicyEvaluationsAPI {
     );
   }
 
-  async getPolicyEvaluation(id: string): Promise<PolicyEvaluation> {
-    const res = await axiosClient.get<PolicyEvaluationResponse>(`/policy-evaluations/${id}`);
-    return policyEvaluationMapper.map(res.data.data);
-  }
 }

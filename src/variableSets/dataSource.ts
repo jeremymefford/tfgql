@@ -8,9 +8,15 @@ import { variableSetMapper } from './mapper';
 import { streamPages } from '../common/streamPages';
 
 export class VariableSetsAPI {
-    async getVariableSet(id: string): Promise<VariableSet> {
-        const res = await axiosClient.get<VariableSetResponse>(`/varsets/${id}`);
-        return variableSetMapper.map(res.data.data);
+    async getVariableSet(id: string): Promise<VariableSet | null> {
+        return axiosClient.get<VariableSetResponse>(`/varsets/${id}`)
+            .then(res => variableSetMapper.map(res.data.data))
+            .catch(err => {
+                if (err.status === 404) {
+                    return null;
+                }
+                throw err;
+            });
     }
 
     async *getOrgsVariableSets(orgName: string, filter?: VariableSetFilter): AsyncGenerator<VariableSet[], void, unknown> {

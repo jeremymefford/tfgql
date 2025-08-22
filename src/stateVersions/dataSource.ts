@@ -27,18 +27,30 @@ export class StateVersionsAPI {
   /**
    * Fetch a single state version by ID.
    */
-  async getStateVersion(id: string): Promise<StateVersion> {
-    const res = await axiosClient.get<StateVersionResponse>(`/state-versions/${id}`);
-    return stateVersionMapper.map(res.data.data);
+  async getStateVersion(id: string): Promise<StateVersion | null> {
+    return axiosClient.get<StateVersionResponse>(`/state-versions/${id}`)
+      .then(res => stateVersionMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 
   /**
    * Fetch the current state version for a given workspace.
    */
-  async getCurrentStateVersion(workspaceId: string): Promise<StateVersion> {
-    const res = await axiosClient.get<StateVersionResponse>(
+  async getCurrentStateVersion(workspaceId: string): Promise<StateVersion | null> {
+    return axiosClient.get<StateVersionResponse>(
       `/workspaces/${workspaceId}/current-state-version`
-    );
-    return stateVersionMapper.map(res.data.data);
+    )
+      .then(res => stateVersionMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
 }

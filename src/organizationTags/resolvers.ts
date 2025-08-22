@@ -13,12 +13,5 @@ export const resolvers = {
         dataSources.organizationTagsAPI.listOrganizationTags(orgName, filter)
       );
     },
-    organizationTag: async (
-      _: unknown,
-      { id }: { id: string },
-      { dataSources }: Context
-    ): Promise<OrganizationTag | null> => {
-      return dataSources.organizationTagsAPI.getOrganizationTag(id);
-    }
   }
 };

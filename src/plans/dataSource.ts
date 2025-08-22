@@ -13,10 +13,17 @@ export class PlansAPI {
     );
   }
 
-  async getPlan(id: string): Promise<Plan> {
-    const res = await axiosClient.get<PlanResponse>(`/plans/${id}`);
-    return planMapper.map(res.data.data);
+  async getPlan(id: string): Promise<Plan | null> {
+    return axiosClient.get<PlanResponse>(`/plans/${id}`)
+      .then(res => planMapper.map(res.data.data))
+      .catch(err => {
+        if (err.status === 404) {
+          return null;
+        }
+        throw err;
+      });
   }
+
   async getPlanJsonOutputUrl(id: string): Promise<string> {
     const res = await axiosClient.get<void>(`/plans/${id}/json-output`, {
       maxRedirects: 0,

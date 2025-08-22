@@ -20,9 +20,4 @@ export class PolicySetParametersAPI {
       filter
     );
   }
-
-  async getPolicySetParameter(id: string): Promise<PolicySetParameter> {
-    const res = await axiosClient.get<PolicySetParameterResponse>(`/policy-set-parameters/${id}`);
-    return policySetParameterMapper.map(res.data.data);
-  }
 }

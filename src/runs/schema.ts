@@ -27,6 +27,9 @@ const runSchema = gql`
     workspace: Workspace
     configurationVersion: ConfigurationVersion
     apply: Apply
+    comments(filter: CommentFilter): [Comment!]!
+    runEvents: [RunEvent!]!
+    runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
   }
 
   type RunPermissions {
@@ -112,18 +115,6 @@ const runSchema = gql`
     run(id: ID!): Run
   }
 
-  extend type Run {
-    # List of comments associated with this run
-    comments(filter: CommentFilter): [Comment!]!
-    # Sequence of low-level run events (run-triggers, workspace dependencies, etc.)
-    runEvents: [RunEvent!]!
-    # Inbound or outbound workspace run triggers for the run's workspace
-    runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
-  }
-
-  """
-  Low-level run event data for building workspace trigger graphs.
-  """
   type RunEvent {
     id: ID!
     body: JSON!

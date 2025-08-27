@@ -3,6 +3,7 @@ import { streamPages } from '../common/streamPages';
 import {
   OrganizationMembership,
   OrganizationMembershipFilter,
+  OrganizationMembershipListResponse,
   OrganizationMembershipResponse
 } from './types';
 import { organizationMembershipMapper } from './mapper';
@@ -27,6 +28,17 @@ export class OrganizationMembershipsAPI {
       .catch(err => {
         if (err.status === 404) {
           return null;
+        }
+        throw err;
+      });
+  }
+
+  async myOrganizationMemberships(): Promise<OrganizationMembership[]> {
+    return axiosClient.get<OrganizationMembershipListResponse>(`/organization-memberships`)
+      .then(res => res.data.data.map(organizationMembershipMapper.map))
+      .catch(err => {
+        if (err.status === 404) {
+          return [];
         }
         throw err;
       });

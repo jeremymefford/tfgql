@@ -19,6 +19,13 @@ export const resolvers = {
       { dataSources }: Context
     ): Promise<OrganizationMembership | null> => {
       return dataSources.organizationMembershipsAPI.getOrganizationMembership(id);
+    },
+    myOrganizationMemberships: async (
+      _: unknown,
+      _1: unknown,
+      { dataSources }: Context
+    ): Promise<OrganizationMembership[]> => {
+      return dataSources.organizationMembershipsAPI.myOrganizationMemberships();
     }
   }
 };

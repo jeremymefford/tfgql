@@ -7,6 +7,7 @@ import {
   OrganizationMembershipResponse
 } from './types';
 import { organizationMembershipMapper } from './mapper';
+import { evaluateWhereClause } from '../common/filtering/filtering';
 
 export class OrganizationMembershipsAPI {
   async *listOrganizationMemberships(orgName: string, filter?: OrganizationMembershipFilter): AsyncGenerator<
@@ -33,9 +34,12 @@ export class OrganizationMembershipsAPI {
       });
   }
 
-  async myOrganizationMemberships(): Promise<OrganizationMembership[]> {
+  async myOrganizationMemberships(filter?: OrganizationMembershipFilter): Promise<OrganizationMembership[]> {
     return axiosClient.get<OrganizationMembershipListResponse>(`/organization-memberships`)
-      .then(res => res.data.data.map(organizationMembershipMapper.map))
+      .then(res =>
+        res.data.data
+          .map(organizationMembershipMapper.map)
+          .filter(orgMembership => evaluateWhereClause(filter, orgMembership)))
       .catch(err => {
         if (err.status === 404) {
           return [];

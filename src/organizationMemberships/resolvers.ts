@@ -22,10 +22,10 @@ export const resolvers = {
     },
     myOrganizationMemberships: async (
       _: unknown,
-      _1: unknown,
+      { filter }: { filter: OrganizationMembershipFilter },
       { dataSources }: Context
     ): Promise<OrganizationMembership[]> => {
-      return dataSources.organizationMembershipsAPI.myOrganizationMemberships();
+      return dataSources.organizationMembershipsAPI.myOrganizationMemberships(filter);
     }
   }
 };

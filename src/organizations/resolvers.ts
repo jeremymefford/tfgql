@@ -1,5 +1,5 @@
 import { Context } from '../server/context';
-import { Organization } from './types';
+import { Organization, OrganizationFilter } from './types';
 import { Workspace, WorkspaceFilter } from '../workspaces/types';
 import { Team, TeamFilter } from '../teams/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
@@ -18,8 +18,8 @@ import { PolicySet, PolicySetFilter } from '../policySets/types';
 
 export const resolvers = {
   Query: {
-    organizations: async (_: unknown, __: unknown, { dataSources }: Context): Promise<Promise<Organization>[]> => {
-      return gatherAsyncGeneratorPromises(dataSources.organizationsAPI.listOrganizations());
+    organizations: async (_: unknown, {filter}: {filter: OrganizationFilter}, { dataSources }: Context): Promise<Promise<Organization>[]> => {
+      return gatherAsyncGeneratorPromises(dataSources.organizationsAPI.listOrganizations(filter));
     },
     organization: async (_: unknown, { name }: { name: string }, { dataSources }: Context): Promise<Organization | null> => {
       const org = await dataSources.organizationsAPI.getOrganization(name);

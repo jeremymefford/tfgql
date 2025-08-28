@@ -14,7 +14,6 @@ export class RunsAPI {
     }>(`/workspaces/${workspaceId}/runs`, runMapper, undefined, filter);
   }
 
-  /** Get a single run by ID */
   async getRun(runId: string): Promise<Run | null> {
     return axiosClient.get<RunResponse>(`/runs/${runId}`)
       .then(res => runMapper.map(res.data.data))
@@ -25,9 +24,7 @@ export class RunsAPI {
         throw err;
       });
   }
-  /**
-   * Stream all run-events for a given run (used for workspace dependency graphs).
-   */
+
   async *listRunEvents(runId: string): AsyncGenerator<RunEvent[], void, unknown> {
     yield* streamPages<RunEvent, {}>(
       `/runs/${runId}/run-events`,

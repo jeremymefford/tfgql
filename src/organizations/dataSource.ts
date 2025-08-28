@@ -1,13 +1,17 @@
 import { axiosClient } from '../common/httpClient';
 import { streamPages } from '../common/streamPages';
-import { OrganizationResponse, Organization } from './types';
+import { OrganizationResponse, Organization, OrganizationFilter, OrganizationPermissionsFilter } from './types';
 import { organizationMapper } from './mapper';
 
 export class OrganizationsAPI {
-  async *listOrganizations(): AsyncGenerator<Organization[]> {
-    yield* streamPages<Organization>(
+  async *listOrganizations(filter?: OrganizationFilter): AsyncGenerator<Organization[]> {
+    yield* streamPages<Organization, {
+      permissions: OrganizationPermissionsFilter
+    }>(
       '/organizations',
-      organizationMapper
+      organizationMapper,
+      undefined,
+      filter
     );
   }
 

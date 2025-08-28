@@ -1,4 +1,11 @@
 import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import {
+  StringComparisonExp,
+  IntComparisonExp,
+  BooleanComparisonExp,
+  DateTimeComparisonExp,
+  WhereClause,
+} from '../common/filtering/types';
 
 export interface OrganizationAttributes {
   name: string;
@@ -113,4 +120,70 @@ export interface Organization {
     canReadRunTasks: boolean;
     canCreateProject: boolean;
   };
+}
+
+export interface OrganizationPermissionsFilter extends WhereClause<Organization['permissions']> {
+  canUpdate?: BooleanComparisonExp;
+  canDestroy?: BooleanComparisonExp;
+  canAccessViaTeams?: BooleanComparisonExp;
+  canCreateModule?: BooleanComparisonExp;
+  canCreateTeam?: BooleanComparisonExp;
+  canCreateWorkspace?: BooleanComparisonExp;
+  canManageUsers?: BooleanComparisonExp;
+  canManageSubscription?: BooleanComparisonExp;
+  canManageSso?: BooleanComparisonExp;
+  canUpdateOauth?: BooleanComparisonExp;
+  canUpdateSentinel?: BooleanComparisonExp;
+  canUpdateSshKeys?: BooleanComparisonExp;
+  canUpdateApiToken?: BooleanComparisonExp;
+  canTraverse?: BooleanComparisonExp;
+  canStartTrial?: BooleanComparisonExp;
+  canUpdateAgentPools?: BooleanComparisonExp;
+  canManageTags?: BooleanComparisonExp;
+  canManageVarsets?: BooleanComparisonExp;
+  canReadVarsets?: BooleanComparisonExp;
+  canManagePublicProviders?: BooleanComparisonExp;
+  canCreateProvider?: BooleanComparisonExp;
+  canManagePublicModules?: BooleanComparisonExp;
+  canManageCustomProviders?: BooleanComparisonExp;
+  canManageRunTasks?: BooleanComparisonExp;
+  canReadRunTasks?: BooleanComparisonExp;
+  canCreateProject?: BooleanComparisonExp;
+}
+
+export interface OrganizationFilter extends WhereClause<
+  Organization, {
+    permissions: OrganizationPermissionsFilter
+  }> {
+
+  _and?: OrganizationFilter[];
+  _or?: OrganizationFilter[];
+  _not?: OrganizationFilter;
+
+  id?: StringComparisonExp;
+  name?: StringComparisonExp;
+  externalId?: StringComparisonExp;
+  email?: StringComparisonExp;
+  createdAt?: DateTimeComparisonExp;
+  sessionTimeout?: IntComparisonExp;
+  sessionRemember?: IntComparisonExp;
+  collaboratorAuthPolicy?: StringComparisonExp;
+  planExpired?: BooleanComparisonExp;
+  planExpiresAt?: DateTimeComparisonExp;
+  planIsTrial?: BooleanComparisonExp;
+  planIsEnterprise?: BooleanComparisonExp;
+  planIdentifier?: StringComparisonExp;
+  costEstimationEnabled?: BooleanComparisonExp;
+  sendPassingStatusesForUntriggeredSpeculativePlans?: BooleanComparisonExp;
+  aggregatedCommitStatusEnabled?: BooleanComparisonExp;
+  speculativePlanManagementEnabled?: BooleanComparisonExp;
+  allowForceDeleteWorkspaces?: BooleanComparisonExp;
+  fairRunQueuingEnabled?: BooleanComparisonExp;
+  samlEnabled?: BooleanComparisonExp;
+  ownersTeamSamlRoleId?: StringComparisonExp;
+  twoFactorConformant?: BooleanComparisonExp;
+  assessmentsEnforced?: BooleanComparisonExp;
+  defaultExecutionMode?: StringComparisonExp;
+
+  permissions?: OrganizationPermissionsFilter;
 }

@@ -1,5 +1,7 @@
 import { gql } from 'graphql-tag';
 
+// TODO come back and review
+
 const organizationTagsSchema = gql`
   type OrganizationTag {
     id: ID!

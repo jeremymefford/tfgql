@@ -30,6 +30,7 @@ const runSchema = gql`
     comments(filter: CommentFilter): [Comment!]!
     runEvents: [RunEvent!]!
     runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
+    plan: Plan
   }
 
   type RunPermissions {

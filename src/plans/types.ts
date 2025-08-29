@@ -20,23 +20,38 @@ export interface PlanAttributes {
   'resource-changes': number;
   'resource-destructions': number;
   'resource-imports': number;
+  'structured-run-output-enabled': boolean;
   status: string;
   'status-timestamps': {
-    'queued-at': string;
+    'agent-queued-at': string;
     'pending-at': string;
     'started-at': string;
     'finished-at': string;
   };
   'log-read-url': string;
+  actions: {
+    'is-exportable': boolean;
+  }
+  permissions: {
+    'can-export': boolean;
+  }
+}
+
+export interface PlanLinks {
+  'json-output': string;
+  'json-output-redacted': string;
+  'json-schema': string;
 }
 
 export interface PlanRelationships {
-  'state-versions': {
+  exports: {
     data: ResourceRef[];
   };
 }
 
+
 export type PlanResource = ResourceObject<PlanAttributes> & {
+  links: PlanLinks;
   relationships?: PlanRelationships;
 };
 
@@ -45,13 +60,11 @@ export type PlanListResponse = ListResponse<PlanResource>;
 
 export interface Plan {
   id: string;
-  executionDetails: {
-    mode: string;
-    agentId?: string;
-    agentName?: string;
-    agentPoolId?: string;
-    agentPoolName?: string;
-  };
+  mode: string;
+  agentId?: string;
+  agentName?: string;
+  agentPoolId?: string;
+  agentPoolName?: string;
   generatedConfiguration: boolean;
   hasChanges: boolean;
   resourceAdditions: number;
@@ -59,14 +72,15 @@ export interface Plan {
   resourceDestructions: number;
   resourceImports: number;
   status: string;
-  statusTimestamps: {
-    queuedAt: string;
-    pendingAt: string;
-    startedAt: string;
-    finishedAt: string;
-  };
+  agentQueuedAt?: string;
+  pendingAt?: string;
+  startedAt?: string;
+  finishedAt?: string;
   logReadUrl: string;
-  stateVersionIds: string[];
+  jsonOutputUrl: string;
+  jsonOutputRedactedUrl: string;
+  jsonSchema: string;
+  structuredRunOutputEnabled: boolean;
 }
 
 export interface PlanFilter extends WhereClause<Plan> {

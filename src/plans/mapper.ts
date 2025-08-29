@@ -6,13 +6,11 @@ export const planMapper: DomainMapper<PlanResource, Plan> = {
     const attrs = resource.attributes;
     return {
       id: resource.id,
-      executionDetails: {
-        mode: attrs['execution-details'].mode,
-        agentId: attrs['execution-details']['agent-id'],
-        agentName: attrs['execution-details']['agent-name'],
-        agentPoolId: attrs['execution-details']['agent-pool-id'],
-        agentPoolName: attrs['execution-details']['agent-pool-name']
-      },
+      mode: attrs['execution-details'].mode,
+      agentId: attrs['execution-details']?.['agent-id'],
+      agentName: attrs['execution-details']?.['agent-name'],
+      agentPoolId: attrs['execution-details']?.['agent-pool-id'],
+      agentPoolName: attrs['execution-details']?.['agent-pool-name'],
       generatedConfiguration: attrs['generated-configuration'],
       hasChanges: attrs['has-changes'],
       resourceAdditions: attrs['resource-additions'],
@@ -20,15 +18,15 @@ export const planMapper: DomainMapper<PlanResource, Plan> = {
       resourceDestructions: attrs['resource-destructions'],
       resourceImports: attrs['resource-imports'],
       status: attrs.status,
-      statusTimestamps: {
-        queuedAt: attrs['status-timestamps']['queued-at'],
-        pendingAt: attrs['status-timestamps']['pending-at'],
-        startedAt: attrs['status-timestamps']['started-at'],
-        finishedAt: attrs['status-timestamps']['finished-at']
-      },
+      agentQueuedAt: attrs['status-timestamps']?.['agent-queued-at'],
+      pendingAt: attrs['status-timestamps']?.['pending-at'],
+      startedAt: attrs['status-timestamps']?.['started-at'],
+      finishedAt: attrs['status-timestamps']?.['finished-at'],
       logReadUrl: attrs['log-read-url'],
-      stateVersionIds:
-        resource.relationships?.['state-versions'].data.map(r => r.id) ?? []
+      structuredRunOutputEnabled: attrs['structured-run-output-enabled'],
+      jsonOutputRedactedUrl: resource.links['json-output-redacted'],
+      jsonSchema: resource.links['json-schema'],
+      jsonOutputUrl: resource.links['json-output'],
     };
   }
 };

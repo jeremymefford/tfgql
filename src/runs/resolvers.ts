@@ -7,6 +7,7 @@ import { RunTrigger, RunTriggerFilter } from "../runTriggers/types";
 import { ConfigurationVersionsAPI } from "../configurationVersions/dataSource";
 import { ConfigurationVersion } from "../configurationVersions/types";
 import { Apply, ApplyFilter } from "../applies/types";
+import { Plan } from "../plans/types";
 
 export const resolvers = {
   Query: {
@@ -58,9 +59,13 @@ export const resolvers = {
       run: Run,
       _: unknown,
       { dataSources }: Context
-    ): Promise<Apply | null> => {
-      const apply = dataSources.appliesAPI.getRunApply(run.id)
-      return apply
-    }
+    ): Promise<Apply | null> => 
+      dataSources.appliesAPI.getRunApply(run.id),
+    plan: async (
+      run: Run,
+      _: unknown,
+      { dataSources }: Context
+    ): Promise<Plan | null> => 
+      dataSources.plansAPI.getPlanForRun(run.id)
   }
 };

@@ -91,7 +91,7 @@ export async function buildContext(): Promise<Context> {
       commentsAPI: new CommentsAPI(),
       organizationMembershipsAPI: new OrganizationMembershipsAPI(),
       organizationTagsAPI: new OrganizationTagsAPI(),
-      plansAPI: new PlansAPI(),
+      plansAPI: new PlansAPI(requestCache),
       policiesAPI: new PoliciesAPI(),
       policySetsAPI: new PolicySetsAPI(),
       policyEvaluationsAPI: new PolicyEvaluationsAPI(),

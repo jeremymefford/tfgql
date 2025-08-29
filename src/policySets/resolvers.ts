@@ -67,11 +67,7 @@ export const resolvers = {
       { dataSources }: Context
     ) =>
       gatherAsyncGeneratorPromises(
-        dataSources.policySetParametersAPI.listPolicySetParameters(
-          filter
-            ? { _and: [filter, { policySetId: { _eq: set.id } }] }
-            : { policySetId: { _eq: set.id } }
-        )
+        dataSources.policySetParametersAPI.listPolicySetParameters(set.id, filter)
       )
   }
 };

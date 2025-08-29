@@ -1,20 +1,14 @@
-import { axiosClient } from '../common/httpClient';
 import { streamPages } from '../common/streamPages';
 import {
   PolicySetParameter,
-  PolicySetParameterFilter,
-  PolicySetParameterResponse
+  PolicySetParameterFilter
 } from './types';
 import { policySetParameterMapper } from './mapper';
 
 export class PolicySetParametersAPI {
-  async *listPolicySetParameters(filter?: PolicySetParameterFilter): AsyncGenerator<
-    PolicySetParameter[],
-    void,
-    unknown
-  > {
+  async *listPolicySetParameters(policySetId: string, filter?: PolicySetParameterFilter): AsyncGenerator<PolicySetParameter[]> {
     yield* streamPages<PolicySetParameter, PolicySetParameterFilter>(
-      `/policy-set-parameters`,
+      `/policy-sets/${policySetId}/parameters`,
       policySetParameterMapper,
       undefined,
       filter

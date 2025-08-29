@@ -14,6 +14,7 @@ const policySetsSchema = gql`
     policyToolVersion: String!
     overridable: Boolean!
     workspaceCount: Int!
+    projectCount: Int!
     policyCount: Int
     policiesPath: String
     versioned: Boolean!

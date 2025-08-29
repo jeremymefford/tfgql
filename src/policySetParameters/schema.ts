@@ -23,7 +23,7 @@ const policySetParametersSchema = gql`
   }
 
   extend type Query {
-    policySetParameters(filter: PolicySetParameterFilter): [PolicySetParameter!]!
+    policySetParameters(policySetId: ID!, filter: PolicySetParameterFilter): [PolicySetParameter!]!
   }
 `;
 

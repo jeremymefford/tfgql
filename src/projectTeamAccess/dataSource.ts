@@ -11,10 +11,8 @@ export class ProjectTeamAccessAPI {
     yield* streamPages<ProjectTeamAccess, ProjectTeamAccessFilter>(
       `/team-projects`,
       projectTeamAccessMapper,
-      undefined,
+      { 'filter[project][id]': projectId },
       filter
-        ? { _and: [filter, { projectId: { _eq: projectId } }] }
-        : { projectId: { _eq: projectId } }
     );
   }
 

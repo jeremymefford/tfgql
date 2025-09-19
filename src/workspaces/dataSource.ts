@@ -43,7 +43,7 @@ export class WorkspacesAPI {
       });
   }
 
-  async *getWorkspacesByProjectId(projectId: string): AsyncGenerator<Workspace[], void, unknown> {
+  async *getWorkspacesByProjectId(projectId: string, workspaceFilter?: WorkspaceFilter): AsyncGenerator<Workspace[], void, unknown> {
     const orgNameResponse = await axiosClient.get<ProjectResponse>(`/projects/${projectId}`);
     if (!orgNameResponse || orgNameResponse.status !== 200 || !orgNameResponse.data.data.relationships.organization.data.id) {
       console.error('Error fetching project organization:', orgNameResponse);
@@ -58,7 +58,8 @@ export class WorkspacesAPI {
     }>(
       `/organizations/${orgName}/workspaces`,
       workspaceMapper,
-      { 'filter[project][id]': projectId }
+      { 'filter[project][id]': projectId },
+      workspaceFilter
     );
   }
 }

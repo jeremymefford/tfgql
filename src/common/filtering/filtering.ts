@@ -5,6 +5,7 @@ import {
 
 export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> | undefined, obj: T): boolean {
     if (!where) return true;
+    if (!obj) return false;
 
     const logical = {
         _and: (clauses: WhereClause<T, TFilter>[]) => clauses.every(clause => evaluateWhereClause(clause, obj)),

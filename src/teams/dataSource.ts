@@ -32,7 +32,7 @@ export class TeamsAPI {
             filter
         );
     }
-
+    
     async getTeam(id: string): Promise<Team | null> {
         return axiosClient.get<TeamResponse>(`/teams/${id}`)
             .then(res => teamMapper.map(res.data.data))

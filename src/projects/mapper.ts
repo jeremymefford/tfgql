@@ -28,7 +28,7 @@ export const projectsMapper: DomainMapper<ProjectResource, Project> = {
                 canManageEphemeralWorkspaceForProjects: attr.permissions['can-manage-ephemeral-workspace-for-projects'],
                 canManageVarsets: attr.permissions['can-manage-varsets'],
             },
-            organizationId: resource.relationships?.organization?.data?.id
+            organizationId: resource.relationships.organization.data.id
         };
     }
 };

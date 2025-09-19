@@ -31,8 +31,13 @@ export interface ProjectAttributes {
     'team-count': number;
     'stack-count': number;
     'auto-destroy-activity-duration'?: string | null;
+    'default-execution-mode'?: string;
     permissions: ProjectPermissions;
     relationships?: ProjectRelationships;
+    'setting-overwrites'?: {
+        'default-execution-mode': boolean;
+        'default-agent-pool': boolean
+    };
 }
 
 export interface ProjectRelationships {
@@ -56,6 +61,7 @@ export interface Project {
     teamCount: number;
     stackCount: number;
     autoDestroyActivityDuration?: string | null;
+    defaultExecutionMode?: string;
     permissions: {
         canRead: boolean;
         canUpdate: boolean;
@@ -71,7 +77,11 @@ export interface Project {
         canManageEphemeralWorkspaceForProjects: boolean;
         canManageVarsets: boolean;
     };
-    organizationId?: string;
+    organizationId: string;
+    settingOverwrites?: {
+        defaultExecutionMode: boolean;
+        defaultAgentPool: boolean
+    };
 }
 
 export interface ProjectPermissionsFilter extends WhereClause<Project['permissions']> {
@@ -110,5 +120,6 @@ export interface ProjectFilter extends WhereClause<
     teamCount?: IntComparisonExp;
     stackCount?: IntComparisonExp;
     autoDestroyActivityDuration?: StringComparisonExp;
+    defaultExecutionMode?: StringComparisonExp;
     permissions?: ProjectPermissionsFilter;
 }

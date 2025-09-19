@@ -19,12 +19,20 @@ export class VariableSetsAPI {
             });
     }
 
-    async *getOrgsVariableSets(orgName: string, filter?: VariableSetFilter): AsyncGenerator<VariableSet[], void, unknown> {
+    async *listVariableSetsForOrg(orgName: string, filter?: VariableSetFilter): AsyncGenerator<VariableSet[], void, unknown> {
         console.log(`/organizations/${orgName}/varsets`);
         yield* streamPages<VariableSet, VariableSetFilter>(
             `/organizations/${orgName}/varsets`,
             variableSetMapper,
             {},
+            filter);
+    }
+
+    async *listVariableSetsForProject(projectId: string, filter?: VariableSetFilter): AsyncGenerator<VariableSet[], void, unknown> {
+        yield* streamPages<VariableSet, VariableSetFilter>(
+            `/projects/${projectId}/varsets`,
+            variableSetMapper,
+            undefined,
             filter);
     }
 }

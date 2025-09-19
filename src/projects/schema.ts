@@ -17,6 +17,11 @@ const projectsSchema = gql`
         canManageVarsets: Boolean
     }
 
+    type SettingOverwrites {
+        defaultExecutionMode: Boolean
+        defaultAgentPool: Boolean
+    }
+
     type Project {
         id: ID!
         name: String!
@@ -26,14 +31,19 @@ const projectsSchema = gql`
         teamCount: Int
         stackCount: Int
         autoDestroyActivityDuration: String
+        defaultExecutionMode: String
+        settingOverwrites: SettingOverwrites
         permissions: ProjectPermissions
         organization: Organization
-        #  TODO: Add fields for workspaces, stacks, teams, and varsets
+        workspaces(filter: WorkspaceFilter): [Workspace!]!
+        teams(filter: TeamFilter): [Team!]!
+        variableSets(filter: VariableSetFilter): [VariableSet !]!
         teamAccess(filter: ProjectTeamAccessFilter): [ProjectTeamAccess!]!
     }
 
     extend type Query {
         projects(organization: String!, filter: ProjectFilter): [Project!]!
+        project(id: ID!): Project
     }
 
     input ProjectPermissionsFilter {
@@ -66,6 +76,7 @@ const projectsSchema = gql`
         description: StringComparisonExp
         createdAt: DateTimeComparisonExp
         workspaceCount: IntComparisonExp
+        defaultExecutionMode: StringComparisonExp
         teamCount: IntComparisonExp
         stackCount: IntComparisonExp
         autoDestroyActivityDuration: StringComparisonExp

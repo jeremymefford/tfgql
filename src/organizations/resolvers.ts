@@ -37,7 +37,7 @@ export const resolvers = {
       return gatherAsyncGeneratorPromises(dataSources.teamsAPI.listTeams(org.name, filter));
     },
     variableSets: async (org: Organization, { filter }: { filter?: VariableSetFilter }, { dataSources }: Context): Promise<Promise<VariableSet>[]> => {
-      return gatherAsyncGeneratorPromises(dataSources.variableSetsAPI.getOrgsVariableSets(org.name, filter));
+      return gatherAsyncGeneratorPromises(dataSources.variableSetsAPI.listVariableSetsForOrg(org.name, filter));
     },
     users: async (org: Organization, { filter }: { filter?: UserFilter }, { dataSources, requestCache }: Context): Promise<User[]> => {
       console.log("fetching teams");

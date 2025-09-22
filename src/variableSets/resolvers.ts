@@ -4,6 +4,10 @@ import { Organization } from '../organizations/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { fetchResources } from '../common/fetchResources';
 import { Workspace, WorkspaceFilter } from '../workspaces/types';
+import { Variable, VariableFilter } from '../variables/types';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
+import { evaluateWhereClause } from '../common/filtering/filtering';
+import { Project, ProjectFilter } from '../projects/types';
 
 export const resolvers = {
     Query: {
@@ -25,11 +29,19 @@ export const resolvers = {
                 id => dataSources.workspacesAPI.getWorkspace(id),
                 filter);
         },
-        // projects: async (varset: VariableSet, _: unknown, { dataSources }: Context): Promise<Project[]> => {
-        //     return dataSources.projectsAPI.getProjectsByIds(varset.projectIds);
-        // },
-        // vars: async (varset: VariableSet, _: unknown, { dataSources }: Context): Promise<Variable[]> => {
-        //     return dataSources.variablesAPI.getVariablesByIds(varset.variableIds);
-        // },
+        projects: async (varset: VariableSet, {filter}:{filter?:ProjectFilter}, { dataSources }: Context): Promise<Project[]> => {
+            const projectIds = await dataSources.variableSetsAPI.listProjectIDs(varset.id);
+            const projects: Project[] = [];
+            await parallelizeBounded(projectIds, async (projectId) => {
+                const project = await dataSources.projectsAPI.getProject(projectId);
+                if (project && evaluateWhereClause<Project, ProjectFilter>(filter, project)) {
+                    projects.push(project);
+                }
+            });
+            return projects;
+        },
+        vars: async (varset: VariableSet, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
+            return dataSources.variableSetsAPI.listVariables(varset.id, filter);
+        },
     }
 };

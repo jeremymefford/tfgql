@@ -79,7 +79,7 @@ export async function buildContext(): Promise<Context> {
       runsAPI: new RunsAPI(),
       teamsAPI: new TeamsAPI(),
       configurationVersionsAPI: new ConfigurationVersionsAPI(requestCache),
-      variableSetsAPI: new VariableSetsAPI(),
+      variableSetsAPI: new VariableSetsAPI(requestCache),
       projectsAPI: new ProjectsAPI(),
       variablesAPI: new VariablesAPI(),
       workspaceResourcesAPI: new WorkspaceResourcesAPI(),

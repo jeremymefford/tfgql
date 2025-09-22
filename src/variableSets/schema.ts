@@ -14,9 +14,9 @@ const variableSetSchema = gql`
         permissions: VariableSetPermissions!
 
         organization: Organization
-        vars: [Variable!]
+        vars(filter: VariableFilter): [Variable!]
         workspaces(filter: WorkspaceFilter): [Workspace!]
-        # projects(filter: ProjectFilter): [Project!]
+        projects(filter: ProjectFilter): [Project!]
     }
 
     type VariableSetPermissions {

@@ -1,5 +1,6 @@
 import { BooleanComparisonExp, IntComparisonExp, StringComparisonExp, WhereClause } from '../common/filtering/types';
 import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import { VariableResource } from '../variables/types';
 
 export interface VariableSetAttributes {
     name: string;
@@ -34,6 +35,12 @@ export type VariableSetResource = ResourceObject<VariableSetAttributes> & {
     relationships: VariableSetRelationships;
 };
 export type VariableSetResponse = SingleResponse<VariableSetResource>;
+export interface VariableSetResponseIncludingVariables extends SingleResponse<VariableSetResource> {
+    included?: VariableResource[];
+}
+export interface VariableSetResponseIncludingProjects extends SingleResponse<VariableSetResource> {
+    included?: VariableResource[];
+}
 export type VariableSetListResponse = ListResponse<VariableSetResource>;
 
 /** Domain model for VariableSet (matches GraphQL type fields) */

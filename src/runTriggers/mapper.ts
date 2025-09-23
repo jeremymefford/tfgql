@@ -21,12 +21,12 @@ export const outboundRunTriggerMapper: DomainMapper<RunTriggerResource, Workspac
 
 export const runTriggerMapper: DomainMapper<RunTriggerResource, RunTrigger> = {
   map(resource: RunTriggerResource): RunTrigger {
-    const a = resource.attributes;
+    const attrs = resource.attributes;
     return {
       id: resource.id,
-      workspaceName: a['workspace-name'],
-      sourceableName: a['sourceable-name'],
-      createdAt: a['created-at'],
+      workspaceName: attrs['workspace-name'],
+      sourceableName: attrs['sourceable-name'],
+      createdAt: attrs['created-at'],
       workspace: resource.relationships?.workspace?.data,
       sourceable: resource.relationships?.sourceable?.data
     };

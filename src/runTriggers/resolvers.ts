@@ -1,6 +1,7 @@
 import { Context } from '../server/context';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { RunTrigger, RunTriggerFilter } from './types';
+import { Workspace } from '../workspaces/types';
 
 export const resolvers = {
   Query: {
@@ -17,10 +18,26 @@ export const resolvers = {
       return dataSources.runTriggersAPI.getRunTrigger(id);
     }
   },
+
   RunTrigger: {
-    workspace: (rt: RunTrigger, _: unknown, { dataSources }: Context) =>
-      rt.workspace ? dataSources.workspacesAPI.getWorkspace(rt.workspace.id) : null,
-    sourceable: (rt: RunTrigger, _: unknown, { dataSources }: Context) =>
-      rt.sourceable ? dataSources.workspacesAPI.getWorkspace(rt.sourceable.id) : null
+    workspace: async (rt: RunTrigger & { workspaceId?: string }, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+      const id = (rt as any).workspaceId ?? rt.workspace?.id ?? null;
+      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+    },
+    sourceable: async (rt: RunTrigger & { sourceableId?: string }, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+      const id = (rt as any).sourceableId ?? rt.sourceable?.id ?? null;
+      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+    }
+  },
+
+  WorkspaceRunTrigger: {
+    workspace: async (rt: any, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+      const id = rt.workspaceId ?? rt.workspace?.id ?? null;
+      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+    },
+    sourceable: async (rt: any, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+      const id = rt.sourceableId ?? rt.sourceable?.id ?? null;
+      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+    }
   }
 };

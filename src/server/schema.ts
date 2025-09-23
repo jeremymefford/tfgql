@@ -185,4 +185,7 @@ export const resolvers = {
   AgentPool: {
     ...agentPoolsResolvers.AgentPool
   },
+  RunTrigger: {
+    ...runTriggersResolvers.RunTrigger
+  }
 };

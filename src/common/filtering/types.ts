@@ -10,6 +10,22 @@ export interface StringComparisonExp {
     _is_null?: boolean;
 }
 
+export interface TerraformVersionComparisonExp {
+    _eq?: string;
+    _neq?: string;
+    _in?: string[];
+    _nin?: string[];
+    _like?: string;
+    _nlike?: string;
+    _ilike?: string;
+    _nilike?: string;
+    _is_null?: boolean;
+    _gt?: string;
+    _gte?: string;
+    _lt?: string;
+    _lte?: string;
+}
+
 export interface IntComparisonExp {
     _eq?: number;
     _neq?: number;
@@ -44,7 +60,8 @@ export type FieldComparisonExp =
     | StringComparisonExp
     | IntComparisonExp
     | BooleanComparisonExp
-    | DateTimeComparisonExp;
+    | DateTimeComparisonExp
+    | TerraformVersionComparisonExp;
 
 export type WhereClause<T, TFilters = {}> = {
     _and?: WhereClause<T, TFilters>[];

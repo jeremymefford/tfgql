@@ -1,7 +1,10 @@
 import {
     FieldComparisonExp,
+    TerraformVersionComparisonExp,
     WhereClause,
 } from './types';
+
+const TERRAFORM_VERSION_REGEX = /^(~>|>=|<=|>|<|!=|=)?\s*v?(\d+)\.(\d+)(?:\.(\d+))?.*$/;
 
 export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> | undefined, obj: T): boolean {
     if (!where) return true;
@@ -49,10 +52,13 @@ export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> |
 
                 const valueType = typeof value;
                 const isDate = value instanceof Date || (valueType === 'string' && !isNaN(Date.parse(value as string)));
+                const isSemver = valueType === 'string' && TERRAFORM_VERSION_REGEX.test(value as string);
 
                 switch (valueType) {
                     case 'string':
-                        if (isDate) {
+                        if (isSemver) {
+                            if (!evaluateSemver(value as string, filter as TerraformVersionComparisonExp)) return false;
+                        } else if (isDate) {
                             if (!evaluateDate(value as string, filter)) return false;
                         } else {
                             if (!evaluateString(value as string, filter)) return false;
@@ -124,5 +130,49 @@ function evaluateDate(value: string | Date, filter: FieldComparisonExp): boolean
     if ('_gte' in filter && dateValue < new Date((filter._gte as unknown) as string)) return false;
     if ('_lt' in filter && dateValue >= new Date((filter._lt as unknown) as string)) return false;
     if ('_lte' in filter && dateValue > new Date((filter._lte as unknown) as string)) return false;
+    return true;
+}
+
+function evaluateSemver(value: string, filter: TerraformVersionComparisonExp): boolean {
+    // string-based equality/membership
+    if ('_eq' in filter && value !== filter._eq) return false;
+    if ('_neq' in filter && value === filter._neq) return false;
+    if ('_in' in filter && Array.isArray(filter._in) && !filter._in.includes(value)) return false;
+    if ('_nin' in filter && Array.isArray(filter._nin) && filter._nin.includes(value)) return false;
+
+    // numeric comparison based on vMAJOR.MINOR.PATCH
+    const m = value.match(TERRAFORM_VERSION_REGEX);
+    if (!m) return false;
+    const [major, minor, patch] = m.slice(2, 5).map(n => parseInt(n, 10)) as [number, number, number];
+
+    const parse = (v: unknown): [number, number, number] | null => {
+        if (typeof v !== 'string') return null;
+        const mm = v.match(TERRAFORM_VERSION_REGEX);
+        return mm ? mm.slice(2, 5).map(n => parseInt(n, 10)) as [number, number, number] : null;
+    };
+
+    const compare = (a: [number, number, number], b: [number, number, number]) => {
+        if (a[0] !== b[0]) return a[0] - b[0];
+        if (a[1] !== b[1]) return a[1] - b[1];
+        return a[2] - b[2];
+    };
+
+    if ('_gt' in filter) {
+        const parsed = parse(filter._gt);
+        if (parsed && compare([major, minor, patch], parsed) <= 0) return false;
+    }
+    if ('_gte' in filter) {
+        const parsed = parse(filter._gte);
+        if (parsed && compare([major, minor, patch], parsed) < 0) return false;
+    }
+    if ('_lt' in filter) {
+        const parsed = parse(filter._lt);
+        if (parsed && compare([major, minor, patch], parsed) >= 0) return false;
+    }
+    if ('_lte' in filter) {
+        const parsed = parse(filter._lte);
+        if (parsed && compare([major, minor, patch], parsed) > 0) return false;
+    }
+
     return true;
 }

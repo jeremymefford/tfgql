@@ -11,6 +11,18 @@ const filterSchema = gql`
     _ilike: String
     _nilike: String
     _is_null: Boolean
+  }
+
+  input TerraformVersionComparisonExp {
+    _eq: String
+    _neq: String
+    _in: [String!]
+    _nin: [String!]
+    _like: String
+    _nlike: String
+    _ilike: String
+    _nilike: String
+    _is_null: Boolean
     _gt: String
     _gte: String
     _lt: String

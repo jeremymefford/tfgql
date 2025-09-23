@@ -114,7 +114,7 @@ const workspaceSchema = gql`
     speculativeEnabled: BooleanComparisonExp
     structuredRunOutputEnabled: BooleanComparisonExp
     tagNames: StringComparisonExp
-    terraformVersion: StringComparisonExp
+    terraformVersion: TerraformVersionComparisonExp
     triggerPrefixes: StringComparisonExp
     vcsRepoIdentifier: StringComparisonExp
     workingDirectory: StringComparisonExp

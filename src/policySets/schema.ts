@@ -62,7 +62,7 @@ const policySetsSchema = gql`
   }
 
   extend type Query {
-    policySets(organization: String, filter: PolicySetFilter): [PolicySet!]!
+    policySets(organization: String!, filter: PolicySetFilter): [PolicySet!]!
     policySet(id: ID!): PolicySet
   }
 `;

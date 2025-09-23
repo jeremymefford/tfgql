@@ -28,16 +28,5 @@ export const resolvers = {
       const id = (rt as any).sourceableId ?? rt.sourceable?.id ?? null;
       return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
     }
-  },
-
-  WorkspaceRunTrigger: {
-    workspace: async (rt: any, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
-      const id = rt.workspaceId ?? rt.workspace?.id ?? null;
-      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
-    },
-    sourceable: async (rt: any, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
-      const id = rt.sourceableId ?? rt.sourceable?.id ?? null;
-      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
-    }
   }
 };

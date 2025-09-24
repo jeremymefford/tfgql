@@ -1,23 +1,15 @@
 import { WhereClause, StringComparisonExp, BooleanComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
 
 export interface StateVersionOutputAttributes {
   name: string;
   sensitive: boolean;
   type: string;
   value: any;
-  'detailed-type': string;
+  'detailed-type': any;
 }
 
-export interface StateVersionOutputRelationships {
-  stateVersion?: {
-    data: ResourceRef;
-  };
-}
-
-export type StateVersionOutputResource = ResourceObject<StateVersionOutputAttributes> & {
-  relationships?: StateVersionOutputRelationships;
-};
+export type StateVersionOutputResource = ResourceObject<StateVersionOutputAttributes>;
 
 export type StateVersionOutputResponse = SingleResponse<StateVersionOutputResource>;
 export type StateVersionOutputListResponse = ListResponse<StateVersionOutputResource>;
@@ -28,7 +20,7 @@ export interface StateVersionOutput {
   sensitive: boolean;
   type: string;
   value: any;
-  detailedType: string;
+  detailedType: any;
 }
 
 export interface StateVersionOutputFilter extends WhereClause<StateVersionOutput> {

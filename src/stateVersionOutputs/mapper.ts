@@ -10,8 +10,7 @@ export const stateVersionOutputMapper: DomainMapper<StateVersionOutputResource, 
       sensitive: attrs.sensitive,
       type: attrs.type,
       value: attrs.value,
-      detailedType: attrs['detailed-type'],
-      stateVersionId: resource.relationships?.stateVersion?.data.id,
+      detailedType: attrs['detailed-type']
     };
   },
 };

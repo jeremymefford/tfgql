@@ -187,5 +187,8 @@ export const resolvers = {
   },
   RunTrigger: {
     ...runTriggersResolvers.RunTrigger
+  },
+  StateVersion: {
+    ...stateVersionsResolvers.StateVersion
   }
 };

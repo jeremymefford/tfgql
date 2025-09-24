@@ -8,7 +8,6 @@ const stateVersionOutputsSchema = gql`
     type: String!
     value: JSON!
     detailedType: JSON!
-    stateVersionId: ID
   }
 
   input StateVersionOutputFilter {
@@ -20,7 +19,6 @@ const stateVersionOutputsSchema = gql`
     name: StringComparisonExp
     sensitive: BooleanComparisonExp
     type: StringComparisonExp
-    stateVersionId: StringComparisonExp
   }
 
   extend type Query {

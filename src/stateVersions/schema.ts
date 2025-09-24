@@ -23,6 +23,7 @@ const stateVersionsSchema = gql`
     terraformVersion: String
     vcsCommitSha: String
     vcsCommitUrl: String
+    billableRumCount: Int
     run: Run
     createdBy: User
     workspace: Workspace
@@ -38,7 +39,12 @@ const stateVersionsSchema = gql`
     status: StringComparisonExp
     intermediate: BooleanComparisonExp
     serial: IntComparisonExp
+    billableRumCount: IntComparisonExp  
+    createdAt: DateTimeComparisonExp
+    size: IntComparisonExp
+    resourcesProcessed: BooleanComparisonExp
     stateVersion: IntComparisonExp
+    terraformVersion: TerraformVersionComparisonExp
   }
 
   extend type Query {

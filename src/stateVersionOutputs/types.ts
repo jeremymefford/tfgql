@@ -6,7 +6,7 @@ export interface StateVersionOutputAttributes {
   sensitive: boolean;
   type: string;
   value: any;
-  'detailed-type': any;
+  'detailed-type': string;
 }
 
 export interface StateVersionOutputRelationships {
@@ -28,8 +28,7 @@ export interface StateVersionOutput {
   sensitive: boolean;
   type: string;
   value: any;
-  detailedType: any;
-  stateVersionId?: string;
+  detailedType: string;
 }
 
 export interface StateVersionOutputFilter extends WhereClause<StateVersionOutput> {
@@ -41,5 +40,4 @@ export interface StateVersionOutputFilter extends WhereClause<StateVersionOutput
   name?: StringComparisonExp;
   sensitive?: BooleanComparisonExp;
   type?: StringComparisonExp;
-  stateVersionId?: StringComparisonExp;
 }

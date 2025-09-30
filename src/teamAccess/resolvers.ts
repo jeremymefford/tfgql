@@ -8,10 +8,12 @@ export const resolvers = {
       _: unknown,
       { teamId, filter }: { teamId: string; filter?: WorkspaceFilter },
       { dataSources }: Context
-    ): Promise<Promise<Workspace>[]> => {
-      return gatherAsyncGeneratorPromises(
-        dataSources.teamAccessAPI.listWorkspacesForTeam(teamId, filter)
-      );
+    ): Promise<Workspace[]> => {
+      return [];
+      // return gatherAsyncGeneratorPromises(
+      //   return []; // TODO fix later
+      //   // dataSources.teamAccessAPI.listWorkspacesForTeam(teamId, filter)
+      // );
     }
   }
 };

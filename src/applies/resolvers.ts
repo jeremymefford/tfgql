@@ -6,6 +6,7 @@ import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 import { Run } from '../runs/types';
 import { evaluateWhereClause } from '../common/filtering/filtering';
 import { Workspace } from '../workspaces/types';
+import { StateVersion, StateVersionFilter } from '../stateVersions/types';
 
 export const resolvers = {
   Query: {
@@ -83,6 +84,18 @@ export const resolvers = {
         }
       }
       return results;
+    }
+  },
+  Apply: {
+    stateVersions: async (apply: Apply, { filter }: { filter?: StateVersionFilter }, { dataSources }: Context): Promise<StateVersion[]> => {
+      const ret: StateVersion[] = [];
+      await parallelizeBounded(apply.stateVersionIds || [], async (svId) => {
+        const sv = await dataSources.stateVersionsAPI.getStateVersion(svId);
+        if (sv && (!filter || evaluateWhereClause(filter, sv))) {
+          ret.push(sv);
+        }
+      });
+      return ret;
     }
   }
 };

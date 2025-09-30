@@ -14,7 +14,7 @@ const appliesSchema = gql`
     resourceChanges: Int
     resourceDestructions: Int
     resourceImports: Int
-    stateVersionIds: [ID]!
+    stateVersions(filter: StateVersionFilter): [StateVersion!]!
   }
 
   input ApplyFilter {

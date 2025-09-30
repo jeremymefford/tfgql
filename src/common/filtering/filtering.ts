@@ -1,10 +1,15 @@
 import {
+    BooleanComparisonExp,
     FieldComparisonExp,
+    IntComparisonExp,
+    StringComparisonExp,
     TerraformVersionComparisonExp,
     WhereClause,
 } from './types';
 
 const TERRAFORM_VERSION_REGEX = /^(~>|>=|<=|>|<|!=|=)?\s*v?(\d+)\.(\d+)(?:\.(\d+))?.*$/;
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})$/;
+
 
 export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> | undefined, obj: T): boolean {
     if (!where) return true;
@@ -51,24 +56,27 @@ export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> |
                 }
 
                 const valueType = typeof value;
-                const isDate = value instanceof Date || (valueType === 'string' && !isNaN(Date.parse(value as string)));
+                const isDate = value instanceof Date ||
+                    (valueType === 'string' &&
+                        ISO_DATE_REGEX.test(value as string) &&
+                        !isNaN(Date.parse(value as string)));
                 const isSemver = valueType === 'string' && TERRAFORM_VERSION_REGEX.test(value as string);
 
                 switch (valueType) {
                     case 'string':
-                        if (isSemver) {
-                            if (!evaluateSemver(value as string, filter as TerraformVersionComparisonExp)) return false;
-                        } else if (isDate) {
+                        if (isDate) {
                             if (!evaluateDate(value as string, filter)) return false;
+                        } else if (isSemver) {
+                            if (!evaluateSemver(value as string, filter as TerraformVersionComparisonExp)) return false;
                         } else {
-                            if (!evaluateString(value as string, filter)) return false;
+                            if (!evaluateString(value as string, filter as StringComparisonExp)) return false;
                         }
                         break;
                     case 'number':
-                        if (!evaluateNumber(value as number, filter)) return false;
+                        if (!evaluateNumber(value as number, filter as IntComparisonExp)) return false;
                         break;
                     case 'boolean':
-                        if (!evaluateBoolean(value as boolean, filter)) return false;
+                        if (!evaluateBoolean(value as boolean, filter as BooleanComparisonExp)) return false;
                         break;
                     case 'object':
                         if (isDate) {
@@ -90,7 +98,7 @@ function like(value: string, pattern: string): boolean {
     return regex.test(value);
 }
 
-function evaluateString(value: string, filter: FieldComparisonExp): boolean {
+function evaluateString(value: string, filter: StringComparisonExp): boolean {
     if ('_eq' in filter && value !== filter._eq) return false;
     if ('_neq' in filter && value === filter._neq) return false;
     if ('_in' in filter && !(filter._in as unknown[])?.includes(value)) return false;
@@ -102,7 +110,7 @@ function evaluateString(value: string, filter: FieldComparisonExp): boolean {
     return true;
 }
 
-function evaluateNumber(value: number, filter: FieldComparisonExp): boolean {
+function evaluateNumber(value: number, filter: IntComparisonExp): boolean {
     if ('_eq' in filter && value !== filter._eq) return false;
     if ('_neq' in filter && value === filter._neq) return false;
     if ('_in' in filter && !(filter._in as number[])?.includes(value)) return false;
@@ -114,7 +122,7 @@ function evaluateNumber(value: number, filter: FieldComparisonExp): boolean {
     return true;
 }
 
-function evaluateBoolean(value: boolean, filter: FieldComparisonExp): boolean {
+function evaluateBoolean(value: boolean, filter: BooleanComparisonExp): boolean {
     if ('_eq' in filter && value !== filter._eq) return false;
     if ('_neq' in filter && value === filter._neq) return false;
     return true;
@@ -134,6 +142,7 @@ function evaluateDate(value: string | Date, filter: FieldComparisonExp): boolean
 }
 
 function evaluateSemver(value: string, filter: TerraformVersionComparisonExp): boolean {
+    // TODO: 1.5 is showing as _gte 1.12
     // string-based equality/membership
     if ('_eq' in filter && value !== filter._eq) return false;
     if ('_neq' in filter && value === filter._neq) return false;

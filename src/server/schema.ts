@@ -190,5 +190,8 @@ export const resolvers = {
   },
   StateVersion: {
     ...stateVersionsResolvers.StateVersion
+  },
+  Apply: {
+    ...appliesResolvers.Apply
   }
 };

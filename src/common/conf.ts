@@ -15,7 +15,12 @@ export class Config {
         }
 
         this.tfcToken = token;
-        this.tfeBaseUrl = env.TFE_BASE_URL || 'https://app.terraform.io/api/v2';
+        let baseUrl = env.TFE_BASE_URL || 'https://app.terraform.io/api/v2';
+        baseUrl = baseUrl.toLowerCase();
+        if (!baseUrl.endsWith('/api/v2')) {
+            baseUrl = baseUrl + '/api/v2';
+        }
+        this.tfeBaseUrl = baseUrl;
         this.graphqlBatchSize = this.parsePositiveNumber(env.TFCE_GRAPHQL_BATCH_SIZE, 10);
         const userGivenPageSize = this.parsePositiveNumber(env.TFCE_GRAPHQL_PAGE_SIZE, 100);
         this.tfcPageSize = userGivenPageSize > 100 || userGivenPageSize == 0 ? 100 : userGivenPageSize;

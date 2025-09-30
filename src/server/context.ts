@@ -26,7 +26,7 @@ import { ProjectTeamAccessAPI } from '../projectTeamAccess/dataSource';
 import { StateVersionOutputsAPI } from '../stateVersionOutputs/dataSource';
 import { StateVersionsAPI } from '../stateVersions/dataSource';
 import { TeamTokensAPI } from '../teamTokens/dataSource';
-import { TeamAccessAPI } from '../teamAccess/dataSource';
+import { TeamAccessAPI } from '../workspaceTeamAccess/dataSource';
 import { RunTriggersAPI } from '../runTriggers/dataSource';
 
 /** GraphQL context type */

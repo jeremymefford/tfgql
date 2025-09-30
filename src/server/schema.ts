@@ -30,7 +30,7 @@ import { resolvers as stateVersionOutputsResolvers } from '../stateVersionOutput
 import { resolvers as stateVersionsResolvers } from '../stateVersions/resolvers';
 import { resolvers as runTriggersResolvers } from '../runTriggers/resolvers';
 import { resolvers as teamTokensResolvers } from '../teamTokens/resolvers';
-import { resolvers as teamAccessResolvers } from '../teamAccess/resolvers';
+import { resolvers as teamAccessResolvers } from '../workspaceTeamAccess/resolvers';
 import configurationVersionSchema from '../configurationVersions/schema';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
@@ -59,7 +59,7 @@ import projectTeamAccessSchema from '../projectTeamAccess/schema';
 import stateVersionOutputsSchema from '../stateVersionOutputs/schema';
 import runTriggersSchema from '../runTriggers/schema';
 import teamTokensSchema from '../teamTokens/schema';
-import teamAccessSchema from '../teamAccess/schema';
+import teamAccessSchema from '../workspaceTeamAccess/schema';
 import stateVersionsSchema from '../stateVersions/schema';
 import { Config } from '../common/conf';
 

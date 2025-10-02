@@ -13,11 +13,14 @@ export class RequestCache {
 
     async getOrSet<T>(entityType: string, id: string, valueFactory: () => Promise<T>): Promise<T> {
         const key = `${entityType}:${id}`;
+
         if (this.cache.has(key)) {
             console.debug(`Cache hit for key: ${key}`);
             return this.cache.get(key) as T;
         }
+
         if (this.inFlight.has(key)) {
+            console.debug(`Awaiting in-flight value for key: ${key}`);
             return this.inFlight.get(key) as Promise<T>;
         }
 
@@ -26,15 +29,12 @@ export class RequestCache {
             if (firstKey) this.cache.delete(firstKey);
         }
 
-        const valuePromise = (async () => {
-            try {
-                const value = await valueFactory();
+        const valuePromise: Promise<T> = valueFactory()
+            .then(value => {
                 this.cache.set(key, value);
                 return value;
-            } finally {
-                this.inFlight.delete(key);
-            }
-        })();
+            })
+            .finally(() => this.inFlight.delete(key));
 
         this.inFlight.set(key, valuePromise);
         return valuePromise;

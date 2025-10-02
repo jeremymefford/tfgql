@@ -156,7 +156,6 @@ export const resolvers = {
   },
   Workspace: {
     ...workspacesResolvers.Workspace,
-    ...workspaceResourceResolvers.Workspace
   },
   Team: {
     ...teamsResolvers.Team

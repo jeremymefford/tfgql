@@ -10,7 +10,7 @@ const workspaceResourcesSchema = gql`
     module: String!
     provider: String!
     providerType: String!
-    modifiedByStateVersionId: String!
+    modifiedByStateVersion: StateVersion!
     nameIndex: Int
     workspace: Workspace!
   }
@@ -28,7 +28,6 @@ const workspaceResourcesSchema = gql`
     module: StringComparisonExp
     provider: StringComparisonExp
     providerType: StringComparisonExp
-    modifiedByStateVersionId: StringComparisonExp
     nameIndex: IntComparisonExp
   }
 

@@ -98,7 +98,7 @@ export async function buildContext(): Promise<Context> {
       policySetParametersAPI: new PolicySetParametersAPI(),
       projectTeamAccessAPI: new ProjectTeamAccessAPI(),
       stateVersionOutputsAPI: new StateVersionOutputsAPI(),
-      stateVersionsAPI: new StateVersionsAPI(),
+      stateVersionsAPI: new StateVersionsAPI(requestCache),
       teamTokensAPI: new TeamTokensAPI(),
       teamAccessAPI: new TeamAccessAPI(),
       runTriggersAPI: new RunTriggersAPI()

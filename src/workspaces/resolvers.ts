@@ -10,6 +10,7 @@ import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 import { RunTrigger, WorkspaceRunTrigger } from '../runTriggers/types';
 import { StateVersion, StateVersionFilter } from '../stateVersions/types';
 import { AxiosError } from 'axios';
+import { WorkspaceResourceFilter, WorkspaceResource } from '../workspaceResources/types';
 
 export const resolvers = {
   Query: {
@@ -86,6 +87,9 @@ export const resolvers = {
     runs: async (workspace: Workspace, { filter }: { filter?: RunFilter }, { dataSources }: Context): Promise<Promise<Run>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.runsAPI.listRuns(workspace.id, filter));
     },
+    workspaceResources: async (workspace: Workspace, { filter }: { filter?: WorkspaceResourceFilter }, { dataSources }: Context): Promise<Promise<WorkspaceResource>[]> => {
+      return gatherAsyncGeneratorPromises(dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, filter));
+    },
     configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, { dataSources }: Context): Promise<ConfigurationVersion[]> => {
       return dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter);
     },
@@ -100,19 +104,14 @@ export const resolvers = {
       return gatherAsyncGeneratorPromises(dataSources.stateVersionsAPI.listStateVersions(workspace.organizationName, workspace.id, filter));
     },
     currentStateVersion: async (workspace: Workspace, _: unknown, { dataSources }: Context): Promise<StateVersion | null> => {
-      try {
-        const currentStateVersion = await dataSources.stateVersionsAPI.getCurrentStateVersion(workspace.id);
-        return currentStateVersion;
-      } catch (error) {
-        if (error instanceof AxiosError) {
+      return await dataSources.stateVersionsAPI.getCurrentStateVersion(workspace.id)
+        .catch(async (error) => {
           if (error.response && error.response.status === 404) {
-            // If the current state version does not exist, return null
             return null;
+          } else {
+            throw error;
           }
-          console.error(`Error fetching current state version for workspace ${workspace.id}:`, error);
-        }
-        throw error;
-      }
+        });
     }
   }
 };

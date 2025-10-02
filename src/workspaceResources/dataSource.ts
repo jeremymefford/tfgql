@@ -1,4 +1,4 @@
-import { WorkspaceResource, WorkspaceResourceFilter, WorkspaceResourceListResponse } from './types';
+import { WorkspaceResource, WorkspaceResourceFilter } from './types';
 import { workspaceResourceMapper } from './mapper';
 import { streamPages } from '../common/streamPages';
 import { applicationConfiguration } from '../common/conf';

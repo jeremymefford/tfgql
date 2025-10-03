@@ -68,6 +68,8 @@ Ensure the runtime environment has the following variables:
 | `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` | Max retries after 5xx responses      | `20`                             | ❌       |
 | `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` | Delay (ms) between 5xx retries      | `60000`                          | ❌       |
 | `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` | Max entries for request-level cache     | `5000`                           | ❌       |
+| `LOG_LEVEL`                      | Pino log level (`fatal`,`error`,`warn`,`info`,`debug`,`trace`) | `info` | ❌ |
+| `NODE_ENV`                       | Node environment; `development` enables pretty logs           | —      | ❌ |
 
 ### Run
 
@@ -122,6 +124,11 @@ Request handling:
 - Outbound HTTP calls propagate `traceparent` and `x-request-id` headers automatically.
 
 The log context is bound per request using AsyncLocalStorage so both resolver-level and shared-module logs are correlated.
+
+Log configuration:
+
+- Set `LOG_LEVEL` to control verbosity (default `info`).
+- When `NODE_ENV=development`, logs are human-friendly via `pino-pretty` (single-line, colorized).
 
 ## Usage
 

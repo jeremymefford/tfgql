@@ -63,6 +63,9 @@ Create a `.env` file in the project root with the following:
 TFC_TOKEN=your_terraform_api_token_here
 TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
 PORT=4000
+# Logging
+# LOG_LEVEL=info          # fatal,error,warn,info,debug,trace (default: info)
+# NODE_ENV=development    # pretty-prints logs in development
 # Optional tuning:
 # TFCE_GRAPHQL_BATCH_SIZE=10
 # TFCE_GRAPHQL_PAGE_SIZE=100

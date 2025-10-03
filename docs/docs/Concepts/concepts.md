@@ -180,3 +180,8 @@ All logs are structured via Pino and include `trace_id` and `span_id` for correl
 - The same `traceparent` value is used as `x-request-id`.
 - Outbound HTTP calls add `traceparent` and `x-request-id` headers automatically.
 - The log context is bound per request using AsyncLocalStorage, so logs from any module are correctly correlated.
+
+Configuration:
+
+- `LOG_LEVEL` controls verbosity (`fatal`, `error`, `warn`, `info`, `debug`, `trace`). Default is `info`.
+- `NODE_ENV=development` enables prettified, single-line, colorized logs via `pino-pretty`.

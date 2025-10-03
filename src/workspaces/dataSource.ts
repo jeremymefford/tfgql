@@ -3,6 +3,7 @@ import { streamPages } from '../common/streamPages';
 import { WorkspaceResponse, WorkspaceFilter, Workspace, WorkspaceActionsFilter, WorkspacePermissionsFilter, WorkspaceSettingOverwritesFilter } from './types';
 import { workspaceMapper } from './mapper';
 import { ProjectResponse } from '../projects/types';
+import { logger } from '../common/logger';
 
 export class WorkspacesAPI {
   async *listWorkspaces(
@@ -46,7 +47,7 @@ export class WorkspacesAPI {
   async *getWorkspacesByProjectId(projectId: string, workspaceFilter?: WorkspaceFilter): AsyncGenerator<Workspace[], void, unknown> {
     const orgNameResponse = await axiosClient.get<ProjectResponse>(`/projects/${projectId}`);
     if (!orgNameResponse || orgNameResponse.status !== 200 || !orgNameResponse.data.data.relationships.organization.data.id) {
-      console.error('Error fetching project organization:', orgNameResponse);
+      logger.error({ response: orgNameResponse }, 'Error fetching project organization');
       return;
     }
     const orgName = orgNameResponse.data.data.relationships.organization.data.id;

@@ -8,6 +8,7 @@ import { VariableSetsAPI } from '../variableSets/dataSource';
 import { ProjectsAPI } from '../projects/dataSource';
 import { VariablesAPI } from '../variables/dataSource';
 import { RequestCache } from '../common/requestCache';
+import type { Logger } from 'pino';
 import { WorkspaceResourcesAPI } from '../workspaceResources/dataSource';
 import { AgentPoolsAPI } from '../agentPools/dataSource';
 import { AgentTokensAPI } from '../agentTokens/dataSource';
@@ -63,12 +64,13 @@ export interface Context {
     runTriggersAPI: RunTriggersAPI;
   };
   requestCache: RequestCache;
+  logger: Logger;
 }
 
 /**
  * Build the context for each GraphQL request, including data source instances.
  */
-export async function buildContext(): Promise<Context> {
+export async function buildContext(baseLogger: Logger): Promise<Context> {
   const requestCache = new RequestCache();
 
   return {
@@ -103,6 +105,7 @@ export async function buildContext(): Promise<Context> {
       teamAccessAPI: new TeamAccessAPI(),
       runTriggersAPI: new RunTriggersAPI()
     },
-    requestCache
+    requestCache,
+    logger: baseLogger
   };
 }

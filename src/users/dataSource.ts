@@ -1,6 +1,7 @@
 import { axiosClient } from '../common/httpClient';
 import { RequestCache } from '../common/requestCache';
 import { userMapper } from './mapper';
+import { logger } from '../common/logger';
 import { User, UserResponse } from './types';
 
 export class UsersAPI {
@@ -18,7 +19,7 @@ export class UsersAPI {
         if (error.status === 404) {
           return null;
         }
-        console.error(`Failed to fetch user with ID ${userId}:`, error);
+        logger.error({ err: error, userId }, 'Failed to fetch user');
         throw error;
       });
     });

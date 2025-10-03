@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import { applicationConfiguration } from './conf';
+import { logger, logContext } from './logger';
 
 export const axiosClient: AxiosInstance = axios.create({
   baseURL: applicationConfiguration.tfeBaseUrl,
@@ -8,6 +9,16 @@ export const axiosClient: AxiosInstance = axios.create({
     'Content-Type': 'application/vnd.api+json',
     'Authorization': `Bearer ${applicationConfiguration.tfcToken}`,
   }
+});
+
+// Propagate W3C trace context on all outbound requests
+axiosClient.interceptors.request.use((config) => {
+  const ctx = logContext.getStore();
+  if (ctx?.traceparent) {
+    config.headers['traceparent'] = ctx.traceparent;
+    config.headers['x-request-id'] = ctx.traceparent;
+  }
+  return config;
 });
 
 axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
@@ -32,7 +43,7 @@ axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
   config._retryCount = (config._retryCount || 0) + 1;
   if (config._retryCount <= applicationConfiguration.serverErrorMaxRetries) {
     const retryDelay = applicationConfiguration.serverErrorRetryDelay;
-    console.debug(`Server error occurred. Retry attempt #${config._retryCount} in ${retryDelay}ms`);
+    logger.debug({ attempt: config._retryCount, retryDelay }, 'Server error occurred, retrying');
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(axiosClient(config));
@@ -41,7 +52,7 @@ axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
   }
   // If we reach here, we've exhausted retries
   if (error.response) {
-    console.error(`Server error continued after ${config._retryCount} retries: ${error.response.status} ${error.response.statusText}`);
+    logger.error({ attempts: config._retryCount, status: error.response.status, statusText: error.response.statusText }, 'Server error after retries');
   }
 
   return Promise.reject(error);
@@ -64,7 +75,7 @@ axiosClient.interceptors.response.use(undefined, async (error: AxiosError) => {
   if (config._retryCount <= applicationConfiguration.rateLimitMaxRetries) {
     const backoff = Math.min(reset * 1000, 60000); // convert seconds to ms, cap at 60s
 
-    console.debug(`Rate limited. Retry attempt #${config._retryCount} in ${Math.round(backoff)}ms`);
+    logger.debug({ attempt: config._retryCount, backoff: Math.round(backoff) }, 'Rate limited, retrying');
 
     return new Promise(resolve => {
       setTimeout(() => {

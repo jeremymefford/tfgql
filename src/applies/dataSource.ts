@@ -2,6 +2,7 @@ import { axiosClient } from '../common/httpClient';
 import { streamPages } from '../common/streamPages';
 import { Apply, ApplyFilter, ApplyResponse } from './types';
 import { applyMapper } from './mapper';
+import { logger } from '../common/logger';
 
 export class AppliesAPI {
   async getRunApply(runId: string): Promise<Apply | null> {
@@ -10,7 +11,7 @@ export class AppliesAPI {
         return applyMapper.map(response.data.data)
       })
       .catch((error) => {
-        console.error(`Error fetching run apply for runId ${runId}:`, error);
+        logger.error({ err: error, runId }, 'Error fetching run apply');
         return null;
       });
   }

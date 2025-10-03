@@ -2,11 +2,12 @@ import { axiosClient } from '../common/httpClient';
 import { streamPages } from '../common/streamPages';
 import { RunResponse, Run, RunFilter, RunPermissionsFilter, RunActionsFilter, RunStatusTimestampsFilter, RunEvent, RunEventResource } from './types';
 import { runMapper, runEventMapper } from './mapper';
+import { logger } from '../common/logger';
 
 export class RunsAPI {
   /** List all runs for a given workspace */
   async *listRuns(workspaceId: string, filter?: RunFilter): AsyncGenerator<Run[], void, unknown> {
-    console.log('fetching runs for workspace', workspaceId);
+    logger.debug({ workspaceId }, 'Fetching runs for workspace');
     yield* streamPages<Run, {
       permissions: RunPermissionsFilter;
       actions: RunActionsFilter;

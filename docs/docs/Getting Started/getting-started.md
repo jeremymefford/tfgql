@@ -61,12 +61,12 @@ Create a `.env` file in the project root with the following:
 
 ```env
 TFC_TOKEN=your_terraform_api_token_here
-TFE_BASE_URL=https://app.terraform.io/api/v2  # default for Terraform Cloud
+TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
 PORT=4000
 # Optional tuning:
 # TFCE_GRAPHQL_BATCH_SIZE=10
 # TFCE_GRAPHQL_PAGE_SIZE=100
-# TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES=20
+# TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES=50
 # TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES=20
 # TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY=60000
 # TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE=5000
@@ -258,6 +258,7 @@ query {
 ## Resources
 
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
+ - Logging & tracing: The server emits structured logs with `trace_id` and `span_id`, and propagates `traceparent`/`x-request-id` on outbound calls.
 - [TFCE GraphQL Concepts](../Concepts/)
 - [Implementation Status](../implementation-status)
 - [Contributing Guide](../Contributing/)

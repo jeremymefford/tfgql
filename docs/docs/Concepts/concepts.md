@@ -59,13 +59,12 @@ for await (const workspace of streamPages(
 
 ## Rate Limiting
 
-Rate limits are a fundamental reality of working with APIs like HCP Terraform and TFE. `tfce-graphql` implements client-side rate limit protection to avoid abuse and maximize throughput.
+Rate limits are a fundamental reality of working with APIs like HCP Terraform and TFE. `tfce-graphql` implements client-side protection to avoid abuse and maximize throughput.
 
 ### Mechanisms
 
-- **Rate Limiter Awareness**: Each request tracks headers like `X-RateLimit-Remaining`.
-- **Request Spacing**: Requests are paused or throttled when the system detects limits are near exhaustion.
-- **Retry Strategies**: Certain APIs are backed off using `Retry-After` hints when returned by the server.
+- 429 handling: When the API returns HTTP 429, we respect `Retry-After` or `X-RateLimit-Reset` headers and back off (capped at 60s). Retries are limited by `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` (default 50).
+- 5xx handling: For idempotent GETs (and safe non-mutation POSTs), we retry server errors with a fixed delay between attempts, controlled by `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` and `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY`.
 
 ### Responsible Client Behavior
 
@@ -118,8 +117,8 @@ To support high-performance querying and avoid redundant fetches, `tfce-graphql`
 ### Features
 
 - Shared across resolvers for a single query execution
-- Keyed by entity type and ID
-- Supports async resolution and caching with `getOrSet`
+- Keyed with stable strings that include all parameters that affect results
+- Supports async resolution with in-flight de-duplication (the first call populates the cache; concurrent calls await it)
 
 This cache enables deduplication of operations like:
 
@@ -154,3 +153,30 @@ input TeamFilter {
 ```
 
 This allows for expressive, nested filtering.
+
+---
+
+## Terraform Version Filtering
+
+Filtering supports semantic version comparisons on Terraform versions. Use the `TerraformVersionComparisonExp` operators (`_gt`, `_gte`, `_lt`, `_lte`, `_eq`, `_neq`, `_in`, `_nin`) for fields that contain Terraform versions (e.g., `workspace.terraformVersion`).
+
+Example:
+
+```graphql
+workspaces(orgName: "my-org", filter: { terraformVersion: { _gte: "1.6.0" }}) {
+  id
+  name
+  terraformVersion
+}
+```
+
+---
+
+## Logging & Tracing
+
+All logs are structured via Pino and include `trace_id` and `span_id` for correlation across services.
+
+- Incoming requests parse the W3C `traceparent` header (or generate one if absent).
+- The same `traceparent` value is used as `x-request-id`.
+- Outbound HTTP calls add `traceparent` and `x-request-id` headers automatically.
+- The log context is bound per request using AsyncLocalStorage, so logs from any module are correctly correlated.

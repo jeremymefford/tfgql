@@ -6,6 +6,7 @@ import {
     TerraformVersionComparisonExp,
     WhereClause,
 } from './types';
+import { logger } from '../logger';
 
 const TERRAFORM_VERSION_REGEX = /^(~>|>=|<=|>|<|!=|=)?\s*v?(\d+)\.(\d+)(?:\.(\d+))?.*$/;
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})$/;
@@ -46,7 +47,7 @@ export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> |
             }
 
             if (key == "createdAt") {
-                console.log(JSON.stringify(obj, null, 2));
+                logger.debug({ obj }, 'Evaluating where clause for createdAt');
             }
 
             if (filter) {

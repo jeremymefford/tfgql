@@ -1,4 +1,5 @@
 import { applicationConfiguration } from "./conf";
+import { logger } from "./logger";
 
 export class RequestCache {
     private cache: Map<string, unknown>;
@@ -15,12 +16,12 @@ export class RequestCache {
         const key = `${entityType}:${id}`;
 
         if (this.cache.has(key)) {
-            console.debug(`Cache hit for key: ${key}`);
+            logger.debug({ key }, 'Cache hit');
             return this.cache.get(key) as T;
         }
 
         if (this.inFlight.has(key)) {
-            console.debug(`Awaiting in-flight value for key: ${key}`);
+            logger.debug({ key }, 'Awaiting in-flight value');
             return this.inFlight.get(key) as Promise<T>;
         }
 

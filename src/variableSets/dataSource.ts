@@ -12,6 +12,7 @@ import { Variable, VariableFilter } from '../variables/types';
 import { variablesMapper } from '../variables/mapper';
 import { evaluateWhereClause } from '../common/filtering/filtering';
 import { RequestCache } from '../common/requestCache';
+import { logger } from '../common/logger';
 
 export class VariableSetsAPI {
     private requestCache: RequestCache;
@@ -32,7 +33,7 @@ export class VariableSetsAPI {
     }
 
     async *listVariableSetsForOrg(orgName: string, filter?: VariableSetFilter): AsyncGenerator<VariableSet[], void, unknown> {
-        console.log(`/organizations/${orgName}/varsets`);
+        logger.debug({ orgName }, 'Listing variable sets for org');
         yield* streamPages<VariableSet, VariableSetFilter>(
             `/organizations/${orgName}/varsets`,
             variableSetMapper,

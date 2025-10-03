@@ -15,6 +15,7 @@ https://developer.hashicorp.com/terraform/enterprise/api-docs/changelog
 - 🚦 Rate limit protection with exponential backoffs
 - 🚀 Apollo Server 4
 - 🧪 TypeScript-first codebase with strong typings
+- 🔎 Observability: structured logging with trace correlation (trace_id/span_id)
 
 ## Documentation
 
@@ -60,10 +61,12 @@ Ensure the runtime environment has the following variables:
 | Variable                          | Description                                | Default                         | Required |
 |----------------------------------|--------------------------------------------|----------------------------------|----------|
 | `TFC_TOKEN`                      | API token for TFC/TFE                      | —                                | ✅       |
-| `TFE_BASE_URL`                   | Base URL for TFE API                      | `https://app.terraform.io/api/v2`       | ❌       |
+| `TFE_BASE_URL`                   | Base URL for TFE API (normalized to end with `/api/v2`) | `https://app.terraform.io/api/v2` | ❌       |
 | `TFCE_GRAPHQL_BATCH_SIZE`        | Max items per batch operation              | `10`                             | ❌       |
 | `TFCE_GRAPHQL_PAGE_SIZE`         | Max items per page when paginating         | `100` (max: 100)                 | ❌       |
-| `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` | Max retries after hitting rate limits | `20`                             | ❌       |
+| `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` | Max retries after HTTP 429 responses   | `50`                             | ❌       |
+| `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` | Max retries after 5xx responses      | `20`                             | ❌       |
+| `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` | Delay (ms) between 5xx retries      | `60000`                          | ❌       |
 | `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` | Max entries for request-level cache     | `5000`                           | ❌       |
 
 ### Run
@@ -90,6 +93,8 @@ src/
   variableSets/         # Variable Set schema, resolvers, and datasource
   variables/            # Variable schema, resolvers, and datasource
   projects/             # Project schema, resolvers, and datasource
+  runTriggers/          # Run Trigger schema, resolvers, and datasource
+  workspaceTeamAccess/  # Workspace Team Access schema, resolvers, and datasource
   workspaceResources/   # Workspace Resource schema, resolvers, and datasource
   server/               # Apollo server setup
   index.ts              # Entry point
@@ -101,6 +106,22 @@ src/
 | `resolvers.ts`   | Resolver logic                             |
 | `types.ts`       | TypeScript types and domain models         |
 | `dataSource.ts`  | REST API integration layer                 |
+
+## Observability
+
+### Logging & Tracing
+
+The server emits structured logs via Pino. Each log line includes:
+
+- `trace_id`, `span_id` for cross-service correlation (W3C trace context)
+
+Request handling:
+
+- The server parses an incoming `traceparent` header or generates one if absent.
+- The same `traceparent` value is used as the `x-request-id` for consistency.
+- Outbound HTTP calls propagate `traceparent` and `x-request-id` headers automatically.
+
+The log context is bound per request using AsyncLocalStorage so both resolver-level and shared-module logs are correlated.
 
 ## Usage
 
@@ -155,6 +176,7 @@ When filtering nested entities, it is important to remember that the
 | `Boolean`      | `_eq`, `_neq`, `_is_null`                                                            |
 | `DateTime`     | `_eq`, `_neq`, `_gt`, `_gte`, `_lt`, `_lte`, `_in`, `_nin`, `_is_null`               |
 | `Enum`         | `_eq`, `_neq`, `_in`, `_nin`, `_is_null`                                             |
+| `TerraformVersion` | `_eq`, `_neq`, `_gt`, `_gte`, `_lt`, `_lte`, `_in`, `_nin`                     |
 
 #### Examples
 

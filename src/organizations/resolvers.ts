@@ -39,18 +39,18 @@ export const resolvers = {
     variableSets: async (org: Organization, { filter }: { filter?: VariableSetFilter }, { dataSources }: Context): Promise<Promise<VariableSet>[]> => {
       return gatherAsyncGeneratorPromises(dataSources.variableSetsAPI.listVariableSetsForOrg(org.name, filter));
     },
-    users: async (org: Organization, { filter }: { filter?: UserFilter }, { dataSources, requestCache }: Context): Promise<User[]> => {
-      console.log("fetching teams");
+    users: async (org: Organization, { filter }: { filter?: UserFilter }, { dataSources, requestCache, logger }: Context): Promise<User[]> => {
+      logger.debug({ org: org.name }, 'Fetching teams');
       const userIdSet = new Set<string>();
 
       for await (const teams of dataSources.teamsAPI.listTeams(org.name)) {
         for (const team of teams) {
-          console.log(`found team ${team.name}`);
+          logger.debug({ teamName: team.name }, 'Found team');
           team.userIds.forEach(id => userIdSet.add(id));
         }
       }
 
-      console.log("done fetching ids");
+      logger.debug({ count: userIdSet.size }, 'Done fetching user IDs');
 
       return fetchResources<string, User, UserFilter>(
         Array.from(userIdSet),

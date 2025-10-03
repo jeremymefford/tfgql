@@ -93,8 +93,8 @@ export const resolvers = {
     configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, { dataSources }: Context): Promise<ConfigurationVersion[]> => {
       return dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter);
     },
-    variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
-      console.log(`fetching variables for workspace ${workspace.id}`);
+    variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, { dataSources, logger }: Context): Promise<Variable[]> => {
+      logger.info({ workspaceId: workspace.id }, 'Fetching variables for workspace');
       return dataSources.variablesAPI.getVariablesForWorkspace(workspace.id, filter);
     },
     stateVersions: async (workspace: Workspace, { filter }: { filter?: StateVersionFilter }, { dataSources }: Context): Promise<Promise<StateVersion>[]> => {

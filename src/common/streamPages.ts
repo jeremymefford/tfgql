@@ -4,8 +4,8 @@ import type { ListResponse } from './types/jsonApi';
 import { evaluateWhereClause } from './filtering/filtering';
 import { DomainMapper } from './middleware/domainMapper';
 import { applicationConfiguration } from './conf';
-import { error } from 'console';
 import { AxiosError } from 'axios';
+import { logger } from './logger';
 
 
 export async function* streamPages<T, TFilter = {}>(
@@ -20,7 +20,7 @@ export async function* streamPages<T, TFilter = {}>(
     firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   } catch (error:any) {
     if (error?.status === 404) {
-      console.log(`No results found for ${endpoint}`);
+      logger.debug({ endpoint }, 'No results found');
       return;
     }
     throw error;

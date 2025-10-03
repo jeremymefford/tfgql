@@ -8,25 +8,25 @@ export const resolvers = {
     runTriggers: async (
       _: unknown,
       { workspaceId, filter }: { workspaceId: string; filter?: RunTriggerFilter },
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Promise<RunTrigger>[]> =>
       gatherAsyncGeneratorPromises(
-        dataSources.runTriggersAPI.listRunTriggers(workspaceId, filter)
+        ctx.dataSources.runTriggersAPI.listRunTriggers(workspaceId, filter)
       ),
 
-    runTrigger: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<RunTrigger | null> => {
-      return dataSources.runTriggersAPI.getRunTrigger(id);
+    runTrigger: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<RunTrigger | null> => {
+      return ctx.dataSources.runTriggersAPI.getRunTrigger(id);
     }
   },
 
   RunTrigger: {
-    workspace: async (rt: RunTrigger & { workspaceId?: string }, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+    workspace: async (rt: RunTrigger & { workspaceId?: string }, _: unknown, ctx: Context): Promise<Workspace | null> => {
       const id = (rt as any).workspaceId ?? rt.workspace?.id ?? null;
-      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+      return id ? ctx.dataSources.workspacesAPI.getWorkspace(id) : null;
     },
-    sourceable: async (rt: RunTrigger & { sourceableId?: string }, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+    sourceable: async (rt: RunTrigger & { sourceableId?: string }, _: unknown, ctx: Context): Promise<Workspace | null> => {
       const id = (rt as any).sourceableId ?? rt.sourceable?.id ?? null;
-      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+      return id ? ctx.dataSources.workspacesAPI.getWorkspace(id) : null;
     }
   }
 };

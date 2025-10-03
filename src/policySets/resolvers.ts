@@ -12,62 +12,62 @@ export const resolvers = {
     policySets: async (
       _: unknown,
       { organization, filter }: { organization: string, filter?: PolicySetFilter },
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Promise<PolicySet>[]> =>
-      gatherAsyncGeneratorPromises(dataSources.policySetsAPI.listPolicySets(organization, filter)),
+      gatherAsyncGeneratorPromises(ctx.dataSources.policySetsAPI.listPolicySets(organization, filter)),
     policySet: async (
       _: unknown,
       { id }: { id: string },
-      { dataSources }: Context
-    ): Promise<PolicySet | null> => dataSources.policySetsAPI.getPolicySet(id)
+      ctx: Context
+    ): Promise<PolicySet | null> => ctx.dataSources.policySetsAPI.getPolicySet(id)
   },
   PolicySet: {
-    organization: (set: PolicySet, _: unknown, { dataSources }: Context) =>
-      dataSources.organizationsAPI.getOrganization(set.organizationId),
+    organization: (set: PolicySet, _: unknown, ctx: Context) =>
+      ctx.dataSources.organizationsAPI.getOrganization(set.organizationId),
     policies: (
       set: PolicySet,
       { filter }: { filter?: PolicyFilter },
-      { dataSources }: Context
+      ctx: Context
     ) => fetchResources<string, Policy, PolicyFilter>(
       set.policyIds,
-      id => dataSources.policiesAPI.getPolicy(id),
+      id => ctx.dataSources.policiesAPI.getPolicy(id),
       filter
     ),
     projects: (
       set: PolicySet,
       { filter }: { filter?: ProjectFilter },
-      { dataSources }: Context
+      ctx: Context
     ) => fetchResources<string, Project, ProjectFilter>(
       set.projectIds,
-      id => dataSources.projectsAPI.getProject(id),
+      id => ctx.dataSources.projectsAPI.getProject(id),
       filter
     ),
     workspaces: (
       set: PolicySet,
       { filter }: { filter?: WorkspaceFilter },
-      { dataSources }: Context
+      ctx: Context
     ) => fetchResources<string, Workspace, WorkspaceFilter>(
       set.workspaceIds,
-      id => dataSources.workspacesAPI.getWorkspace(id),
+      id => ctx.dataSources.workspacesAPI.getWorkspace(id),
       filter
     ),
     workspaceExclusions: (
       set: PolicySet,
       { filter }: { filter?: WorkspaceFilter },
-      { dataSources }: Context
+      ctx: Context
     ) =>
       fetchResources<string, Workspace, WorkspaceFilter>(
         set.workspaceExclusionIds,
-        id => dataSources.workspacesAPI.getWorkspace(id),
+        id => ctx.dataSources.workspacesAPI.getWorkspace(id),
         filter
       ),
     parameters: (
       set: PolicySet,
       { filter }: { filter?: PolicySetParameterFilter },
-      { dataSources }: Context
+      ctx: Context
     ) =>
       gatherAsyncGeneratorPromises(
-        dataSources.policySetParametersAPI.listPolicySetParameters(set.id, filter)
+        ctx.dataSources.policySetParametersAPI.listPolicySetParameters(set.id, filter)
       )
   }
 };

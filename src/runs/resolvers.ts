@@ -11,61 +11,61 @@ import { Plan } from "../plans/types";
 
 export const resolvers = {
   Query: {
-    runs: async (_: unknown, { workspaceId }: { workspaceId: string }, { dataSources }: Context): Promise<Promise<Run>[]> => {
+    runs: async (_: unknown, { workspaceId }: { workspaceId: string }, ctx: Context): Promise<Promise<Run>[]> => {
       return gatherAsyncGeneratorPromises(
-        dataSources.runsAPI.listRuns(workspaceId)
+        ctx.dataSources.runsAPI.listRuns(workspaceId)
       );
     },
-    run: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<Run | null> => {
-      return dataSources.runsAPI.getRun(id);
+    run: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<Run | null> => {
+      return ctx.dataSources.runsAPI.getRun(id);
     }
   },
   Run: {
-    workspace: async (run: Run, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+    workspace: async (run: Run, _: unknown, ctx: Context): Promise<Workspace | null> => {
       const workspaceId = run.workspace?.id;
       if (!workspaceId) return null;
-      return dataSources.workspacesAPI.getWorkspace(workspaceId);
+      return ctx.dataSources.workspacesAPI.getWorkspace(workspaceId);
     },
-    configurationVersion: async (run: Run, _: unknown, { dataSources }: Context): Promise<ConfigurationVersion | null> => {
+    configurationVersion: async (run: Run, _: unknown, ctx: Context): Promise<ConfigurationVersion | null> => {
       const cvId = run.configurationVersion?.id;
       if (!cvId) return null;
-      return dataSources.configurationVersionsAPI.getConfigurationVersion(cvId);
+      return ctx.dataSources.configurationVersionsAPI.getConfigurationVersion(cvId);
     },
     comments: async (
       run: Run,
       { filter }: { filter?: CommentFilter },
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Promise<Comment>[]> =>
       gatherAsyncGeneratorPromises(
-        dataSources.commentsAPI.listComments(run.id, filter)
+        ctx.dataSources.commentsAPI.listComments(run.id, filter)
       ),
     runEvents: async (
       run: Run,
       _: unknown,
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Promise<RunEvent>[]> =>
       gatherAsyncGeneratorPromises(
-        dataSources.runsAPI.listRunEvents(run.id)
+        ctx.dataSources.runsAPI.listRunEvents(run.id)
       ),
     runTriggers: async (
       run: Run,
       { filter }: { filter?: RunTriggerFilter },
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Promise<RunTrigger>[]> =>
       gatherAsyncGeneratorPromises(
-        dataSources.runTriggersAPI.listRunTriggers(run.workspace?.id ?? "", filter)
+        ctx.dataSources.runTriggersAPI.listRunTriggers(run.workspace?.id ?? "", filter)
       ),
     apply: async (
       run: Run,
       _: unknown,
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Apply | null> => 
-      dataSources.appliesAPI.getRunApply(run.id),
+      ctx.dataSources.appliesAPI.getRunApply(run.id),
     plan: async (
       run: Run,
       _: unknown,
-      { dataSources }: Context
+      ctx: Context
     ): Promise<Plan | null> => 
-      dataSources.plansAPI.getPlanForRun(run.id)
+      ctx.dataSources.plansAPI.getPlanForRun(run.id)
   }
 };

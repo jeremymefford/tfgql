@@ -11,38 +11,40 @@ export const resolvers = {
     stateVersions: async (
       _: unknown,
       { orgName, workspaceName, filter }: { orgName: string; workspaceName: string; filter?: StateVersionFilter },
-      { dataSources }: Context
-    ): Promise<Promise<StateVersion>[]> =>
-      gatherAsyncGeneratorPromises(
-        dataSources.stateVersionsAPI.listStateVersions(orgName, workspaceName, filter)
-      ),
+      ctx: Context
+    ): Promise<Promise<StateVersion>[]> => {
+      ctx.logger.info({ orgName, workspaceName }, 'Listing state versions');
+      return gatherAsyncGeneratorPromises(
+        ctx.dataSources.stateVersionsAPI.listStateVersions(orgName, workspaceName, filter)
+      );
+    },
 
-    stateVersion: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<StateVersion | null> => {
-      return dataSources.stateVersionsAPI.getStateVersion(id);
+    stateVersion: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<StateVersion | null> => {
+      return ctx.dataSources.stateVersionsAPI.getStateVersion(id);
     },
 
     workspaceCurrentStateVersion: async (
       _: unknown,
       { workspaceId }: { workspaceId: string },
-      { dataSources }: Context
+      ctx: Context
     ): Promise<StateVersion | null> => {
-      return dataSources.stateVersionsAPI.getCurrentStateVersion(workspaceId);
+      return ctx.dataSources.stateVersionsAPI.getCurrentStateVersion(workspaceId);
     }
   },
   StateVersion: {
-    run: async (sv: StateVersion, _: unknown, { dataSources }: Context): Promise<Run | null> => {
+    run: async (sv: StateVersion, _: unknown, ctx: Context): Promise<Run | null> => {
       const id = sv.run?.id ?? null;
-      return id ? dataSources.runsAPI.getRun(id) : null;
+      return id ? ctx.dataSources.runsAPI.getRun(id) : null;
     },
-    createdBy: async (sv: StateVersion, _: unknown, { dataSources }: Context): Promise<User | null> => {
+    createdBy: async (sv: StateVersion, _: unknown, ctx: Context): Promise<User | null> => {
       const id = sv.createdBy?.id ?? null;
-      return id ? dataSources.usersAPI.getUser(id) : null;
+      return id ? ctx.dataSources.usersAPI.getUser(id) : null;
     },
-    workspace: async (sv: StateVersion, _: unknown, { dataSources }: Context): Promise<Workspace | null> => {
+    workspace: async (sv: StateVersion, _: unknown, ctx: Context): Promise<Workspace | null> => {
       const id = sv.workspace?.id ?? null;
-      return id ? dataSources.workspacesAPI.getWorkspace(id) : null;
+      return id ? ctx.dataSources.workspacesAPI.getWorkspace(id) : null;
     },
-    outputs: async (sv: StateVersion, _: unknown, { dataSources }: Context): Promise<Promise<StateVersionOutput>[]> =>
-      gatherAsyncGeneratorPromises(dataSources.stateVersionOutputsAPI.listStateVersionOutputs(sv.id))
+    outputs: async (sv: StateVersion, _: unknown, ctx: Context): Promise<Promise<StateVersionOutput>[]> =>
+      gatherAsyncGeneratorPromises(ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(sv.id))
   }
 };

@@ -28,6 +28,7 @@ export async function* streamPages<T, TFilter = {}>(
 
   const pagination = firstRes.data.meta?.pagination;
   const totalPages = pagination?.['total-pages'] ?? 1;
+  logger.debug({ endpoint, totalPages }, 'Fetched first page');
 
   // some APIs return a single object instead of an array
   // in those cases, subsequent pages shouldn't need to load

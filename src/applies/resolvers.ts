@@ -87,10 +87,10 @@ export const resolvers = {
     }
   },
   Apply: {
-    stateVersions: async (apply: Apply, { filter }: { filter?: StateVersionFilter }, { dataSources }: Context): Promise<StateVersion[]> => {
+    stateVersions: async (apply: Apply, { filter }: { filter?: StateVersionFilter }, ctx: Context): Promise<StateVersion[]> => {
       const ret: StateVersion[] = [];
       await parallelizeBounded(apply.stateVersionIds || [], async (svId) => {
-        const sv = await dataSources.stateVersionsAPI.getStateVersion(svId);
+        const sv = await ctx.dataSources.stateVersionsAPI.getStateVersion(svId);
         if (sv && (!filter || evaluateWhereClause(filter, sv))) {
           ret.push(sv);
         }

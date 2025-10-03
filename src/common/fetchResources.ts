@@ -11,6 +11,8 @@ export async function* streamResources<T, R, RFilter>(
   const inflight = new Set<Promise<void>>();
   const resultsQueue: R[] = [];
   const resourceIterator = resources[Symbol.iterator]();
+  const { logger } = await import('./logger');
+  let scheduled = 0;
 
   const dispatch = (item: T, index: number) => {
     const p = operation(item)
@@ -23,6 +25,7 @@ export async function* streamResources<T, R, RFilter>(
         inflight.delete(p);
       });
     inflight.add(p);
+    scheduled++;
   };
 
   let index = 0;
@@ -43,6 +46,7 @@ export async function* streamResources<T, R, RFilter>(
       await Promise.race(inflight);
     }
   }
+  logger.debug({ scheduled }, 'streamResources complete');
 
 }
 

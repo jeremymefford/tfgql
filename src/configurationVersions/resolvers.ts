@@ -7,28 +7,28 @@ import { Workspace } from '../workspaces/types';
 
 export const resolvers = {
     Query: {
-        configurationVersion: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<ConfigurationVersion | null> => {
-            const cv = await dataSources.configurationVersionsAPI.getConfigurationVersion(id);
+        configurationVersion: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<ConfigurationVersion | null> => {
+            const cv = await ctx.dataSources.configurationVersionsAPI.getConfigurationVersion(id);
             return cv;
         },
         configurationVersions: async (
             _: unknown,
             { workspaceId }: { workspaceId: string },
-            { dataSources }: Context
+            ctx: Context
         ): Promise<ConfigurationVersion[]> => {
-            return dataSources.configurationVersionsAPI.listConfigurationVersions(workspaceId);
+            return ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(workspaceId);
         },
         workspacesWithConfigurationVersionsLargerThan: async (
             _: unknown,
             { organizationName, bytes }: { organizationName: string, bytes: number },
-            { dataSources }: Context
+            ctx: Context
         ): Promise<Workspace[]> => {
             const workspacesWithLargeCVs: Workspace[] = [];
-            for await (const workspacePage of dataSources.workspacesAPI.listWorkspaces(organizationName)) {
+            for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(organizationName)) {
                 await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
-                    const cvs = await dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
+                    const cvs = await ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
                     await parallelizeBounded(cvs, async (cv: ConfigurationVersion) => {
-                        const size = await resolvers.ConfigurationVersion.size(cv, {}, { dataSources } as Context);
+                        const size = await resolvers.ConfigurationVersion.size(cv, {}, ctx);
                         if (size && size > bytes) {
                             workspacesWithLargeCVs.push(workspace);
                         }
@@ -39,17 +39,17 @@ export const resolvers = {
         }
     },
     ConfigurationVersion: {
-        size: async (cv: ConfigurationVersion, _: unknown, { dataSources }: Context): Promise<number | null> => {
+        size: async (cv: ConfigurationVersion, _: unknown, ctx: Context): Promise<number | null> => {
             if (!cv.id || !cv.downloadUrl) return null;
-            return dataSources.configurationVersionsAPI.getConfigurationVersionSize(cv.downloadUrl);
+            return ctx.dataSources.configurationVersionsAPI.getConfigurationVersionSize(cv.downloadUrl);
         },
         ingressAttributes: async (
             cv: ConfigurationVersion,
             _: unknown,
-            { dataSources }: Context
+            ctx: Context
         ): Promise<IngressAttributes | null> => {
             if (!cv.ingressAttributesId) return null;
-            return dataSources.configurationVersionsAPI.getIngressAttributes(cv.id);
+            return ctx.dataSources.configurationVersionsAPI.getIngressAttributes(cv.id);
         }
     }
 };

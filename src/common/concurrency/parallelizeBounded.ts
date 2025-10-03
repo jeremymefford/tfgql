@@ -9,6 +9,10 @@ export async function parallelizeBounded<T, R>(
   const results: R[] = new Array(items.length);
   const inflight = new Set<Promise<void>>();
   let i = 0;
+  // Logging: bounded parallel processing can be tricky; emit minimal debug
+  // Lazy import to avoid circular import at module top
+  const { logger } = await import('../logger');
+  logger.debug({ total: items.length, concurrency }, 'parallelizeBounded start');
 
   function schedule(index: number, item: T) {
     const p = operation(item)
@@ -30,5 +34,6 @@ export async function parallelizeBounded<T, R>(
   }
 
   await Promise.all(inflight);
+  logger.debug({ total: items.length }, 'parallelizeBounded complete');
   return results;
 }

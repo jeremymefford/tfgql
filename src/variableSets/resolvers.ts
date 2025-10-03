@@ -11,37 +11,37 @@ import { Project, ProjectFilter } from '../projects/types';
 
 export const resolvers = {
     Query: {
-        variableSet: async (_: unknown, { id }: { id: string }, { dataSources }: Context): Promise<VariableSet | null> => {
-            return dataSources.variableSetsAPI.getVariableSet(id);
+        variableSet: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<VariableSet | null> => {
+            return ctx.dataSources.variableSetsAPI.getVariableSet(id);
         },
-        variableSets: async (_: unknown, { organization, filter }: { organization: string, filter?: VariableSetFilter }, { dataSources }: Context): Promise<Promise<VariableSet>[]> => {
-            return gatherAsyncGeneratorPromises(dataSources.variableSetsAPI.listVariableSetsForOrg(organization, filter));
+        variableSets: async (_: unknown, { organization, filter }: { organization: string, filter?: VariableSetFilter }, ctx: Context): Promise<Promise<VariableSet>[]> => {
+            return gatherAsyncGeneratorPromises(ctx.dataSources.variableSetsAPI.listVariableSetsForOrg(organization, filter));
         }
     },
     VariableSet: {
-        organization: async (varset: VariableSet, _: unknown, { dataSources }: Context): Promise<Organization | null> => {
+        organization: async (varset: VariableSet, _: unknown, ctx: Context): Promise<Organization | null> => {
             if (!varset.organizationId) return null;
-            return dataSources.organizationsAPI.getOrganization(varset.organizationId);
+            return ctx.dataSources.organizationsAPI.getOrganization(varset.organizationId);
         },
-        workspaces: async (varset: VariableSet, { filter }: { filter?: WorkspaceFilter }, { dataSources }: Context): Promise<Workspace[]> => {
+        workspaces: async (varset: VariableSet, { filter }: { filter?: WorkspaceFilter }, ctx: Context): Promise<Workspace[]> => {
             return fetchResources<string, Workspace, WorkspaceFilter>(
                 varset.workspaceIds,
-                id => dataSources.workspacesAPI.getWorkspace(id),
+                id => ctx.dataSources.workspacesAPI.getWorkspace(id),
                 filter);
         },
-        projects: async (varset: VariableSet, {filter}:{filter?:ProjectFilter}, { dataSources }: Context): Promise<Project[]> => {
-            const projectIds = await dataSources.variableSetsAPI.listProjectIDs(varset.id);
+        projects: async (varset: VariableSet, {filter}:{filter?:ProjectFilter}, ctx: Context): Promise<Project[]> => {
+            const projectIds = await ctx.dataSources.variableSetsAPI.listProjectIDs(varset.id);
             const projects: Project[] = [];
             await parallelizeBounded(projectIds, async (projectId) => {
-                const project = await dataSources.projectsAPI.getProject(projectId);
+                const project = await ctx.dataSources.projectsAPI.getProject(projectId);
                 if (project && evaluateWhereClause<Project, ProjectFilter>(filter, project)) {
                     projects.push(project);
                 }
             });
             return projects;
         },
-        vars: async (varset: VariableSet, { filter }: { filter?: VariableFilter }, { dataSources }: Context): Promise<Variable[]> => {
-            return dataSources.variableSetsAPI.listVariables(varset.id, filter);
+        vars: async (varset: VariableSet, { filter }: { filter?: VariableFilter }, ctx: Context): Promise<Variable[]> => {
+            return ctx.dataSources.variableSetsAPI.listVariables(varset.id, filter);
         },
     }
 };

@@ -152,6 +152,7 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 - Do: rely on mixin for `trace_id`/`span_id`.
 - Don’t: log `traceparent` or `trace_flags` directly; infer as needed.
 - Don’t: duplicate `trace_id`/`span_id` in child logger bindings.
+- Don't: make changes to lines not directly in scope of the required changes.  For example, do not change "" to '' on another line just because '' may fit better.
 
 ---
 Scope: Root-level instructions apply to the whole repo. If a more specific `AGENTS.md` is added in a subdirectory later, it takes precedence within that subtree.

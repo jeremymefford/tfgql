@@ -4,16 +4,23 @@ import { fetchResources } from '../common/fetchResources';
 import { User, UserFilter } from '../users/types';
 import { TeamToken, TeamTokenFilter } from '../teamTokens/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { coalesceOrgs } from '../common/orgHelper';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
     Query: {
-        teams: async (_: unknown, { organization, filter }: { organization: string, filter?: TeamFilter }, ctx: Context): Promise<Promise<Team>[]> => {
-            return gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeams(organization, filter));
+        teams: async (_: unknown, { includeOrgs, excludeOrgs, filter }: { includeOrgs: string[], excludeOrgs: string[], filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
+            const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+            const results: Team[] = [];
+            await parallelizeBounded(orgs, async orgId => {
+                results.push(...(await gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeams(orgId, filter))));
+            });
+            return results;
         },
-        teamsByName: async (_: unknown, { organization, names, filter }: { organization: string, names: string[], filter?: TeamFilter }, ctx: Context): Promise<Promise<Team>[]> => {
+        teamsByName: async (_: unknown, { organization, names, filter }: { organization: string, names: string[], filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
             return gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeamsByName(organization, new Set(names), filter));
         },
-        teamsByQuery: async (_: unknown, { organization, query, filter }: { organization: string, query: string, filter?: TeamFilter }, ctx: Context): Promise<Promise<Team>[]> => {
+        teamsByQuery: async (_: unknown, { organization, query, filter }: { organization: string, query: string, filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
             return gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeamsByQuery(organization, query, filter));
         },
         team: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<Team | null> => {
@@ -36,7 +43,7 @@ export const resolvers = {
             team: Team,
             { filter }: { filter?: TeamTokenFilter },
             ctx: Context
-        ): Promise<Promise<TeamToken>[]> =>
+        ): Promise<TeamToken[]> =>
             gatherAsyncGeneratorPromises(
                 ctx.dataSources.teamTokensAPI.listTeamTokens(team.id, filter)
             ),

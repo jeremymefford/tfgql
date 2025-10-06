@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { workspaceId, filter }: { workspaceId: string; filter?: AssessmentResultFilter },
       { dataSources }: Context
-    ): Promise<Promise<AssessmentResult>[]> => {
+    ): Promise<AssessmentResult[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.assessmentResultsAPI.listAssessmentResults(workspaceId, filter)
       );

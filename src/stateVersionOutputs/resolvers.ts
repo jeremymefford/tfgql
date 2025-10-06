@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { stateVersionId, filter }: { stateVersionId: string; filter?: StateVersionOutputFilter },
       { dataSources }: Context
-    ): Promise<Promise<StateVersionOutput>[]> => {
+    ): Promise<StateVersionOutput[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.stateVersionOutputsAPI.listStateVersionOutputs(stateVersionId, filter)
       );

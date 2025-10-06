@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { runId, filter }: { runId: string; filter?: CommentFilter },
       { dataSources }: Context
-    ): Promise<Promise<Comment>[]> => {
+    ): Promise<Comment[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.commentsAPI.listComments(runId, filter)
       );

@@ -12,7 +12,7 @@ export const resolvers = {
       _: unknown,
       { orgName, workspaceName, filter }: { orgName: string; workspaceName: string; filter?: StateVersionFilter },
       ctx: Context
-    ): Promise<Promise<StateVersion>[]> => {
+    ): Promise<StateVersion[]> => {
       ctx.logger.info({ orgName, workspaceName }, 'Listing state versions');
       return gatherAsyncGeneratorPromises(
         ctx.dataSources.stateVersionsAPI.listStateVersions(orgName, workspaceName, filter)
@@ -44,7 +44,7 @@ export const resolvers = {
       const id = sv.workspace?.id ?? null;
       return id ? ctx.dataSources.workspacesAPI.getWorkspace(id) : null;
     },
-    outputs: async (sv: StateVersion, _: unknown, ctx: Context): Promise<Promise<StateVersionOutput>[]> =>
+    outputs: async (sv: StateVersion, _: unknown, ctx: Context): Promise<StateVersionOutput[]> =>
       gatherAsyncGeneratorPromises(ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(sv.id))
   }
 };

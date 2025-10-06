@@ -100,7 +100,8 @@ const teamSchema = gql`
   }
 
   extend type Query {
-    teams(organization: String!, filter: TeamFilter): [Team!]!
+    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
+    # teams(organization: String!, filter: TeamFilter): [Team!]!
     teamsByQuery(organization: String!, query: String!, filter: TeamFilter): [Team!]!
     teamsByName(organization: String!, names: [String!]!, filter: TeamFilter): [Team!]!
     team(id: ID!): Team

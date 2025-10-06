@@ -9,7 +9,7 @@ export const resolvers = {
       _: unknown,
       { workspaceId, filter }: { workspaceId: string; filter?: RunTriggerFilter },
       ctx: Context
-    ): Promise<Promise<RunTrigger>[]> =>
+    ): Promise<RunTrigger[]> =>
       gatherAsyncGeneratorPromises(
         ctx.dataSources.runTriggersAPI.listRunTriggers(workspaceId, filter)
       ),

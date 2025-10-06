@@ -14,7 +14,7 @@ export const resolvers = {
         variableSet: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<VariableSet | null> => {
             return ctx.dataSources.variableSetsAPI.getVariableSet(id);
         },
-        variableSets: async (_: unknown, { organization, filter }: { organization: string, filter?: VariableSetFilter }, ctx: Context): Promise<Promise<VariableSet>[]> => {
+        variableSets: async (_: unknown, { organization, filter }: { organization: string, filter?: VariableSetFilter }, ctx: Context): Promise<VariableSet[]> => {
             return gatherAsyncGeneratorPromises(ctx.dataSources.variableSetsAPI.listVariableSetsForOrg(organization, filter));
         }
     },

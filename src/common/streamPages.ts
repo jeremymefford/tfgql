@@ -71,11 +71,11 @@ export async function* streamPages<T, TFilter = {}>(
 
 export async function gatherAsyncGeneratorPromises<T>(
   generator: AsyncGenerator<T[]>
-): Promise<Promise<T>[]> {
-  const all: Promise<T>[] = [];
+): Promise<T[]> {
+  const all: T[] = [];
   for await (const batch of generator) {
     for (const item of batch) {
-      all.push(Promise.resolve(item));
+      all.push(await Promise.resolve(item));
     }
   }
   return all;

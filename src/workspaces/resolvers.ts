@@ -14,7 +14,7 @@ import { WorkspaceResourceFilter, WorkspaceResource } from '../workspaceResource
 
 export const resolvers = {
   Query: {
-    workspaces: (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, ctx: Context): Promise<Promise<Workspace>[]> => {
+    workspaces: (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, ctx: Context): Promise<Workspace[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.workspacesAPI.listWorkspaces(orgName, filter));
     },
     workspaceByName: async (_: unknown, { orgName, workspaceName }: { orgName: string, workspaceName: string }, ctx: Context): Promise<Workspace | null> => {
@@ -90,10 +90,10 @@ export const resolvers = {
       const organization = await ctx.dataSources.organizationsAPI.getOrganization(orgName);
       return organization
     },
-    runs: async (workspace: Workspace, { filter }: { filter?: RunFilter }, ctx: Context): Promise<Promise<Run>[]> => {
+    runs: async (workspace: Workspace, { filter }: { filter?: RunFilter }, ctx: Context): Promise<Run[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.runsAPI.listRuns(workspace.id, filter));
     },
-    workspaceResources: async (workspace: Workspace, { filter }: { filter?: WorkspaceResourceFilter }, ctx: Context): Promise<Promise<WorkspaceResource>[]> => {
+    workspaceResources: async (workspace: Workspace, { filter }: { filter?: WorkspaceResourceFilter }, ctx: Context): Promise<WorkspaceResource[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, filter));
     },
     configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, ctx: Context): Promise<ConfigurationVersion[]> => {
@@ -103,7 +103,7 @@ export const resolvers = {
       ctx.logger.info({ workspaceId: workspace.id }, 'Fetching variables for workspace');
       return ctx.dataSources.variablesAPI.getVariablesForWorkspace(workspace.id, filter);
     },
-    stateVersions: async (workspace: Workspace, { filter }: { filter?: StateVersionFilter }, ctx: Context): Promise<Promise<StateVersion>[]> => {
+    stateVersions: async (workspace: Workspace, { filter }: { filter?: StateVersionFilter }, ctx: Context): Promise<StateVersion[]> => {
       if (!workspace.organizationName) {
         throw new Error(`Workspace ${workspace.id} does not have an organizationName set, cannot fetch state versions.`);
       }

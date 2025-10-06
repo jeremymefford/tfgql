@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { poolId, filter }: { poolId: string; filter?: AgentTokenFilter },
       { dataSources }: Context
-    ): Promise<Promise<AgentToken>[]> => {
+    ): Promise<AgentToken[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.agentTokensAPI.listAgentTokens(poolId, filter)
       );

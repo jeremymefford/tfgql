@@ -6,7 +6,7 @@ import { Workspace } from '../workspaces/types';
 
 export const resolvers = {
     Query: {
-        workspaceResources: async (_: unknown, { workspaceId, filter }: { workspaceId: string, filter?: WorkspaceResourceFilter }, ctx: Context): Promise<Promise<WorkspaceResource>[]> => {
+        workspaceResources: async (_: unknown, { workspaceId, filter }: { workspaceId: string, filter?: WorkspaceResourceFilter }, ctx: Context): Promise<WorkspaceResource[]> => {
             return gatherAsyncGeneratorPromises(
                 ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspaceId, filter));
         }

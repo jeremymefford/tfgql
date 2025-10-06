@@ -12,7 +12,7 @@ export const resolvers = {
       _: unknown,
       { orgName, filter }: { orgName: string; filter?: AgentPoolFilter },
       { dataSources }: Context
-    ): Promise<Promise<AgentPool>[]> => {
+    ): Promise<AgentPool[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.agentPoolsAPI.listAgentPools(orgName, filter)
       );
@@ -52,7 +52,7 @@ export const resolvers = {
       pool: AgentPool,
       { filter }: { filter?: AgentFilter },
       { dataSources }: Context
-    ): Promise<Promise<Agent>[]> => {
+    ): Promise<Agent[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.agentPoolsAPI.listAgents(pool.id, filter)
       );
@@ -61,7 +61,7 @@ export const resolvers = {
       pool: AgentPool,
       { filter }: { filter?: AgentTokenFilter },
       { dataSources }: Context
-    ): Promise<Promise<AgentToken>[]> => {
+    ): Promise<AgentToken[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.agentTokensAPI.listAgentTokens(pool.id, filter)
       );

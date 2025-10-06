@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { projectId, filter }: { projectId: string; filter?: ProjectTeamAccessFilter },
       { dataSources }: Context
-    ): Promise<Promise<ProjectTeamAccess>[]> => {
+    ): Promise<ProjectTeamAccess[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.projectTeamAccessAPI.listProjectTeamAccess(projectId, filter)
       );

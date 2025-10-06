@@ -11,7 +11,7 @@ import { Plan } from "../plans/types";
 
 export const resolvers = {
   Query: {
-    runs: async (_: unknown, { workspaceId }: { workspaceId: string }, ctx: Context): Promise<Promise<Run>[]> => {
+    runs: async (_: unknown, { workspaceId }: { workspaceId: string }, ctx: Context): Promise<Run[]> => {
       return gatherAsyncGeneratorPromises(
         ctx.dataSources.runsAPI.listRuns(workspaceId)
       );
@@ -35,7 +35,7 @@ export const resolvers = {
       run: Run,
       { filter }: { filter?: CommentFilter },
       ctx: Context
-    ): Promise<Promise<Comment>[]> =>
+    ): Promise<Comment[]> =>
       gatherAsyncGeneratorPromises(
         ctx.dataSources.commentsAPI.listComments(run.id, filter)
       ),
@@ -43,7 +43,7 @@ export const resolvers = {
       run: Run,
       _: unknown,
       ctx: Context
-    ): Promise<Promise<RunEvent>[]> =>
+    ): Promise<RunEvent[]> =>
       gatherAsyncGeneratorPromises(
         ctx.dataSources.runsAPI.listRunEvents(run.id)
       ),
@@ -51,7 +51,7 @@ export const resolvers = {
       run: Run,
       { filter }: { filter?: RunTriggerFilter },
       ctx: Context
-    ): Promise<Promise<RunTrigger>[]> =>
+    ): Promise<RunTrigger[]> =>
       gatherAsyncGeneratorPromises(
         ctx.dataSources.runTriggersAPI.listRunTriggers(run.workspace?.id ?? "", filter)
       ),

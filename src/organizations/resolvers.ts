@@ -18,7 +18,7 @@ import { PolicySet, PolicySetFilter } from '../policySets/types';
 
 export const resolvers = {
   Query: {
-    organizations: async (_: unknown, {filter}: {filter: OrganizationFilter}, ctx: Context): Promise<Promise<Organization>[]> => {
+    organizations: async (_: unknown, {filter}: {filter: OrganizationFilter}, ctx: Context): Promise<Organization[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.organizationsAPI.listOrganizations(filter));
     },
     organization: async (_: unknown, { name }: { name: string }, ctx: Context): Promise<Organization | null> => {
@@ -27,16 +27,16 @@ export const resolvers = {
     }
   },
   Organization: {
-    workspaces: async (org: Organization, { filter }: { filter?: WorkspaceFilter }, ctx: Context): Promise<Promise<Workspace>[]> => {
+    workspaces: async (org: Organization, { filter }: { filter?: WorkspaceFilter }, ctx: Context): Promise<Workspace[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.workspacesAPI.listWorkspaces(org.name, filter));
     },
-    policySets: async (org: Organization, { filter }: { filter?: PolicySetFilter }, ctx: Context): Promise<Promise<PolicySet>[]> => {
+    policySets: async (org: Organization, { filter }: { filter?: PolicySetFilter }, ctx: Context): Promise<PolicySet[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.policySetsAPI.listPolicySets(org.name, filter));
     },
-    teams: async (org: Organization, { filter }: { filter?: TeamFilter }, ctx: Context): Promise<Promise<Team>[]> => {
+    teams: async (org: Organization, { filter }: { filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeams(org.name, filter));
     },
-    variableSets: async (org: Organization, { filter }: { filter?: VariableSetFilter }, ctx: Context): Promise<Promise<VariableSet>[]> => {
+    variableSets: async (org: Organization, { filter }: { filter?: VariableSetFilter }, ctx: Context): Promise<VariableSet[]> => {
       return gatherAsyncGeneratorPromises(ctx.dataSources.variableSetsAPI.listVariableSetsForOrg(org.name, filter));
     },
     users: async (org: Organization, { filter }: { filter?: UserFilter }, ctx: Context): Promise<User[]> => {
@@ -62,7 +62,7 @@ export const resolvers = {
       org: Organization,
       { filter }: { filter?: OrganizationMembershipFilter },
       ctx: Context
-    ): Promise<Promise<OrganizationMembership>[]> => {
+    ): Promise<OrganizationMembership[]> => {
       return gatherAsyncGeneratorPromises(
         ctx.dataSources.organizationMembershipsAPI.listOrganizationMemberships(
           org.name,
@@ -74,7 +74,7 @@ export const resolvers = {
       org: Organization,
       { filter }: { filter?: OrganizationTagFilter },
       ctx: Context
-    ): Promise<Promise<OrganizationTag>[]> =>
+    ): Promise<OrganizationTag[]> =>
       gatherAsyncGeneratorPromises(
         ctx.dataSources.organizationTagsAPI.listOrganizationTags(org.name, filter)
       )

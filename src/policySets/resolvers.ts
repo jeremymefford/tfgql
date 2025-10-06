@@ -13,7 +13,7 @@ export const resolvers = {
       _: unknown,
       { organization, filter }: { organization: string, filter?: PolicySetFilter },
       ctx: Context
-    ): Promise<Promise<PolicySet>[]> =>
+    ): Promise<PolicySet[]> =>
       gatherAsyncGeneratorPromises(ctx.dataSources.policySetsAPI.listPolicySets(organization, filter)),
     policySet: async (
       _: unknown,

@@ -14,7 +14,7 @@ export const resolvers = {
             _: unknown,
             { organization, filter }: { organization: string; filter?: ProjectFilter },
             { dataSources }: Context
-        ): Promise<Promise<Project>[]> =>
+        ): Promise<Project[]> =>
             gatherAsyncGeneratorPromises(dataSources.projectsAPI.getProjects(organization, filter)),
         project: async (
             _: unknown,
@@ -27,7 +27,7 @@ export const resolvers = {
             project: Project,
             { filter }: { filter?: ProjectTeamAccessFilter },
             { dataSources }: Context
-        ): Promise<Promise<ProjectTeamAccess>[]> =>
+        ): Promise<ProjectTeamAccess[]> =>
             gatherAsyncGeneratorPromises(
                 dataSources.projectTeamAccessAPI.listProjectTeamAccess(project.id, filter)
             ),
@@ -35,7 +35,7 @@ export const resolvers = {
             project: Project,
             { filter }: { filter?: WorkspaceFilter },
             { dataSources }: Context
-        ): Promise<Promise<Workspace>[]> =>
+        ): Promise<Workspace[]> =>
             gatherAsyncGeneratorPromises(
                 dataSources.workspacesAPI.getWorkspacesByProjectId(project.id, filter)
             ),
@@ -59,7 +59,7 @@ export const resolvers = {
             project: Project,
             { filter }: { filter?: VariableSetFilter },
             { dataSources }: Context
-        ): Promise<Promise<VariableSet>[]> =>
+        ): Promise<VariableSet[]> =>
             gatherAsyncGeneratorPromises(
                 dataSources.variableSetsAPI.listVariableSetsForProject(project.id, filter)
             ),

@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { orgName, filter }: { orgName: string; filter?: OrganizationMembershipFilter },
       { dataSources }: Context
-    ): Promise<Promise<OrganizationMembership>[]> => {
+    ): Promise<OrganizationMembership[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.organizationMembershipsAPI.listOrganizationMemberships(orgName, filter)
       );

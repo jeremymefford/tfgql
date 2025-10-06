@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { teamId, filter }: { teamId: string; filter?: TeamTokenFilter },
       { dataSources }: Context
-    ): Promise<Promise<TeamToken>[]> => {
+    ): Promise<TeamToken[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.teamTokensAPI.listTeamTokens(teamId, filter)
       );

@@ -8,7 +8,7 @@ export const resolvers = {
       _: unknown,
       { taskStageId, filter }: { taskStageId: string; filter?: PolicyEvaluationFilter },
       { dataSources }: Context
-    ): Promise<Promise<PolicyEvaluation>[]> => {
+    ): Promise<PolicyEvaluation[]> => {
       return gatherAsyncGeneratorPromises(
         dataSources.policyEvaluationsAPI.listPolicyEvaluations(taskStageId, filter)
       );

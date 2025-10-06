@@ -5,17 +5,29 @@ import { fetchResources } from '../common/fetchResources';
 import { Workspace, WorkspaceFilter } from '../workspaces/types';
 import { Agent, AgentFilter } from '../agents/types';
 import { AgentToken, AgentTokenFilter } from '../agentTokens/types';
+import { coalesceOrgs } from '../common/orgHelper';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
   Query: {
     agentPools: async (
       _: unknown,
-      { orgName, filter }: { orgName: string; filter?: AgentPoolFilter },
-      { dataSources }: Context
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: AgentPoolFilter },
+      ctx: Context
     ): Promise<AgentPool[]> => {
-      return gatherAsyncGeneratorPromises(
-        dataSources.agentPoolsAPI.listAgentPools(orgName, filter)
-      );
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+
+      const results: AgentPool[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const pools = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.agentPoolsAPI.listAgentPools(orgId, filter)
+        );
+        results.push(...pools);
+      });
+      return results;
     },
     agentPool: async (
       _: unknown,

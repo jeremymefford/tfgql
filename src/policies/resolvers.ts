@@ -1,15 +1,29 @@
 import { Context } from '../server/context';
 import { Policy, PolicyFilter } from './types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { coalesceOrgs } from '../common/orgHelper';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
   Query: {
     policies: async (
       _: unknown,
-      { orgName, filter }: { orgName: string, filter?: PolicyFilter },
-      { dataSources }: Context
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: PolicyFilter },
+      ctx: Context
     ): Promise<Policy[]> => {
-      return gatherAsyncGeneratorPromises(dataSources.policiesAPI.listPolicies(orgName, filter));
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+
+      const results: Policy[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const policies = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.policiesAPI.listPolicies(orgId, filter)
+        );
+        results.push(...policies);
+      });
+      return results;
     },
     policy: async (
       _: unknown,

@@ -42,7 +42,7 @@ const projectsSchema = gql`
     }
 
     extend type Query {
-        projects(organization: String!, filter: ProjectFilter): [Project!]!
+        projects(includeOrgs: [String!], excludeOrgs: [String!], filter: ProjectFilter): [Project!]!
         project(id: ID!): Project
     }
 

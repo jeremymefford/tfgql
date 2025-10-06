@@ -30,7 +30,7 @@ const policiesSchema = gql`
   }
 
   extend type Query {
-    policies(orgName: String!, filter: PolicyFilter): [Policy!]!
+    policies(includeOrgs: [String!], excludeOrgs: [String!], filter: PolicyFilter): [Policy!]!
     policy(id: ID!): Policy
   }
 `;

@@ -7,15 +7,29 @@ import { Team, TeamFilter } from '../teams/types';
 import { VariableSet, VariableSetFilter } from '../variableSets/types';
 import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 import { evaluateWhereClause } from '../common/filtering/filtering';
+import { coalesceOrgs } from '../common/orgHelper';
 
 export const resolvers = {
     Query: {
         projects: async (
             _: unknown,
-            { organization, filter }: { organization: string; filter?: ProjectFilter },
-            { dataSources }: Context
-        ): Promise<Project[]> =>
-            gatherAsyncGeneratorPromises(dataSources.projectsAPI.getProjects(organization, filter)),
+            { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: ProjectFilter },
+            ctx: Context
+        ): Promise<Project[]> => {
+            const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+            if (orgs.length === 0) {
+                return [];
+            }
+
+            const results: Project[] = [];
+            await parallelizeBounded(orgs, async (orgId) => {
+                const projects = await gatherAsyncGeneratorPromises(
+                    ctx.dataSources.projectsAPI.getProjects(orgId, filter)
+                );
+                results.push(...projects);
+            });
+            return results;
+        },
         project: async (
             _: unknown,
             { id }: { id: string },

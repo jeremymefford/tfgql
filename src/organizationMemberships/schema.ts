@@ -22,7 +22,7 @@ const organizationMembershipsSchema = gql`
   }
 
   extend type Query {
-    organizationMemberships(orgName: String!, filter: OrganizationMembershipFilter): [OrganizationMembership!]!
+    organizationMemberships(includeOrgs: [String!], excludeOrgs: [String!], filter: OrganizationMembershipFilter): [OrganizationMembership!]!
     organizationMembership(id: ID!): OrganizationMembership
     myOrganizationMemberships(filter: OrganizationMembershipFilter): [OrganizationMembership!]!
   }

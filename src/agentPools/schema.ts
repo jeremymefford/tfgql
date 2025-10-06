@@ -28,7 +28,7 @@ const agentPoolsSchema = gql`
   }
 
   extend type Query {
-    agentPools(orgName: String!, filter: AgentPoolFilter): [AgentPool!]!
+    agentPools(includeOrgs: [String!], excludeOrgs: [String!], filter: AgentPoolFilter): [AgentPool!]!
     agentPool(id: ID!): AgentPool
   }
 `;

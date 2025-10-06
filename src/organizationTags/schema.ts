@@ -23,7 +23,7 @@ const organizationTagsSchema = gql`
   }
 
   extend type Query {
-    organizationTags(orgName: String!, filter: OrganizationTagFilter): [OrganizationTag!]!
+    organizationTags(includeOrgs: [String!], excludeOrgs: [String!], filter: OrganizationTagFilter): [OrganizationTag!]!
   }
 `;
 

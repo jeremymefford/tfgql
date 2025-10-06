@@ -1,17 +1,29 @@
 import { Context } from '../server/context';
 import { OrganizationMembership, OrganizationMembershipFilter } from './types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { coalesceOrgs } from '../common/orgHelper';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
   Query: {
     organizationMemberships: async (
       _: unknown,
-      { orgName, filter }: { orgName: string; filter?: OrganizationMembershipFilter },
-      { dataSources }: Context
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: OrganizationMembershipFilter },
+      ctx: Context
     ): Promise<OrganizationMembership[]> => {
-      return gatherAsyncGeneratorPromises(
-        dataSources.organizationMembershipsAPI.listOrganizationMemberships(orgName, filter)
-      );
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+
+      const results: OrganizationMembership[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const memberships = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.organizationMembershipsAPI.listOrganizationMemberships(orgId, filter)
+        );
+        results.push(...memberships);
+      });
+      return results;
     },
     organizationMembership: async (
       _: unknown,

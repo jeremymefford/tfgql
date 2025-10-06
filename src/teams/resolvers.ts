@@ -9,11 +9,14 @@ import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
     Query: {
-        teams: async (_: unknown, { includeOrgs, excludeOrgs, filter }: { includeOrgs: string[], excludeOrgs: string[], filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
+        teams: async (_: unknown, { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[], excludeOrgs?: string[], filter?: TeamFilter }, ctx: Context): Promise<Team[]> => {
             const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
             const results: Team[] = [];
             await parallelizeBounded(orgs, async orgId => {
-                results.push(...(await gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeams(orgId, filter))));
+                await gatherAsyncGeneratorPromises(ctx.dataSources.teamsAPI.listTeams(orgId, filter))
+                    .then(teams => {
+                        results.push(...teams);
+                    });
             });
             return results;
         },

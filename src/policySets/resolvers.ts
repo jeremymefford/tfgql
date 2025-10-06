@@ -6,15 +6,30 @@ import { Policy, PolicyFilter } from '../policies/types';
 import { Project, ProjectFilter } from '../projects/types';
 import { Workspace, WorkspaceFilter } from '../workspaces/types';
 import { PolicySetParameter, PolicySetParameterFilter } from '../policySetParameters/types';
+import { coalesceOrgs } from '../common/orgHelper';
+import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 
 export const resolvers = {
   Query: {
     policySets: async (
       _: unknown,
-      { organization, filter }: { organization: string, filter?: PolicySetFilter },
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: PolicySetFilter },
       ctx: Context
-    ): Promise<PolicySet[]> =>
-      gatherAsyncGeneratorPromises(ctx.dataSources.policySetsAPI.listPolicySets(organization, filter)),
+    ): Promise<PolicySet[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+
+      const results: PolicySet[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const sets = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.policySetsAPI.listPolicySets(orgId, filter)
+        );
+        results.push(...sets);
+      });
+      return results;
+    },
     policySet: async (
       _: unknown,
       { id }: { id: string },

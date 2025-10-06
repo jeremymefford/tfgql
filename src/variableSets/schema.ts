@@ -24,7 +24,7 @@ const variableSetSchema = gql`
     }
 
     extend type Query {
-        variableSets(organization: String!, filter: VariableSetFilter): [VariableSet!]!
+        variableSets(includeOrgs: [String!], excludeOrgs: [String!], filter: VariableSetFilter): [VariableSet!]!
         variableSet(id: ID!): VariableSet
     }
 

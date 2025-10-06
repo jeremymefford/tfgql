@@ -2,6 +2,8 @@ import { Context } from "../server/context";
 import { isNotFound } from "./http";
 
 export async function coalesceOrgs(ctx: Context, includeOrgs: string[] | undefined, excludeOrgs: string[] | undefined): Promise<string[]> {
+    const includeSet = includeOrgs ? new Set(includeOrgs) : new Set<string>();
+    const excludeSet = excludeOrgs ? new Set(excludeOrgs) : new Set<string>();
     return ctx.dataSources.organizationMembershipsAPI.myOrganizationMemberships()
         .catch(err => {
             if (isNotFound(err)) {
@@ -9,10 +11,7 @@ export async function coalesceOrgs(ctx: Context, includeOrgs: string[] | undefin
             }
             throw err;
         })
-        .then(memberships => {
-            return memberships.map(m => m.organizationId)
-                .filter(orgId => includeOrgs ? includeOrgs.includes(orgId) : true)
-                .filter(orgId => excludeOrgs ? !excludeOrgs.includes(orgId) : true
-        )
-        });
+        .then(memberships =>
+            memberships.map(m => m.organizationId)
+                .filter(orgId => includeSet.has(orgId) && !excludeSet.has(orgId)));
 }

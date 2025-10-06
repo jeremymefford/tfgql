@@ -19,7 +19,7 @@ export async function* streamPages<T, TFilter = {}>(
   try {
     firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
   } catch (error:any) {
-    if (error?.status === 404) {
+    if (error?.response?.status === 404) {
       logger.debug({ endpoint }, 'No results found');
       return;
     }

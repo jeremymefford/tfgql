@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { WorkspaceResponse, WorkspaceFilter, Workspace, WorkspaceActionsFilter, WorkspacePermissionsFilter, WorkspaceSettingOverwritesFilter } from './types';
 import { workspaceMapper } from './mapper';
@@ -26,7 +27,7 @@ export class WorkspacesAPI {
     return axiosClient.get<WorkspaceResponse>(`/workspaces/${id}`)
       .then((res) => workspaceMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;
@@ -37,7 +38,7 @@ export class WorkspacesAPI {
     return axiosClient.get<WorkspaceResponse>(`/organizations/${orgName}/workspaces/${workspaceName}`)
       .then((res) => workspaceMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

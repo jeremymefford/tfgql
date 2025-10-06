@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import {
   OrganizationMembership,
@@ -27,7 +28,7 @@ export class OrganizationMembershipsAPI {
     return axiosClient.get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
       .then(res => organizationMembershipMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;
@@ -41,7 +42,7 @@ export class OrganizationMembershipsAPI {
           .map(organizationMembershipMapper.map)
           .filter(orgMembership => evaluateWhereClause(filter, orgMembership)))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return [];
         }
         throw err;

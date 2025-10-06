@@ -3,6 +3,7 @@ import { streamPages } from '../common/streamPages';
 import { Apply, ApplyFilter, ApplyResponse } from './types';
 import { applyMapper } from './mapper';
 import { logger } from '../common/logger';
+import { isNotFound } from '../common/http';
 
 export class AppliesAPI {
   async getRunApply(runId: string): Promise<Apply | null> {
@@ -20,7 +21,7 @@ export class AppliesAPI {
     return axiosClient.get<ApplyResponse>(`/applies/${id}`)
       .then((res) => applyMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

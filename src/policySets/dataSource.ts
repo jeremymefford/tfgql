@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { PolicySet, PolicySetFilter, PolicySetResponse } from './types';
 import { policySetMapper } from './mapper';
@@ -17,7 +18,7 @@ export class PolicySetsAPI {
     return axiosClient.get<PolicySetResponse>(`/policy-sets/${id}`)
       .then(res => policySetMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

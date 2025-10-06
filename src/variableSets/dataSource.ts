@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import {
     VariableSet,
     VariableSetFilter,
@@ -25,7 +26,7 @@ export class VariableSetsAPI {
         return axiosClient.get<VariableSetResponse>(`/varsets/${id}`)
             .then(res => variableSetMapper.map(res.data.data))
             .catch(err => {
-                if (err.status === 404) {
+                if (isNotFound(err)) {
                     return null;
                 }
                 throw err;

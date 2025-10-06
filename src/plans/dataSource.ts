@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { Plan, PlanFilter, PlanResponse } from './types';
 import { planMapper } from './mapper';
@@ -25,7 +26,7 @@ export class PlansAPI {
     return axiosClient.get<PlanResponse>(`/plans/${id}`)
       .then(res => planMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;
@@ -36,7 +37,7 @@ export class PlansAPI {
     return axiosClient.get<PlanResponse>(`/runs/${runId}/plan`)
       .then(res => planMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

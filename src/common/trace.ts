@@ -1,9 +1,5 @@
 import { randomBytes } from 'crypto';
 
-function randomHex(bytes: number): string {
-  return randomBytes(bytes).toString('hex');
-}
-
 export type ParsedTraceparent = {
   version: string;
   traceId: string;
@@ -26,13 +22,11 @@ export function parseTraceparent(value: string | undefined | null): ParsedTracep
 }
 
 export function generateTraceId(): string {
-  // 16 bytes (32 hex chars)
-  return randomHex(16);
+  return randomBytes(16).toString('hex');
 }
 
 export function generateSpanId(): string {
-  // 8 bytes (16 hex chars)
-  return randomHex(8);
+  return randomBytes(8).toString('hex');
 }
 
 export function formatTraceparent(traceId: string, spanId: string, flags: string = '01', version: string = '00'): string {

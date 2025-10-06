@@ -3,6 +3,7 @@ import { streamPages } from '../common/streamPages';
 import { RunResponse, Run, RunFilter, RunPermissionsFilter, RunActionsFilter, RunStatusTimestampsFilter, RunEvent, RunEventResource } from './types';
 import { runMapper, runEventMapper } from './mapper';
 import { logger } from '../common/logger';
+import { isNotFound } from '../common/http';
 
 export class RunsAPI {
   /** List all runs for a given workspace */
@@ -19,7 +20,7 @@ export class RunsAPI {
     return axiosClient.get<RunResponse>(`/runs/${runId}`)
       .then(res => runMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

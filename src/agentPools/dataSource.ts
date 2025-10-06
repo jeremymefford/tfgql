@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import {
   AgentPool,
@@ -38,7 +39,7 @@ export class AgentPoolsAPI {
     return axiosClient.get<AgentPoolResponse>(`/agent-pools/${id}`)
       .then((res) => agentPoolMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

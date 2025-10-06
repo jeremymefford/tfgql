@@ -3,6 +3,7 @@ import { RequestCache } from '../common/requestCache';
 import { streamPages } from '../common/streamPages';
 import { stateVersionMapper } from './mapper';
 import { StateVersion, StateVersionFilter, StateVersionResponse, StateVersionListResponse } from './types';
+import { isNotFound } from '../common/http';
 
 export class StateVersionsAPI {
   private requestCache: RequestCache;
@@ -39,7 +40,7 @@ export class StateVersionsAPI {
       axiosClient.get<StateVersionResponse>(`/state-versions/${id}`)
         .then(res => stateVersionMapper.map(res.data.data))
         .catch(err => {
-          if (err.status === 404) {
+          if (isNotFound(err)) {
             return null;
           }
           throw err;
@@ -55,7 +56,7 @@ export class StateVersionsAPI {
     )
       .then(res => stateVersionMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

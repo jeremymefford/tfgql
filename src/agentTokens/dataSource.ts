@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { AgentToken, AgentTokenFilter, AgentTokenResponse } from './types';
 import { agentTokenMapper } from './mapper';
@@ -23,7 +24,7 @@ export class AgentTokensAPI {
     return axiosClient.get<AgentTokenResponse>(`/authentication-tokens/${id}`)
       .then((res) => agentTokenMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

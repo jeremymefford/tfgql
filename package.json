@@ -16,6 +16,7 @@
   "description": "",
   "dependencies": {
     "@apollo/server": "^4.11.3",
+    "@escape.tech/graphql-armor": "^3.1.7",
     "axios": "^1.8.4",
     "dotenv": "^16.4.7",
     "graphql": "^16.10.0",

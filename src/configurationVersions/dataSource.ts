@@ -1,5 +1,6 @@
 import { gatherAsyncGeneratorPromises, streamPages } from '../common/streamPages';
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { configurationVersionMapper } from './mapper';
 import { ConfigurationVersionResponse, ConfigurationVersion, ConfigurationVersionFilter, IngressAttributes, /*IngressAttributesResponse*/ } from './types';
 import { RequestCache } from '../common/requestCache';
@@ -23,7 +24,7 @@ export class ConfigurationVersionsAPI {
                 })
                     .then(res => configurationVersionMapper.map(res.data.data))
                     .catch(err => {
-                        if (err.status === 404) {
+                        if (isNotFound(err)) {
                             return null;
                         }
                         throw err;

@@ -33,7 +33,7 @@ export const resolvers = {
       const workspacesWithNoResources: Workspace[] = [];
       for await (const workspacePage of workspaceGenerator) {
         await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
-          const resourcesGenerator = ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined, 1);
+          const resourcesGenerator = ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined);
           const resources = await resourcesGenerator.next();
           if (!resources.value || resources.value.length === 0) {
             workspacesWithNoResources.push(workspace);

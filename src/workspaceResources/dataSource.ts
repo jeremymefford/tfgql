@@ -1,10 +1,9 @@
 import { WorkspaceResource, WorkspaceResourceFilter } from './types';
 import { workspaceResourceMapper } from './mapper';
 import { streamPages } from '../common/streamPages';
-import { applicationConfiguration } from '../common/conf';
 
 export class WorkspaceResourcesAPI {
-    async *getResourcesByWorkspaceId(workspaceId: string, filter?: WorkspaceResourceFilter, pageSize: number = applicationConfiguration.tfcPageSize): AsyncGenerator<WorkspaceResource[]> {
+    async *getResourcesByWorkspaceId(workspaceId: string, filter?: WorkspaceResourceFilter): AsyncGenerator<WorkspaceResource[]> {
         const generator = streamPages<WorkspaceResource, undefined>(
             `/workspaces/${workspaceId}/resources`,
             workspaceResourceMapper,

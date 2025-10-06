@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { inboundRunTriggerMapper, outboundRunTriggerMapper, runTriggerMapper } from './mapper';
 import { RunTrigger, RunTriggerFilter, RunTriggerResponse, WorkspaceRunTrigger } from './types';
@@ -32,7 +33,7 @@ export class RunTriggersAPI {
     return axiosClient.get<RunTriggerResponse>(`/run-triggers/${id}`)
       .then(res => runTriggerMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

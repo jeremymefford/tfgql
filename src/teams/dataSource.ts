@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { TeamResponse, Team, TeamFilter, TeamPermissionsFilter, TeamOrganizationAccessFilter } from './types';
 import { teamMapper } from './mapper';
@@ -37,7 +38,7 @@ export class TeamsAPI {
         return axiosClient.get<TeamResponse>(`/teams/${id}`)
             .then(res => teamMapper.map(res.data.data))
             .catch(err => {
-                if (err.status === 404) {
+                if (isNotFound(err)) {
                     return null;
                 }
                 throw err;

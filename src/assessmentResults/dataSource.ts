@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import {
   AssessmentResult,
@@ -25,7 +26,7 @@ export class AssessmentResultsAPI {
     return axiosClient.get<AssessmentResultResponse>(`/assessment-results/${id}`)
       .then((res) => assessmentResultMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

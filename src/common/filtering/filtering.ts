@@ -94,8 +94,17 @@ export function evaluateWhereClause<T, TFilter>(where: WhereClause<T, TFilter> |
     return true;
 }
 
+function escapeRegex(input: string): string {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function like(value: string, pattern: string): boolean {
-    const regex = new RegExp('^' + pattern.replace(/%/g, '.*').replace(/_/g, '.') + '$');
+    // Convert SQL LIKE pattern to safe regex:
+    // - Escape regex metacharacters first
+    // - Then translate % -> .*, _ -> .
+    const escaped = escapeRegex(pattern);
+    const source = '^' + escaped.replace(/%/g, '.*').replace(/_/g, '.') + '$';
+    const regex = new RegExp(source);
     return regex.test(value);
 }
 

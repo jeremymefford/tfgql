@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { Agent, AgentFilter, AgentResponse, AgentListResponse } from './types';
 import { agentMapper } from './mapper';
@@ -20,7 +21,7 @@ export class AgentsAPI {
     return axiosClient.get<AgentResponse>(`/agents/${id}`)
       .then((res) => agentMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

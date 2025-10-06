@@ -6,15 +6,28 @@ import { createLoggingPlugin } from '../common/middleware/logging';
 import { logger } from '../common/logger';
 import { parseTraceparent, generateTraceId, generateSpanId, formatTraceparent } from '../common/trace';
 import { enterLogContext } from '../common/logger';
+import { ApolloArmor } from '@escape.tech/graphql-armor';
 
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP server).
  */
 export async function startServer(): Promise<void> {
+  const armor = new ApolloArmor({
+    maxDepth: { n: 10 },
+    maxAliases: { n: 20 },
+    maxDirectives: { n: 50 },
+    costLimit: { maxCost: 20000 }
+  });
+  const protection = armor.protect();
+
   const server = new ApolloServer<Context>({
     typeDefs,
     resolvers,
-    plugins: [createLoggingPlugin()]
+    introspection: true,
+    plugins: [createLoggingPlugin(), ...protection.plugins],
+    validationRules: protection.validationRules,
+    includeStacktraceInErrorResponses: protection.includeStacktraceInErrorResponses,
+    allowBatchedHttpRequests: protection.allowBatchedHttpRequests
   });
 
   const { url } = await startStandaloneServer(server, {

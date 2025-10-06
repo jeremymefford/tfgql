@@ -3,6 +3,7 @@ import { RequestCache } from '../common/requestCache';
 import { userMapper } from './mapper';
 import { logger } from '../common/logger';
 import { User, UserResponse } from './types';
+import { isNotFound } from '../common/http';
 
 export class UsersAPI {
   private requestCache: RequestCache;
@@ -16,7 +17,7 @@ export class UsersAPI {
       return axiosClient.get<UserResponse>(`/users/${userId}`).then(res => {
         return userMapper.map(res.data.data);
       }).catch(error => {
-        if (error.status === 404) {
+        if (isNotFound(error)) {
           return null;
         }
         logger.error({ err: error, userId }, 'Failed to fetch user');

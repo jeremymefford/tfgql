@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { Project, ProjectFilter, ProjectResponse } from './types';
 import { projectsMapper } from './mapper';
 import { streamPages } from '../common/streamPages';
@@ -8,7 +9,7 @@ export class ProjectsAPI {
         return axiosClient.get<ProjectResponse>(`/projects/${id}`)
             .then(res => projectsMapper.map(res.data.data))
             .catch(err => {
-                if (err.status === 404) {
+                if (isNotFound(err)) {
                     return null;
                 }
                 throw err;

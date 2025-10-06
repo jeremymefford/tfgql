@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { Comment, CommentFilter, CommentResponse } from './types';
 import { commentMapper } from './mapper';
@@ -17,7 +18,7 @@ export class CommentsAPI {
     return axiosClient.get<CommentResponse>(`/comments/${id}`)
       .then((res) => commentMapper.map(res.data.data))
       .catch((err) => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { OrganizationResponse, Organization, OrganizationFilter, OrganizationPermissionsFilter } from './types';
 import { organizationMapper } from './mapper';
@@ -19,7 +20,7 @@ export class OrganizationsAPI {
     return axiosClient.get<OrganizationResponse>(`/organizations/${name}`)
       .then(res => organizationMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

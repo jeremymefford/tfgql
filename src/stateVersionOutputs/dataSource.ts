@@ -1,4 +1,5 @@
 import { axiosClient } from '../common/httpClient';
+import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { StateVersionOutput, StateVersionOutputFilter, StateVersionOutputResponse } from './types';
 import { stateVersionOutputMapper } from './mapper';
@@ -20,7 +21,7 @@ export class StateVersionOutputsAPI {
     return axiosClient.get<StateVersionOutputResponse>(`/state-version-outputs/${id}`)
       .then(res => stateVersionOutputMapper.map(res.data.data))
       .catch(err => {
-        if (err.status === 404) {
+        if (isNotFound(err)) {
           return null;
         }
         throw err;

@@ -82,7 +82,7 @@ jobs:
         run: |
           echo "${{ steps.meta.outputs.tags }}" | tr ' ' '\n' | while read -r tag; do
             [ -z "$tag" ] && continue
-            cosign sign --yes --keyless "$tag"
+            cosign sign --yes "$tag"
           done
 
       # Optional: attach an explicit GitHub attestation (redundant to buildx provenance,

@@ -203,7 +203,7 @@ query {
 }
 ```
 
-See the [Concepts](../Concepts/) page for filter operators.
+See the [Concepts](Concepts/) page for filter operators.
 
 ---
 
@@ -236,7 +236,7 @@ TFCE GraphQL automatically handles Terraform API rate limits and server errors w
 - `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES`
 - `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY`
 
-Refer to the [Concepts](../Concepts/) page for details on rate-limit strategies.
+Refer to the [Concepts](Concepts/) page for details on rate-limit strategies.
 
 ---
 
@@ -262,7 +262,7 @@ query {
 
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
  - Logging & tracing: The server emits structured logs with `trace_id` and `span_id`, and propagates `traceparent`/`x-request-id` on outbound calls.
-- [TFCE GraphQL Concepts](../Concepts/)
-- [Implementation Status](../implementation-status)
-- [Contributing Guide](../Contributing/)
+- [TFCE GraphQL Concepts](Concepts/)
+- [Implementation Status](implementation-status)
+- [Contributing Guide](Contributing/)
 - [Full Schema Reference (playground)](http://localhost:4000/graphql)

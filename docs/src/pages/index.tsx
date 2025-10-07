@@ -11,7 +11,6 @@ import styles from './index.module.css';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
-  const gettingStartedUrl = useBaseUrl('getting-started/');
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
@@ -24,13 +23,6 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to={gettingStartedUrl}>
-            TF GraphQL Docs
-          </Link>
-        </div>
       </div>
     </header>
   );

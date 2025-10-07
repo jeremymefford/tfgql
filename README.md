@@ -62,6 +62,7 @@ Ensure the runtime environment has the following variables:
 | `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` | Max retries after 5xx responses      | `20`                             | ❌       |
 | `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` | Delay (ms) between 5xx retries      | `60000`                          | ❌       |
 | `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` | Max entries for request-level cache     | `5000`                           | ❌       |
+| `TFCE_GRAPHQL_DISABLE_EXPLORER` | Disable the built-in Apollo Explorer landing page when set to `true` | `false` | ❌ |
 | `TFCE_SERVER_TLS_CERT_FILE`        | Path to PEM-encoded certificate (and chain) for HTTPS termination | — | ❌ |
 | `TFCE_SERVER_TLS_KEY_FILE`         | Path to PEM-encoded private key for HTTPS termination           | — | ❌ |
 | `TFCE_SERVER_TLS_CA_FILE`          | Optional PEM bundle for client auth / certificate chain         | — | ❌ |
@@ -75,7 +76,7 @@ Ensure the runtime environment has the following variables:
 npm start
 ```
 
-The GraphQL API will start on http://localhost:4000 by default. If `TFCE_SERVER_TLS_CERT_FILE` and `TFCE_SERVER_TLS_KEY_FILE` are provided, the server listens with HTTPS instead (terminating TLS inside the Node.js process). See [TLS.md](TLS.md) for deployment guidance and performance caveats.
+The GraphQL API will start on http://localhost:4000 by default. If `TFCE_SERVER_TLS_CERT_FILE` and `TFCE_SERVER_TLS_KEY_FILE` are provided, the server listens with HTTPS/HTTP2 (with HTTP/1.1 fallback) inside the Node.js process. See [TLS.md](TLS.md) for deployment guidance and performance caveats.
 
 ## Project Structure
 

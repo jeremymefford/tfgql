@@ -143,7 +143,7 @@ query {
 
 ```graphql
 query {
-  workspaces(orgName: "my-org") {
+  workspaces(includeOrgs: ["my-org"]) {
     id
     name
     locked
@@ -195,7 +195,7 @@ Use the `filter` argument to narrow results. For example, fetch workspaces named
 
 ```graphql
 query {
-  workspaces(orgName: "my-org", filter: { name: { _eq: "prod-app" } }) {
+  workspaces(includeOrgs: ["my-org"], filter: { name: { _eq: "prod-app" } }) {
     id
     name
     locked

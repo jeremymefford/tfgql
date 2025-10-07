@@ -8,6 +8,8 @@ sidebar_label: Use Cases
 
 This page walks through ten frequent Terraform Cloud/Enterprise (TFC/E) administration tasks and shows how to accomplish each using the TFCE GraphQL API.  When the built‑in GraphQL schema is sufficient, we provide example queries.  For more specialized needs, we highlight the custom queries you can add (and note where API support is missing).
 
+> **Multi-org selection:** Unless noted otherwise, workspace-centric queries accept optional `includeOrgs` and `excludeOrgs` arguments. Omitting `includeOrgs` (or passing an empty array) uses every organization you can access; any organization listed in both arrays is excluded.
+
 ---
 
 ## 1. View all workspaces with open runs
@@ -236,11 +238,11 @@ Below is a list of 25 high-value GraphQL query use cases for Terraform Cloud (TF
 > **Query:**
 ```graphql
 query ActiveRuns(
-  $org: String!
+  $orgs: [String!]!
   $runFilter: RunFilter!
 ) {
   workspacesWithOpenRuns(
-    orgName: $org
+    includeOrgs: $orgs
     runFilter: $runFilter
   ) {
     id

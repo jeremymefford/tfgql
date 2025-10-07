@@ -14,6 +14,10 @@ const variableSchema = gql`
         workspace: Workspace
     }
 
+    enum TF_LOG_CATEGORY {
+        JSON, TRACE, DEBUG, INFO, WARN, ERROR
+    }
+
     input VariableFilter {
         _and: [VariableFilter!]
         _or: [VariableFilter!]
@@ -31,6 +35,10 @@ const variableSchema = gql`
 
     extend type Query {
         variables(organization: String!, workspaceName: String!, filter: VariableFilter): [Variable!]!
+        workspacesWithTFLogCategory(
+            includeOrgs: [String!], 
+            excludeOrgs: [String!], 
+            categories: [TF_LOG_CATEGORY!]!): [Workspace!]!
     }
 `;
 export default variableSchema;

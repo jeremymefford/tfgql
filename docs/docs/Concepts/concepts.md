@@ -139,6 +139,29 @@ users(filter: { username: { _eq: "alice" } }) {
 ```
 ---
 
+## Multi-Organization Selection
+
+Several top-level queries (e.g., `workspaces`, `projects`, `teams`, `policySets`) accept optional `includeOrgs` and `excludeOrgs` arguments to fan out across multiple organizations in a single request. The resolver follows these precedence rules:
+
+- If `includeOrgs` is omitted or an empty array, all organizations the caller can access are considered.
+- Entries listed in `excludeOrgs` are removed from the final set, even if they were implicitly included by the rule above.
+- When the same organization appears in both arrays, the exclusion wins and that organization is skipped.
+
+For example, to query every workspace except those in `legacy-org`:
+
+```graphql
+query {
+  workspaces(includeOrgs: [], excludeOrgs: ["legacy-org"]) {
+    id
+    name
+  }
+}
+```
+
+Passing an empty array for `includeOrgs` is a helpful shorthand when you want “all my orgs except...”.
+
+---
+
 ## Strongly Typed Filtering
 
 Each entity has a corresponding `*Filter` type, and those are recursively composed.
@@ -163,7 +186,7 @@ Filtering supports semantic version comparisons on Terraform versions. Use the `
 Example:
 
 ```graphql
-workspaces(orgName: "my-org", filter: { terraformVersion: { _gte: "1.6.0" }}) {
+workspaces(includeOrgs: ["my-org"], filter: { terraformVersion: { _gte: "1.6.0" }}) {
   id
   name
   terraformVersion

@@ -23,9 +23,13 @@ jobs:
         shell: bash
         run: |
           COMMIT_MSG="${{ github.event.head_commit.message }}"
-          if [[ "$COMMIT_MSG" =~ ^\[(MAJOR|MINOR|PATCH)\][[:space:]].+ ]]; then
-            TYPE="${BASH_REMATCH[1]}"
-            TYPE=$(echo "$TYPE" | tr '[:upper:]' '[:lower:]')
+          TYPE=$(printf '%s\n' "$COMMIT_MSG" | awk '
+            match($0, /\[(MAJOR|MINOR|PATCH)\]/, m) {
+              print tolower(m[1])
+              exit
+            }
+          ')
+          if [[ -n "$TYPE" ]]; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
             echo "type=$TYPE" >> "$GITHUB_OUTPUT"
             exit 0

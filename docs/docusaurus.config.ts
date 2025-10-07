@@ -44,6 +44,11 @@ const config: Config = {
           routeBasePath: '/',
           editUrl:
             'https://github.com/jeremymefford/tfce-graphql/tree/main/',
+          versions: {
+            current: {
+              label: 'Next',
+            },
+          },
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -62,10 +67,15 @@ const config: Config = {
       },
       items: [
         {
-          to: '/Getting%20Started/getting-started', 
+          type: 'doc',
+          docId: 'Getting Started/getting-started',
           label: 'Getting Started',
           position: 'left',
-          activeBasePath: '/tfce-graphql',
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
+          dropdownActiveClassDisabled: true,
         },
       ],
     },

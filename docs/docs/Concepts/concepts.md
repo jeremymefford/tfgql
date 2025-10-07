@@ -186,7 +186,7 @@ Filtering supports semantic version comparisons on Terraform versions. Use the `
 Example:
 
 ```graphql
-workspaces(includeOrgs: ["my-org"], filter: { terraformVersion: { _gte: "1.6.0" }}) {
+workspaces(includeOrgs: ["my-org1"], filter: { terraformVersion: { _gte: "1.6.0" }}) {
   id
   name
   terraformVersion

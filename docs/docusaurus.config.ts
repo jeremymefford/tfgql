@@ -1,6 +1,19 @@
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import versions from './versions.json';
+
+const versionList = versions as string[];
+const latestVersion = versionList[0] ?? 'current';
+const taggedVersionMetadata = Object.fromEntries(
+  versionList.map((version) => [
+    version,
+    {
+      label: version,
+      path: version,
+    },
+  ]),
+);
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -44,10 +57,14 @@ const config: Config = {
           routeBasePath: '/',
           editUrl:
             'https://github.com/jeremymefford/tfce-graphql/tree/main/',
+          lastVersion: latestVersion,
+          includeCurrentVersion: true,
           versions: {
             current: {
               label: 'Next',
+              banner: 'unreleased',
             },
+            ...taggedVersionMetadata,
           },
         },
         theme: {
@@ -67,9 +84,8 @@ const config: Config = {
       },
       items: [
         {
-          type: 'doc',
-          docId: 'Getting Started/getting-started',
-          label: 'Getting Started',
+          type: 'docsVersion',
+          label: 'Docs',
           position: 'left',
         },
         {

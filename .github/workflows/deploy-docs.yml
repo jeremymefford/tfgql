@@ -70,7 +70,7 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
           git_committer_name: "jeremymefford-gh-bot"
-          git_committer_email: "236660322+jeremymefford-gh-bot@users.noreply.github.com"
+          # git_committer_email: "236660322+jeremymefford-gh-bot@users.noreply.github.com"
 
       - name: Commit versioned docs
         if: github.ref_type == 'tag'

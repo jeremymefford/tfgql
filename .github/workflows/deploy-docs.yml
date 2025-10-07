@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -29,16 +27,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Prepare release branch
-        if: github.ref_type == 'tag'
-        working-directory: .
-        run: |
-          git fetch origin main
-          git checkout main
-          git reset --hard "$GITHUB_SHA"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,40 +37,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Determine docs version
-        if: github.ref_type == 'tag'
-        run: |
-          VERSION="${GITHUB_REF_NAME}"
-          CLEAN_VERSION="${VERSION#v}"
-          echo "DOCS_VERSION=${CLEAN_VERSION}" >> "$GITHUB_ENV"
-
-      - name: Snapshot docs version
-        if: github.ref_type == 'tag'
-        run: npm run docusaurus docs:version "$DOCS_VERSION"
-
-      - name: Setup commit signing
-        if: github.ref_type == 'tag'
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
-          passphrase: ${{ secrets.ACTIONS_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_committer_name: "jeremymefford-gh-bot"
-          # git_committer_email: "236660322+jeremymefford-gh-bot@users.noreply.github.com"
-
-      - name: Commit versioned docs
-        if: github.ref_type == 'tag'
-        working-directory: .
-        run: |
-          git add docs/versioned_docs docs/versioned_sidebars docs/versions.json || true
-          if git diff --cached --quiet; then
-            echo "No versioned docs changes to commit."
-          else
-            git commit -S -m "docs: add version ${DOCS_VERSION}"
-            git push origin HEAD:main
-          fi
 
       - name: Build docs
         run: npm run build

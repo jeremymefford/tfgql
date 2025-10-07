@@ -17,15 +17,14 @@ export const resolvers = {
             }
             const result: Workspace[] = [];
             await parallelizeBounded(orgs, async (orgId) => {
-                const workspaces: Workspace[] = [...(await gatherAsyncGeneratorPromises(
-                    ctx.dataSources.workspacesAPI.listWorkspaces(orgId)
-                ))];
-                await parallelizeBounded(workspaces, async (workspace) => {
-                    const vars = await ctx.dataSources.variablesAPI.getVariables(orgId, workspace.name, { key: { _eq: "TF_LOG" } });
-                    if (vars.length > 0 && categories.includes(vars[0].value)) {
-                        result.push(workspace);
-                    }
-                });
+                for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+                    await parallelizeBounded([...workspacePage], async (workspace) => {
+                        const vars = await ctx.dataSources.variablesAPI.getVariables(orgId, workspace.name, { key: { _eq: "TF_LOG" } });
+                        if (vars.length > 0 && categories.includes(vars[0].value)) {
+                            result.push(workspace);
+                        }
+                    });
+                }
             });
             return result;
         }

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 
 # 1) Builder: install dev deps and compile TypeScript
-FROM --platform=$BUILDPLATFORM node:24.10.1-alpine AS builder
+FROM --platform=$BUILDPLATFORM node:24-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run compile
 
 # 2) Runtime: only production deps + compiled output
-FROM --platform=$TARGETPLATFORM node:24.10.1-alpine AS runtime
+FROM --platform=$TARGETPLATFORM node:24-alpine AS runtime
 
 ARG VERSION="0.0.0"
 ARG VCS_REF="unknown"

@@ -61,17 +61,26 @@ jobs:
         if: github.ref_type == 'tag'
         run: npm run docusaurus docs:version "$DOCS_VERSION"
 
+      - name: Setup commit signing
+        if: github.ref_type == 'tag'
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
+          passphrase: ${{ secrets.ACTIONS_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_committer_name: "jeremymefford-gh-bot"
+          git_committer_email: "236660322+jeremymefford-gh-bot@users.noreply.github.com"
+
       - name: Commit versioned docs
         if: github.ref_type == 'tag'
         working-directory: .
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/versioned_docs docs/versioned_sidebars docs/versions.json || true
           if git diff --cached --quiet; then
             echo "No versioned docs changes to commit."
           else
-            git commit -m "docs: add version ${DOCS_VERSION}"
+            git commit -S -m "docs: add version ${DOCS_VERSION}"
             git push origin HEAD:main
           fi
 

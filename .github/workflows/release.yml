@@ -1,25 +1,38 @@
 name: Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches: [main]
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   cut-release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
+    environment:
+      name: prod
     steps:
-      - name: Checkout main
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
           fetch-depth: 0
 
+      - name: Determine version bump type
+        id: bump
+        shell: bash
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if [[ "$COMMIT_MSG" =~ ^\[(MAJOR|MINOR|PATCH)\][[:space:]].+ ]]; then
+            TYPE="${BASH_REMATCH[1]}"
+            TYPE=$(echo "$TYPE" | tr '[:upper:]' '[:lower:]')
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "type=$TYPE" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
       - name: Set up Node.js
+        if: steps.bump.outputs.should_release == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -29,28 +42,16 @@ jobs:
             docs/package-lock.json
 
       - name: Install dependencies
+        if: steps.bump.outputs.should_release == 'true'
         run: npm ci
 
       - name: Install docs dependencies
+        if: steps.bump.outputs.should_release == 'true'
         working-directory: docs
         run: npm ci
 
-      - name: Determine version bump type
-        id: bump
-        shell: bash
-        env:
-          PR_TITLE: "${{ github.event.pull_request.title }}"
-        run: |
-          if [[ "$PR_TITLE" =~ ^\[(MAJOR|MINOR|PATCH)\][[:space:]].+ ]]; then
-            TYPE="${BASH_REMATCH[1]}"
-            TYPE=$(echo "$TYPE" | tr '[:upper:]' '[:lower:]')
-            echo "type=$TYPE" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::Pull request title must match '[MAJOR|MINOR|PATCH] <description>'" >&2
-            exit 1
-          fi
-
       - name: Bump package version
+        if: steps.bump.outputs.should_release == 'true'
         id: version
         run: |
           npm version ${{ steps.bump.outputs.type }} --no-git-tag-version
@@ -58,13 +59,16 @@ jobs:
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Compile TypeScript
+        if: steps.bump.outputs.should_release == 'true'
         run: npm run compile
 
       - name: Snapshot docs version
+        if: steps.bump.outputs.should_release == 'true'
         working-directory: docs
         run: npm run docusaurus docs:version ${{ steps.version.outputs.new_version }}
 
       - name: Setup commit signing
+        if: steps.bump.outputs.should_release == 'true'
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
@@ -73,10 +77,12 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Build docs
+        if: steps.bump.outputs.should_release == 'true'
         working-directory: docs
         run: npm run build
 
       - name: Commit release artifacts
+        if: steps.bump.outputs.should_release == 'true'
         run: |
           git add .
           if git diff --cached --quiet; then
@@ -87,6 +93,7 @@ jobs:
           git push origin HEAD:main
 
       - name: Create tag
+        if: steps.bump.outputs.should_release == 'true'
         run: |
           git tag v${{ steps.version.outputs.new_version }}
           git push origin v${{ steps.version.outputs.new_version }}

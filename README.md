@@ -1,23 +1,17 @@
-# THIS PROJECT IS IN ALPHA, IT IS NOT READY FOR USE IN ANY CAPACITY OTHER THAN DEVELOPMENT
-
 # TFC/E GraphQL
 
 TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise (TFE) and HCP Terraform (TFC) REST API. It enables clients to query TFE data using a flexible and powerful GraphQL schema, with support for filtering, nested relationships, pagination, rate-limiting, and request batching and management.
 
-https://developer.hashicorp.com/terraform/enterprise/api-docs/changelog
-
 ## Features
 
-- 🕸️ GraphQL interface over the TFE REST API
+- 🕸️ GraphQL interface over the TFC/E REST API
 - 🔍 Advanced Hasura-style filtering
 - 🌊 Streaming pagination for efficient retrieval of pages
-- 🔐 TFC token-based authentication
 - 🚦 Rate limit protection with exponential backoffs
-- 🚀 Apollo Server 4
-- 🧪 TypeScript-first codebase with strong typings
-- 🔎 Observability: structured logging with trace correlation (trace_id/span_id)
 
 ## Documentation
+
+[Official latest docs](https://jeremymefford.github.io/tfce-graphql/)
 
 This README is generally kept up-to-date, the docs folder contains a lot more useful information
 and should be considered the primary place to author and consume docs.  It is currently not hosted
@@ -234,67 +228,6 @@ organization(name: "team-rts") {
 }
 ```
 
-## Implementation Status
-
-Below is the current implementation status of the TFC API endpoint categories in this GraphQL wrapper. A check (✓) indicates that queries or mutations for that category are implemented:
-
-| Category                         | Query | Mutations |
-|----------------------------------|:-----:|:---------:|
-| Account                          |       |           |
-| Agent Pools                      |   ✓   |           |
-| Agent Tokens                     |   ✓   |           |
-| Applies                          |   ✓   |           |
-| Audit Trails                     |       |           |
-| Audit Trails Tokens              |       |           |
-| Assessment Results               |   ✓   |           |
-| Change requests                  |       |           |
-| Comments                         |   ✓   |           |
-| Configuration Versions           |   ✓   |           |
-| Cost Estimates                   |       |           |
-| Explorer                         |       |           |
-| Feature Sets                     |       |           |
-| GitHub App Installations         |       |           |
-| Invoices                         |       |           |
-| IP Ranges                        |       |           |
-| No-Code Provisioning             |       |           |
-| Notification Configurations      |       |           |
-| OAuth Clients                    |       |           |
-| OAuth Tokens                     |       |           |
-| Organizations                    |   ✓   |           |
-| Organization Memberships         |   ✓   |           |
-| Organization Tags                |   ✓   |           |
-| Organization Tokens              |       |           |
-| Plan Exports                     |       |           |
-| Plans                            |   ✓   |           |
-| Policies                         |   ✓   |           |
-| Policy Checks                    |       |           |
-| Policy Evaluations               |   ✓   |           |
-| Policy Sets                      |   ✓   |           |
-| Policy Set Parameters            |   ✓   |           |
-| Private Registry                 |       |           |
-| Projects                         |   ✓   |           |
-| Project Team Access              |   ✓   |           |
-| Reserved Tag Keys                |       |           |
-| Runs                             |   ✓   |           |
-| Run Tasks                        |       |           |
-| Run Triggers                     |       |           |
-| SSH Keys                         |       |           |
-| State Versions                   |       |           |
-| State Version Outputs            |   ✓   |           |
-| Subscriptions                    |       |           |
-| Team Membership                  |       |           |
-| Team Tokens                      |   ✓   |           |
-| Teams                            |   ✓   |           |
-| User Tokens                      |       |           |
-| Users                            |   ✓   |           |
-| Variables                        |   ✓   |           |
-| Variable Sets                    |   ✓   |           |
-| VCS Events                       |       |           |
-| Workspaces                       |   ✓   |           |
-| Workspace-Specific Variables     |       |           |
-| Workspace Team Access            |   ✓   |           |
-| Workspace Resources              |   ✓   |           |
-
 ## Development
 
 ### Compile
@@ -309,14 +242,25 @@ Use the following launch config:
 
 ```json
 {
-  "type": "node",
-  "request": "launch",
-  "name": "Debug TFE GraphQL",
-  "skipFiles": ["<node_internals>/**"],
-  "program": "${workspaceFolder}/dist/index.js",
-  "preLaunchTask": "tsc: build - tsconfig.json",
-  "env": {
-    "TFC_TOKEN": "<token>"
-  }
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Compile and Run",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "program": "${workspaceFolder}/dist/index.js",
+            "outputCapture": "std",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "TFC_TOKEN": <token>,
+                "LOG_LEVEL": "trace",
+                "NODE_ENV": "development"
+            }
+        }
+    ]
 }
 ```

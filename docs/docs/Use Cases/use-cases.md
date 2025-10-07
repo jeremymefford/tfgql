@@ -16,11 +16,11 @@ TFC does not currently surface a global filter for run status.  Use the custom `
 
 ```graphql
 query WorkspacesWithOpenRuns(
-  $org: String!
+  $orgs: [String!]!
   $runFilter: RunFilter!
 ) {
   workspacesWithOpenRuns(
-    orgName: $org
+    includeOrgs: $orgs
     runFilter: $runFilter
   ) {
     id
@@ -38,7 +38,7 @@ query WorkspacesWithOpenRuns(
 ```json
 # Variables:
 {
-  "org": "my-org",
+  "orgs": ["my-org"],
   "runFilter": { "status": { "_in": ["planning", "applying"] } }
 }
 ```
@@ -52,9 +52,9 @@ The GraphQL layer pages through all workspaces and tests the first page of runs 
 Use the built‑in `resourceCount` field on `Workspace` to find workspaces whose current state contains more than *N* resources:
 
 ```graphql
-query HeavyWorkspaces($org: String!, $min: Int!) {
+query HeavyWorkspaces($orgs: [String!]!, $min: Int!) {
   workspaces(
-    orgName: $org
+    includeOrgs: $orgs
     filter: { resourceCount: { _gt: $min } }
   ) {
     id
@@ -71,8 +71,8 @@ query HeavyWorkspaces($org: String!, $min: Int!) {
 You can page through all workspaces and then retrieve variables per workspace.  For example, to dump every variable across every workspace:
 
 ```graphql
-query ExportAllVariables($org: String!) {
-  workspaces(orgName: $org) {
+query ExportAllVariables($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     id
     name
     variables {
@@ -137,8 +137,8 @@ This leverages built‑in pagination and filtering on the `teams` and `users` co
 To compare the last run’s commit SHA with your VCS HEAD, fetch the new `ingressAttributes.commitSha` (and related VCS metadata) on the `configurationVersion`:
 
 ```graphql
-query WorkspaceDrift($org: String!) {
-  workspaces(orgName: $org) {
+query WorkspaceDrift($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     id
     name
     runs(filter: { status: { _in: ["applied"] } }) {
@@ -159,8 +159,8 @@ query WorkspaceDrift($org: String!) {
 Fetch the full workspace dependency graph in a single call using the new `stackGraph` query:
 
 ```graphql
-query StackGraph($org: String!) {
-  stackGraph(orgName: $org) {
+query StackGraph($orgs: [String!]!) {
+  stackGraph(includeOrgs: $orgs) {
     id
     workspaceName
     sourceableName
@@ -169,15 +169,15 @@ query StackGraph($org: String!) {
 }
 ```
 
-The `stackGraph` query returns a list of run-trigger edges (workspace dependencies) across all workspaces in the specified organization.
+The `stackGraph` query returns a list of run-trigger edges (workspace dependencies) across all workspaces in the selected organizations.
 
 ## 8. Export workspace inputs & outputs
 
 You can combine the variables (inputs) and state version outputs (outputs) per workspace:
 
 ```graphql
-query WorkspaceIO($org: String!) {
-  workspaces(orgName: $org) {
+query WorkspaceIO($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     id
     name
     variables {
@@ -258,7 +258,7 @@ query ActiveRuns(
 > **Variables:**
 ```json
 {
-  "org": "my-org",
+  "orgs": ["my-org"],
   "runFilter": { "status": { "_in": ["pending", "planning", "applying"] } }
 }
 ```
@@ -273,11 +273,11 @@ query ActiveRuns(
 > **Query:**
 ```graphql
 query StaleWorkspaces(
-  $org: String!
+  $orgs: [String!]!
   $threshold: DateTime!
 ) {
   workspaces(
-    orgName: $org
+    includeOrgs: $orgs
     filter: { latestChangeAt: { _lt: $threshold } }
   ) {
     id
@@ -290,7 +290,7 @@ query StaleWorkspaces(
 > **Variables:**
 ```json
 {
-  "org": "my-org",
+  "orgs": ["my-org"],
   "threshold": "2021-01-01T00:00:00Z"
 }
 ```
@@ -397,8 +397,8 @@ query DriftedResults($workspaceId: ID!) {
 
 > **Query:**
 ```graphql
-query TerraformVersions($org: String!) {
-  workspaces(orgName: $org) {
+query TerraformVersions($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     name
     terraformVersion
   }
@@ -414,9 +414,9 @@ query TerraformVersions($org: String!) {
 
 > **Query:**
 ```graphql
-query LargestWorkspaces($org: String!, $min: Int!) {
+query LargestWorkspaces($orgs: [String!]!, $min: Int!) {
   workspaces(
-    orgName: $org
+    includeOrgs: $orgs
     filter: { resourceCount: { _gt: $min } }
   ) {
     id
@@ -435,8 +435,8 @@ query LargestWorkspaces($org: String!, $min: Int!) {
 
 > **Query:**
 ```graphql
-query RecentFailures($org: String!, $since: DateTime!) {
-  workspaces(orgName: $org) {
+query RecentFailures($orgs: [String!]!, $since: DateTime!) {
+  workspaces(includeOrgs: $orgs) {
     name
     runs(filter: { status: { _in: ["errored", "canceled"] }, createdAt: { _gt: $since } }) {
       id
@@ -457,8 +457,8 @@ query RecentFailures($org: String!, $since: DateTime!) {
 
 > **Query:**
 ```graphql
-query StuckRuns($org: String!, $statuses: [String!]!) {
-  workspacesWithOpenRuns(orgName: $org, runFilter: { status: { _in: $statuses } }) {
+query StuckRuns($orgs: [String!]!, $statuses: [String!]!) {
+  workspacesWithOpenRuns(includeOrgs: $orgs, runFilter: { status: { _in: $statuses } }) {
     id
     name
     runs(filter: { status: { _in: $statuses } }) {
@@ -473,7 +473,7 @@ query StuckRuns($org: String!, $statuses: [String!]!) {
 > **Variables:**
 ```json
 {
-  "org": "my-org",
+  "orgs": ["my-org"],
   "statuses": ["pending", "plan_queued", "policy_checking"]
 }
 ```
@@ -487,8 +487,8 @@ query StuckRuns($org: String!, $statuses: [String!]!) {
 
 > **Query:**
 ```graphql
-query AutoApplySettings($org: String!) {
-  workspaces(orgName: $org) {
+query AutoApplySettings($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     name
     autoApply
     environment
@@ -594,8 +594,8 @@ query WorkspaceRunTriggers($workspaceId: ID!, $direction: String!) {
 
 > **Query:**
 ```graphql
-query PlaintextSecrets($org: String!) {
-  workspaces(orgName: $org) {
+query PlaintextSecrets($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     name
     variables(filter: { sensitive: { _eq: false } }) {
       key
@@ -639,8 +639,8 @@ query PlaintextSecrets($org: String!) {
 
 > **Query:**
 ```graphql
-query UngroupedWorkspaces($org: String!) {
-  workspaces(orgName: $org, filter: { projectName: { _eq: null } }) {
+query UngroupedWorkspaces($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs, filter: { projectName: { _eq: null } }) {
     id
     name
     tagNames
@@ -657,8 +657,8 @@ query UngroupedWorkspaces($org: String!) {
 
 > **Query:**
 ```graphql
-query ExecutionModes($org: String!) {
-  workspaces(orgName: $org) {
+query ExecutionModes($orgs: [String!]!) {
+  workspaces(includeOrgs: $orgs) {
     id
     name
     executionMode

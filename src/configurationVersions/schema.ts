@@ -79,7 +79,7 @@ const configurationVersionSchema = gql`
   extend type Query {
     configurationVersion(id: ID!): ConfigurationVersion
     configurationVersions(workspaceId: ID!, filter: ConfigurationVersionFilter): [ConfigurationVersion]!
-    workspacesWithConfigurationVersionsLargerThan(organizationName: String!, bytes: Int!): [Workspace]!
+    workspacesWithConfigurationVersionsLargerThan(includeOrgs: [String!], excludeOrgs: [String!], bytes: Int!): [Workspace]!
   }
 `;
 

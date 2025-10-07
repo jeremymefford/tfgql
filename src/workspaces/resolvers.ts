@@ -5,20 +5,39 @@ import { Run, RunFilter } from '../runs/types';
 import { ConfigurationVersion, ConfigurationVersionFilter } from '../configurationVersions/types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
 import { Variable, VariableFilter } from '../variables/types';
-import { applicationConfiguration } from '../common/conf';
 import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 import { RunTrigger, WorkspaceRunTrigger } from '../runTriggers/types';
 import { StateVersion, StateVersionFilter } from '../stateVersions/types';
-import { AxiosError } from 'axios';
 import { WorkspaceResourceFilter, WorkspaceResource } from '../workspaceResources/types';
+import { coalesceOrgs } from '../common/orgHelper';
 
 export const resolvers = {
   Query: {
-    workspaces: (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, ctx: Context): Promise<Workspace[]> => {
-      return gatherAsyncGeneratorPromises(ctx.dataSources.workspacesAPI.listWorkspaces(orgName, filter));
+    workspaces: async (
+      _: unknown,
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: WorkspaceFilter },
+      ctx: Context
+    ): Promise<Workspace[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+
+      const results: Workspace[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const workspaces = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter)
+        );
+        results.push(...workspaces);
+      });
+      return results;
     },
-    workspaceByName: async (_: unknown, { orgName, workspaceName }: { orgName: string, workspaceName: string }, ctx: Context): Promise<Workspace | null> => {
-      const workspace = await ctx.dataSources.workspacesAPI.getWorkspaceByName(orgName, workspaceName);
+    workspaceByName: async (
+      _: unknown,
+      { organization, workspaceName }: { organization: string; workspaceName: string },
+      ctx: Context
+    ): Promise<Workspace | null> => {
+      const workspace = await ctx.dataSources.workspacesAPI.getWorkspaceByName(organization, workspaceName);
       if (!workspace) return null;
       return workspace;
     },
@@ -27,59 +46,104 @@ export const resolvers = {
       if (!workspace) return null;
       return workspace;
     },
-    workspacesWithNoResources: async (_: unknown, { orgName, filter }: { orgName: string, filter?: WorkspaceFilter }, ctx: Context): Promise<Workspace[]> => {
-      ctx.logger.info({ orgName }, 'Finding workspaces with no resources');
-      const workspaceGenerator = ctx.dataSources.workspacesAPI.listWorkspaces(orgName, filter);
-      const workspacesWithNoResources: Workspace[] = [];
-      for await (const workspacePage of workspaceGenerator) {
-        await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
-          const resourcesGenerator = ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, undefined, 1);
-          const resources = await resourcesGenerator.next();
-          if (!resources.value || resources.value.length === 0) {
-            workspacesWithNoResources.push(workspace);
-          }
-          resourcesGenerator.return(undefined);
-        });
+    workspacesWithNoResources: async (
+      _: unknown,
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: WorkspaceFilter },
+      ctx: Context
+    ): Promise<Workspace[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
       }
-      ctx.logger.info({ orgName, count: workspacesWithNoResources.length }, 'Found workspaces with no resources');
-      return workspacesWithNoResources;
+
+      const matches: Workspace[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        ctx.logger.info({ orgName: orgId }, 'Finding workspaces with no resources');
+        const workspaceGenerator = ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter);
+        const localMatches: Workspace[] = [];
+        for await (const workspacePage of workspaceGenerator) {
+          await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
+            const resourcesGenerator = ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(
+              workspace.id,
+              undefined,
+              1
+            );
+            const resources = await resourcesGenerator.next();
+            if (!resources.value || resources.value.length === 0) {
+              localMatches.push(workspace);
+            }
+            resourcesGenerator.return(undefined);
+          });
+        }
+        ctx.logger.info({ orgName: orgId, count: localMatches.length }, 'Found workspaces with no resources');
+        matches.push(...localMatches);
+      });
+      return matches;
     },
     workspacesWithOpenRuns: async (
       _: unknown,
-      { orgName, filter, runFilter }: { orgName: string; filter?: WorkspaceFilter; runFilter: RunFilter },
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+        runFilter
+      }: {
+        includeOrgs?: string[];
+        excludeOrgs?: string[];
+        filter?: WorkspaceFilter;
+        runFilter: RunFilter;
+      },
       ctx: Context
     ): Promise<Workspace[]> => {
-      ctx.logger.info({ orgName }, 'Finding workspaces with open runs');
-      const result: Workspace[] = [];
-      for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgName, filter)) {
-        await parallelizeBounded(page, async (workspace: Workspace) => {
-          const runsIterator = ctx.dataSources.runsAPI.listRuns(workspace.id, runFilter);
-          const { value: runs } = await runsIterator.next();
-          if (runs && runs.length > 0) {
-            result.push(workspace);
-          }
-          runsIterator.return(undefined);
-        });
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
       }
-      ctx.logger.info({ orgName, count: result.length }, 'Found workspaces with open runs');
+
+      const result: Workspace[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        ctx.logger.info({ orgName: orgId }, 'Finding workspaces with open runs');
+        const localMatches: Workspace[] = [];
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter)) {
+          await parallelizeBounded(page, async (workspace: Workspace) => {
+            const runsIterator = ctx.dataSources.runsAPI.listRuns(workspace.id, runFilter);
+            const { value: runs } = await runsIterator.next();
+            if (runs && runs.length > 0) {
+              localMatches.push(workspace);
+            }
+            runsIterator.return(undefined);
+          });
+        }
+        ctx.logger.info({ orgName: orgId, count: localMatches.length }, 'Found workspaces with open runs');
+        result.push(...localMatches);
+      });
       return result;
     }
     ,
     stackGraph: async (
       _: unknown,
-      { orgName }: { orgName: string },
+      { includeOrgs, excludeOrgs }: { includeOrgs?: string[]; excludeOrgs?: string[] },
       ctx: Context
     ): Promise<WorkspaceRunTrigger[]> => {
-      ctx.logger.info({ orgName }, 'Building workspace stack graph');
-      const edges: WorkspaceRunTrigger[] = [];
-      for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgName)) {
-        await parallelizeBounded(page, async (workspace: Workspace) => {
-          for await (const triggers of ctx.dataSources.runTriggersAPI.listRunTriggers(workspace.id)) {
-            edges.push(...triggers);
-          }
-        });
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
       }
-      ctx.logger.info({ orgName, edgeCount: edges.length }, 'Workspace stack graph complete');
+
+      const edges: WorkspaceRunTrigger[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        ctx.logger.info({ orgName: orgId }, 'Building workspace stack graph');
+        const localEdges: WorkspaceRunTrigger[] = [];
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+          await parallelizeBounded(page, async (workspace: Workspace) => {
+            for await (const triggers of ctx.dataSources.runTriggersAPI.listRunTriggers(workspace.id)) {
+              localEdges.push(...triggers);
+            }
+          });
+        }
+        ctx.logger.info({ orgName: orgId, edgeCount: localEdges.length }, 'Workspace stack graph complete');
+        edges.push(...localEdges);
+      });
       return edges;
     }
   },

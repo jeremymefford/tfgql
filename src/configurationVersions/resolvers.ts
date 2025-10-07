@@ -1,9 +1,9 @@
 import { Context } from '../server/context';
 import { ConfigurationVersion, IngressAttributes } from './types';
 import { gatherAsyncGeneratorPromises } from '../common/streamPages';
-import { applicationConfiguration, Config } from '../common/conf';
 import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
 import { Workspace } from '../workspaces/types';
+import { coalesceOrgs } from '../common/orgHelper';
 
 export const resolvers = {
     Query: {
@@ -20,21 +20,28 @@ export const resolvers = {
         },
         workspacesWithConfigurationVersionsLargerThan: async (
             _: unknown,
-            { organizationName, bytes }: { organizationName: string, bytes: number },
+            { includeOrgs, excludeOrgs, bytes }: { includeOrgs?: string[]; excludeOrgs?: string[]; bytes: number },
             ctx: Context
         ): Promise<Workspace[]> => {
-            const workspacesWithLargeCVs: Workspace[] = [];
-            for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(organizationName)) {
-                await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
-                    const cvs = await ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
-                    await parallelizeBounded(cvs, async (cv: ConfigurationVersion) => {
-                        const size = await resolvers.ConfigurationVersion.size(cv, {}, ctx);
-                        if (size && size > bytes) {
-                            workspacesWithLargeCVs.push(workspace);
-                        }
-                    });
-                });
+            const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+            if (orgs.length === 0) {
+                return [];
             }
+
+            const workspacesWithLargeCVs: Workspace[] = [];
+            await parallelizeBounded(orgs, async (orgId) => {
+                for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+                    await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
+                        const cvs = await ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id);
+                        await parallelizeBounded(cvs, async (cv: ConfigurationVersion) => {
+                            const size = await resolvers.ConfigurationVersion.size(cv, {}, ctx);
+                            if (size && size > bytes) {
+                                workspacesWithLargeCVs.push(workspace);
+                            }
+                        });
+                    });
+                }
+            });
             return workspacesWithLargeCVs;
         }
     },

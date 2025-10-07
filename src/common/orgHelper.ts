@@ -13,5 +13,6 @@ export async function coalesceOrgs(ctx: Context, includeOrgs: string[] | undefin
         })
         .then(memberships =>
             memberships.map(m => m.organizationId)
-                .filter(orgId => includeSet.has(orgId) && !excludeSet.has(orgId)));
+                .filter(orgId => includeSet.size === 0 || includeSet.has(orgId))
+                .filter(orgId => !excludeSet.has(orgId)));
 }

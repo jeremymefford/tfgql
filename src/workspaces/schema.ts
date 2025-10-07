@@ -137,22 +137,23 @@ const workspaceSchema = gql`
   }
 
   extend type Query {
-    workspaces(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
+    workspaces(includeOrgs: [String!], excludeOrgs: [String!], filter: WorkspaceFilter): [Workspace!]!
     workspace(id: ID!): Workspace
-    workspaceByName(orgName: String!, workspaceName: String!): Workspace
-    workspacesWithNoResources(orgName: String!, filter: WorkspaceFilter): [Workspace!]!
+    workspaceByName(organization: String!, workspaceName: String!): Workspace
+    workspacesWithNoResources(includeOrgs: [String!], excludeOrgs: [String!], filter: WorkspaceFilter): [Workspace!]!
     """
-    List all workspaces in an organization that have at least one run matching the given runFilter (e.g. non-terminal states).
+    List all workspaces across the selected organizations that have at least one run matching the given runFilter (e.g. non-terminal states).
     """
     workspacesWithOpenRuns(
-      orgName: String!
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
       filter: WorkspaceFilter
       runFilter: RunFilter
     ): [Workspace!]!
     """
-    List all run-trigger edges (workspace dependency graph) in the given organization.
+    List all run-trigger edges (workspace dependency graph) across the selected organizations.
     """
-    stackGraph(orgName: String!): [WorkspaceRunTrigger!]!
+    stackGraph(includeOrgs: [String!], excludeOrgs: [String!]): [WorkspaceRunTrigger!]!
   }
 `;
 export default workspaceSchema;

@@ -76,7 +76,7 @@ export async function buildContext(baseLogger: Logger): Promise<Context> {
   return {
     dataSources: {
       usersAPI: new UsersAPI(requestCache),
-      organizationsAPI: new OrganizationsAPI(),
+      organizationsAPI: new OrganizationsAPI(requestCache),
       workspacesAPI: new WorkspacesAPI(),
       runsAPI: new RunsAPI(),
       teamsAPI: new TeamsAPI(),

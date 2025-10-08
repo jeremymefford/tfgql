@@ -31,6 +31,28 @@ This guide will walk you through installation, configuration, and basic usage of
 The **TFCE GraphQL** project provides a flexible GraphQL API for interacting with Terraform Cloud and Terraform Enterprise resources, including organizations, teams, workspaces, runs, and more. It wraps the underlying REST API, exposing a strongly typed schema with advanced filtering, rate-limit handling, and streaming pagination under the hood.
 
 ---
+# No Frills Starter
+
+## Basic Drive with Docker
+
+```bash
+docker run -p 4000:4000 ghcr.io/jeremymefford/tfce-graphql:latest
+export JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d '{"tfcToken":"<token>"}' | jq -r '.token')
+curl -s -X POST -H "content-type: application/json" -H "Authorization: Bearer $JWT" http://localhost:4000/ \
+  -d '{"query":"query { me { username } }"}'
+```
+
+---
+
+## Exploring the API
+
+Open the GraphQL playground at:
+
+```
+http://localhost:4000/graphql
+```
+
+Read [this](#exchange-a-tfc-token-for-a-jwt)
 
 ## Installation and Setup
 
@@ -141,17 +163,7 @@ explorer.environment.set("JWT", jwt);
 
 Then set your authorization header to `Bearer {{JWT}}`
 
----
 
-## Exploring the API
-
-Open the GraphQL playground at:
-
-```
-http://localhost:4000/graphql
-```
-
-Use the **Docs** tab in the playground to browse available queries, types, and filter operators.
 
 ---
 

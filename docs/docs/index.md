@@ -6,7 +6,6 @@ Explore the sections below to get started:
 
 <!-- - [Getting Started](getting-started) -->
 - [Concepts](Concepts/)
-- [Implementation Status](implementation-status)
 - [Contributing](Contributing/)
 - [Deployment](Deployment/docker)
 - [Use Cases](Use%20Cases/use-cases)

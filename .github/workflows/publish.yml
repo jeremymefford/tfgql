@@ -1,8 +1,10 @@
 name: Publish image
 
 on:
-  push:
-    tags: [ 'v*' ]
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -21,6 +23,7 @@ env:
 
 jobs:
   build-and-publish:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

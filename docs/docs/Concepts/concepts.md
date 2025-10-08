@@ -42,7 +42,10 @@ The `streamPages` utility abstracts away manual pagination handling. It lazily y
 Example:
 
 ```ts
+const httpClient = context.httpClient;
+
 for await (const workspace of streamPages(
+  httpClient,
   (page) => this.getWorkspacesPage(page),
 )) {
   // Handle workspace

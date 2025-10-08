@@ -83,8 +83,10 @@ export const myEntityMapper = {
 
 Define the API interaction logic.
 
-Look at existing APIs for examples.  There are a lot of helper functions that
-should be used vs direct calls to `axiosClient`.  
+Look at existing APIs for examples. There are a lot of helper functions that
+should be used vs building bespoke HTTP clients. Every data source receives the
+request-scoped Axios instance from `createHttpClient`, so always use that
+constructor parameter for outbound calls.
 
 Using requestCache should be done with much care.  There are so many things 
 that can go wrong with caching, it's very critical to ensure the cache key
@@ -95,13 +97,15 @@ that the method will be invoked multiple times in a single request.
 File path: `src/{domain}/dataSource.ts`
 
 ```ts
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { MyEntityResponse } from './types';
 import { myEntityMapper } from './mapper';
 
 export class MyEntityAPI {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   async list(): Promise<MyEntity[]> {
-    const res = await axiosClient.get(`/my-entity-endpoint`);
+    const res = await this.httpClient.get(`/my-entity-endpoint`);
     return res.data.data.map(myEntityMapper.map);
   }
 }

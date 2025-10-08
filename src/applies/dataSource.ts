@@ -1,13 +1,14 @@
-import { axiosClient } from '../common/httpClient';
-import { streamPages } from '../common/streamPages';
+import type { AxiosInstance } from 'axios';
 import { Apply, ApplyFilter, ApplyResponse } from './types';
 import { applyMapper } from './mapper';
 import { logger } from '../common/logger';
 import { isNotFound } from '../common/http';
 
 export class AppliesAPI {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   async getRunApply(runId: string): Promise<Apply | null> {
-    return axiosClient.get<ApplyResponse>(`/runs/${runId}/apply`)
+    return this.httpClient.get<ApplyResponse>(`/runs/${runId}/apply`)
       .then((response) => {
         return applyMapper.map(response.data.data)
       })
@@ -18,7 +19,7 @@ export class AppliesAPI {
   }
 
   async getApply(id: string): Promise<Apply | null> {
-    return axiosClient.get<ApplyResponse>(`/applies/${id}`)
+    return this.httpClient.get<ApplyResponse>(`/applies/${id}`)
       .then((res) => applyMapper.map(res.data.data))
       .catch((err) => {
         if (isNotFound(err)) {

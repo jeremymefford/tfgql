@@ -48,8 +48,6 @@ ENV NODE_ENV=production \
     PORT=4000 \
     NODE_OPTIONS=--enable-source-maps
 
-# Note: TFC_TOKEN must be provided at runtime (no default)
-
 COPY --chown=node:node package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 
@@ -57,7 +55,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund 
 COPY --from=builder --chown=node:node /app/dist ./dist
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD ["node", "-e", "const p=(process.env.PORT||'4000'); const u='http://127.0.0.1:'+p+'/graphql?query=%7B__typename%7D'; fetch(u,{headers:{'apollo-require-preflight':'true'}}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{if(!(j&&j.data&&typeof j.data.__typename==='string'&&j.data.__typename.length))process.exit(1)}).catch(()=>process.exit(1))"]
+  CMD ["node", "-e", "const p=(process.env.PORT||'4000'); const u='http://127.0.0.1:'+p+'/health'; fetch(u).then(r=>r.ok?r.json():Promise.reject()).then(j=>{if(!(j&&j.status==='ok'))process.exit(1)}).catch(()=>process.exit(1))"]
 
 USER node
 

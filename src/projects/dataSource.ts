@@ -1,12 +1,14 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { isNotFound } from '../common/http';
 import { Project, ProjectFilter, ProjectResponse } from './types';
 import { projectsMapper } from './mapper';
 import { streamPages } from '../common/streamPages';
 
 export class ProjectsAPI {
+    constructor(private readonly httpClient: AxiosInstance) {}
+
     async getProject(id: string): Promise<Project | null> {
-        return axiosClient.get<ProjectResponse>(`/projects/${id}`)
+        return this.httpClient.get<ProjectResponse>(`/projects/${id}`)
             .then(res => projectsMapper.map(res.data.data))
             .catch(err => {
                 if (isNotFound(err)) {
@@ -18,6 +20,7 @@ export class ProjectsAPI {
 
     async *getProjects(orgName: string, filter?: ProjectFilter): AsyncGenerator<Project[], void, unknown> {
         yield* streamPages<Project, ProjectFilter>(
+            this.httpClient,
             `/organizations/${orgName}/projects`,
             projectsMapper,
             {},

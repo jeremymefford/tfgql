@@ -1,14 +1,14 @@
+import type { AxiosInstance, AxiosError } from 'axios';
 import { WhereClause } from './filtering/types';
-import { axiosClient } from './httpClient';
 import type { ListResponse } from './types/jsonApi';
 import { evaluateWhereClause } from './filtering/filtering';
 import { DomainMapper } from './middleware/domainMapper';
 import { applicationConfiguration } from './conf';
-import { AxiosError } from 'axios';
 import { logger } from './logger';
 
 
 export async function* streamPages<T, TFilter = {}>(
+  httpClient: AxiosInstance,
   endpoint: string,
   mapper: DomainMapper<any, T>,
   params: Record<string, any> = {},
@@ -17,8 +17,8 @@ export async function* streamPages<T, TFilter = {}>(
   const baseParams = { 'page[size]': applicationConfiguration.tfcPageSize, ...(params || {}) };
   let firstRes;
   try {
-    firstRes = await axiosClient.get<ListResponse<T>>(endpoint, { params: baseParams });
-  } catch (error:any) {
+    firstRes = await httpClient.get<ListResponse<T>>(endpoint, { params: baseParams });
+  } catch (error: any) {
     if (error?.response?.status === 404) {
       logger.debug({ endpoint }, 'No results found');
       return;
@@ -47,7 +47,7 @@ export async function* streamPages<T, TFilter = {}>(
   const inflight = new Set<Promise<T[]>>();
 
   async function loadPage(page: number): Promise<T[]> {
-    const res = await axiosClient.get<ListResponse<T>>(endpoint, {
+    const res = await httpClient.get<ListResponse<T>>(endpoint, {
       params: { ...baseParams, 'page[number]': page }
     });
     const mapped = res.data.data.map(mapper.map);

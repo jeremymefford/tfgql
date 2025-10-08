@@ -1,5 +1,5 @@
+import type { AxiosInstance } from 'axios';
 import { gatherAsyncGeneratorPromises, streamPages } from '../common/streamPages';
-import { axiosClient } from '../common/httpClient';
 import { isNotFound } from '../common/http';
 import { configurationVersionMapper } from './mapper';
 import { ConfigurationVersionResponse, ConfigurationVersion, ConfigurationVersionFilter, IngressAttributes, /*IngressAttributesResponse*/ } from './types';
@@ -7,18 +7,17 @@ import { RequestCache } from '../common/requestCache';
 import stringify from 'json-stable-stringify';
 
 export class ConfigurationVersionsAPI {
-    private requestCache: RequestCache;
-
-    constructor(requestCache: RequestCache) {
-        this.requestCache = requestCache;
-    }
+    constructor(
+        private readonly httpClient: AxiosInstance,
+        private readonly requestCache: RequestCache
+    ) {}
 
     async getConfigurationVersion(id: string): Promise<ConfigurationVersion | null> {
         return this.requestCache.getOrSet<ConfigurationVersion | null>(
             'ConfigurationVersion',
             id,
             async () => {
-                return axiosClient.get<ConfigurationVersionResponse>(
+                return this.httpClient.get<ConfigurationVersionResponse>(
                     `/configuration-versions/${id}`, {
                     params: { 'include': 'run' } // currently doesn't work, but should according to the API docs
                 })
@@ -63,13 +62,13 @@ export class ConfigurationVersionsAPI {
             };
 
             try {
-                const head = await axiosClient.head(downloadUrl, baseOpts);
+                const head = await this.httpClient.head(downloadUrl, baseOpts);
                 const n = parseTotal(head.headers as any);
                 if (n !== null) return n;
             } catch { /* continue */ }
 
             try {
-                const rangeResp = await axiosClient.get(downloadUrl, {
+                const rangeResp = await this.httpClient.get(downloadUrl, {
                     ...baseOpts,
                     headers: { ...baseOpts.headers, Range: 'bytes=0-0' },
                     responseType: 'stream',
@@ -92,7 +91,7 @@ export class ConfigurationVersionsAPI {
             const hardTimer = setTimeout(() => controller.abort(), HARD_TIMEOUT_MS);
 
             try {
-                const resp = await axiosClient.get(downloadUrl, {
+                const resp = await this.httpClient.get(downloadUrl, {
                     ...baseOpts,
                     responseType: 'stream',
                     signal: controller.signal as any,
@@ -125,6 +124,7 @@ export class ConfigurationVersionsAPI {
             async () => {
                 const configVersions: ConfigurationVersion[] = [];
                 const generator = streamPages<ConfigurationVersion, ConfigurationVersionFilter>(
+                    this.httpClient,
                     `/workspaces/${workspaceId}/configuration-versions`,
                     configurationVersionMapper,
                     { "include": "run" }, // currently doesn't work, but should according to the API docs
@@ -141,7 +141,7 @@ export class ConfigurationVersionsAPI {
      * Fetch VCS commit metadata for a given configuration version.
      */
     async getIngressAttributes(configurationVersionId: string): Promise<IngressAttributes> {
-        const res = await axiosClient.get<{ data: any }>(
+        const res = await this.httpClient.get<{ data: any }>(
             `/configuration-versions/${configurationVersionId}/ingress-attributes`
         );
         return {

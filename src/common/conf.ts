@@ -8,7 +8,6 @@ export interface ServerTlsConfig {
 }
 
 export class Config {
-    readonly tfcToken: string;
     readonly tfeBaseUrl: string;
     readonly graphqlBatchSize: number;
     readonly tfcPageSize: number;
@@ -17,15 +16,10 @@ export class Config {
     readonly serverErrorMaxRetries: number = 20;
     readonly serverErrorRetryDelay: number = 60000;
     readonly serverTlsConfig?: ServerTlsConfig;
+    readonly authTokenTtlSeconds: number;
+    readonly jwtEncryptionKeyMaterial?: string;
 
     constructor(env = process.env) {
-        const token = env.TFC_TOKEN;
-        if (!token) {
-            throw new Error('TFC_TOKEN is required');
-        }
-
-        this.tfcToken = token;
-
         let baseUrl = env.TFE_BASE_URL || 'https://app.terraform.io/api/v2';
         baseUrl = baseUrl.toLowerCase();
         if (!baseUrl.endsWith('/api/v2')) {
@@ -40,6 +34,8 @@ export class Config {
         this.serverErrorMaxRetries = this.parsePositiveNumber(env.TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES, 20);
         this.serverErrorRetryDelay = this.parsePositiveNumber(env.TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY, 60000);
         this.requestCacheMaxSize = this.parsePositiveNumber(env.TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE, 5000);
+        this.authTokenTtlSeconds = this.parsePositiveNumber(env.TFCE_AUTH_TOKEN_TTL, 2600000); // default 30 days
+        this.jwtEncryptionKeyMaterial = env.TFCE_JWT_ENCRYPTION_KEY;
 
         const tlsCertPath = this.normalizePath(env.TFCE_SERVER_TLS_CERT_FILE);
         const tlsKeyPath = this.normalizePath(env.TFCE_SERVER_TLS_KEY_FILE);

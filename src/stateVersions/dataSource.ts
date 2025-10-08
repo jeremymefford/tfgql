@@ -1,4 +1,4 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { RequestCache } from '../common/requestCache';
 import { streamPages } from '../common/streamPages';
 import { stateVersionMapper } from './mapper';
@@ -6,11 +6,10 @@ import { StateVersion, StateVersionFilter, StateVersionResponse, StateVersionLis
 import { isNotFound } from '../common/http';
 
 export class StateVersionsAPI {
-  private requestCache: RequestCache;
-
-  constructor(requestCache: RequestCache) {
-    this.requestCache = requestCache;
-  }
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache
+  ) {}
 
   /**
    * List all state versions for a given organization and workspace.
@@ -25,6 +24,7 @@ export class StateVersionsAPI {
       'filter[workspace][name]': workspaceName
     };
     yield* streamPages<StateVersion, StateVersionFilter>(
+      this.httpClient,
       `/state-versions`,
       stateVersionMapper,
       params,
@@ -37,7 +37,7 @@ export class StateVersionsAPI {
    */
   async getStateVersion(id: string): Promise<StateVersion | null> {
     return await this.requestCache.getOrSet(`state-version`, id, async () =>
-      axiosClient.get<StateVersionResponse>(`/state-versions/${id}`)
+      this.httpClient.get<StateVersionResponse>(`/state-versions/${id}`)
         .then(res => stateVersionMapper.map(res.data.data))
         .catch(err => {
           if (isNotFound(err)) {
@@ -51,7 +51,7 @@ export class StateVersionsAPI {
    * Fetch the current state version for a given workspace.
    */
   async getCurrentStateVersion(workspaceId: string): Promise<StateVersion | null> {
-    return axiosClient.get<StateVersionResponse>(
+    return this.httpClient.get<StateVersionResponse>(
       `/workspaces/${workspaceId}/current-state-version`
     )
       .then(res => stateVersionMapper.map(res.data.data))

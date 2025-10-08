@@ -7,6 +7,7 @@ import { ConfigurationVersionsAPI } from '../configurationVersions/dataSource';
 import { VariableSetsAPI } from '../variableSets/dataSource';
 import { ProjectsAPI } from '../projects/dataSource';
 import { VariablesAPI } from '../variables/dataSource';
+import type { AxiosInstance } from 'axios';
 import { RequestCache } from '../common/requestCache';
 import type { Logger } from 'pino';
 import { WorkspaceResourcesAPI } from '../workspaceResources/dataSource';
@@ -29,6 +30,7 @@ import { StateVersionsAPI } from '../stateVersions/dataSource';
 import { TeamTokensAPI } from '../teamTokens/dataSource';
 import { TeamAccessAPI } from '../workspaceTeamAccess/dataSource';
 import { RunTriggersAPI } from '../runTriggers/dataSource';
+import { createHttpClient } from '../common/httpClient';
 
 /** GraphQL context type */
 export interface Context {
@@ -65,47 +67,50 @@ export interface Context {
   };
   requestCache: RequestCache;
   logger: Logger;
+  httpClient: AxiosInstance;
 }
 
 /**
  * Build the context for each GraphQL request, including data source instances.
  */
-export async function buildContext(baseLogger: Logger): Promise<Context> {
+export async function buildContext(baseLogger: Logger, token: string): Promise<Context> {
   const requestCache = new RequestCache();
+  const httpClient = createHttpClient(token);
 
   return {
     dataSources: {
-      usersAPI: new UsersAPI(requestCache),
-      organizationsAPI: new OrganizationsAPI(requestCache),
-      workspacesAPI: new WorkspacesAPI(),
-      runsAPI: new RunsAPI(),
-      teamsAPI: new TeamsAPI(),
-      configurationVersionsAPI: new ConfigurationVersionsAPI(requestCache),
-      variableSetsAPI: new VariableSetsAPI(requestCache),
-      projectsAPI: new ProjectsAPI(),
-      variablesAPI: new VariablesAPI(),
-      workspaceResourcesAPI: new WorkspaceResourcesAPI(),
-      agentPoolsAPI: new AgentPoolsAPI(),
-      agentTokensAPI: new AgentTokensAPI(),
-      agentsAPI: new AgentsAPI(),
-      appliesAPI: new AppliesAPI(),
-      assessmentResultsAPI: new AssessmentResultsAPI(),
-      commentsAPI: new CommentsAPI(),
-      organizationMembershipsAPI: new OrganizationMembershipsAPI(),
-      organizationTagsAPI: new OrganizationTagsAPI(),
-      plansAPI: new PlansAPI(requestCache),
-      policiesAPI: new PoliciesAPI(),
-      policySetsAPI: new PolicySetsAPI(),
-      policyEvaluationsAPI: new PolicyEvaluationsAPI(),
-      policySetParametersAPI: new PolicySetParametersAPI(),
-      projectTeamAccessAPI: new ProjectTeamAccessAPI(),
-      stateVersionOutputsAPI: new StateVersionOutputsAPI(),
-      stateVersionsAPI: new StateVersionsAPI(requestCache),
-      teamTokensAPI: new TeamTokensAPI(),
-      teamAccessAPI: new TeamAccessAPI(),
-      runTriggersAPI: new RunTriggersAPI()
+      usersAPI: new UsersAPI(httpClient, requestCache),
+      organizationsAPI: new OrganizationsAPI(httpClient, requestCache),
+      workspacesAPI: new WorkspacesAPI(httpClient),
+      runsAPI: new RunsAPI(httpClient),
+      teamsAPI: new TeamsAPI(httpClient),
+      configurationVersionsAPI: new ConfigurationVersionsAPI(httpClient, requestCache),
+      variableSetsAPI: new VariableSetsAPI(httpClient, requestCache),
+      projectsAPI: new ProjectsAPI(httpClient),
+      variablesAPI: new VariablesAPI(httpClient),
+      workspaceResourcesAPI: new WorkspaceResourcesAPI(httpClient),
+      agentPoolsAPI: new AgentPoolsAPI(httpClient),
+      agentTokensAPI: new AgentTokensAPI(httpClient),
+      agentsAPI: new AgentsAPI(httpClient),
+      appliesAPI: new AppliesAPI(httpClient),
+      assessmentResultsAPI: new AssessmentResultsAPI(httpClient),
+      commentsAPI: new CommentsAPI(httpClient),
+      organizationMembershipsAPI: new OrganizationMembershipsAPI(httpClient),
+      organizationTagsAPI: new OrganizationTagsAPI(httpClient),
+      plansAPI: new PlansAPI(httpClient, requestCache),
+      policiesAPI: new PoliciesAPI(httpClient),
+      policySetsAPI: new PolicySetsAPI(httpClient),
+      policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient),
+      policySetParametersAPI: new PolicySetParametersAPI(httpClient),
+      projectTeamAccessAPI: new ProjectTeamAccessAPI(httpClient),
+      stateVersionOutputsAPI: new StateVersionOutputsAPI(httpClient),
+      stateVersionsAPI: new StateVersionsAPI(httpClient, requestCache),
+      teamTokensAPI: new TeamTokensAPI(httpClient),
+      teamAccessAPI: new TeamAccessAPI(httpClient),
+      runTriggersAPI: new RunTriggersAPI(httpClient)
     },
     requestCache,
-    logger: baseLogger
+    logger: baseLogger,
+    httpClient
   };
 }

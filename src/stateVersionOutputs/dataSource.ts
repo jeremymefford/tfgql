@@ -1,15 +1,18 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { StateVersionOutput, StateVersionOutputFilter, StateVersionOutputResponse } from './types';
 import { stateVersionOutputMapper } from './mapper';
 
 export class StateVersionOutputsAPI {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   async *listStateVersionOutputs(
     stateVersionId: string,
     filter?: StateVersionOutputFilter
   ): AsyncGenerator<StateVersionOutput[], void, unknown> {
     yield* streamPages<StateVersionOutput, StateVersionOutputFilter>(
+      this.httpClient,
       `/state-versions/${stateVersionId}/outputs`,
       stateVersionOutputMapper,
       undefined,
@@ -18,7 +21,7 @@ export class StateVersionOutputsAPI {
   }
 
   async getStateVersionOutput(id: string): Promise<StateVersionOutput | null> {
-    return axiosClient.get<StateVersionOutputResponse>(`/state-version-outputs/${id}`)
+    return this.httpClient.get<StateVersionOutputResponse>(`/state-version-outputs/${id}`)
       .then(res => stateVersionOutputMapper.map(res.data.data))
       .catch(err => {
         if (isNotFound(err)) {

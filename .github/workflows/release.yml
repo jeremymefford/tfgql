@@ -90,7 +90,7 @@ jobs:
           passphrase: ${{ secrets.ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_tag_gpgsign: true
-          git_push_gpgsign: true
+          git_push_gpgsign: false # GitHub does not support signed pushes
           git_commit_gpgsign: true
 
       - name: Build docs

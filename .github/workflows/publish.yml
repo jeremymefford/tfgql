@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up QEMU (multi-arch)
         uses: docker/setup-qemu-action@v3
@@ -85,10 +85,8 @@ jobs:
             cosign sign --yes "$tag"
           done
 
-      # Optional: attach an explicit GitHub attestation (redundant to buildx provenance,
-      # but useful if you use GH's verification surfaces)
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           # Use the digest from the build step

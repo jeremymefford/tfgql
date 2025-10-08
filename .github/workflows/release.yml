@@ -9,6 +9,7 @@ permissions:
   pages: write
   id-token: write
   packages: write
+  attestations: write
 
 jobs:
   prepare-release:

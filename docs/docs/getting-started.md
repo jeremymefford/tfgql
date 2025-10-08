@@ -319,6 +319,5 @@ query {
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
  - Logging & tracing: The server emits structured logs with `trace_id` and `span_id`, and propagates `traceparent`/`x-request-id` on outbound calls.
 - [TFCE GraphQL Concepts](Concepts/)
-- [Implementation Status](implementation-status)
 - [Contributing Guide](Contributing/)
 - [Full Schema Reference (playground)](http://localhost:4000/graphql)

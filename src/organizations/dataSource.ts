@@ -1,4 +1,4 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { OrganizationResponse, Organization, OrganizationFilter, OrganizationPermissionsFilter } from './types';
@@ -7,16 +7,16 @@ import { RequestCache } from '../common/requestCache';
 
 export class OrganizationsAPI {
 
-  private requestCache: RequestCache;
-
-  constructor(requestCache: RequestCache) {
-    this.requestCache = requestCache;
-  }
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache
+  ) {}
 
   async *listOrganizations(filter?: OrganizationFilter): AsyncGenerator<Organization[]> {
     yield* streamPages<Organization, {
       permissions: OrganizationPermissionsFilter
     }>(
+      this.httpClient,
       '/organizations',
       organizationMapper,
       undefined,
@@ -29,7 +29,7 @@ export class OrganizationsAPI {
       'OrganizationGET',
       name,
       async () =>
-        axiosClient.get<OrganizationResponse>(`/organizations/${name}`)
+        this.httpClient.get<OrganizationResponse>(`/organizations/${name}`)
           .then(res => organizationMapper.map(res.data.data))
           .catch(err => {
             if (isNotFound(err)) {

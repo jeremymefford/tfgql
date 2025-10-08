@@ -8,7 +8,7 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 1. **Fork the repository** and clone it to your local machine.
 2. Run `npm install` to install dependencies.
-3. Create a `.env` file in the project root and configure required environment variables (e.g., `TFC_TOKEN`, `TFE_BASE_URL`, etc.).
+3. Create a `.env` file in the project root and configure environment variables (e.g., `TFCE_JWT_ENCRYPTION_KEY`, `TFE_BASE_URL`, etc.).
 4. Build and start the project with:
 
    ```bash

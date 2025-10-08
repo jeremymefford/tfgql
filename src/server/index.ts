@@ -12,6 +12,7 @@ import { applicationConfiguration } from '../common/conf';
 import { createLoggingPlugin } from '../common/middleware/logging';
 import { enterLogContext, logger } from '../common/logger';
 import { parseTraceparent, generateTraceId, generateSpanId, formatTraceparent } from '../common/trace';
+import { mintJwt, verifyJwt } from '../common/auth/tokenService';
 
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
@@ -32,6 +33,31 @@ export async function startServer(): Promise<void> {
   await fastify.register(fastifyCors, {
     origin: true,
     credentials: true,
+  });
+
+  fastify.get('/health', async () => ({
+    status: 'ok',
+  }));
+
+  fastify.post<{ Body: { tfcToken?: string } }>('/auth/token', async (request, reply) => {
+    const tfcToken = request.body?.tfcToken?.trim();
+    if (!tfcToken) {
+      reply.code(400);
+      return { error: 'tfcToken is required' };
+    }
+
+    try {
+      const minted = await mintJwt(tfcToken);
+      reply.code(200);
+      return {
+        token: minted.token,
+        expiresAt: minted.expiresAt.toISOString(),
+      };
+    } catch (error) {
+      logger.error({ err: error }, 'Failed to mint JWT');
+      reply.code(500);
+      return { error: 'Failed to mint token' };
+    }
   });
 
   const landingPagePlugin = disableExplorer
@@ -113,6 +139,31 @@ async function buildFastifyContext(request: FastifyRequest, reply: FastifyReply)
   enterLogContext({ requestId, traceId, spanId, traceFlags, traceparent });
   reply.header('x-request-id', requestId);
   reply.header('traceparent', traceparent);
+
+  const unauthorized = (message: string): never => {
+    const err = new Error(message);
+    (err as any).statusCode = 401;
+    throw err;
+  };
+
+  const rawAuthorization = request.headers.authorization;
+  const authHeader = Array.isArray(rawAuthorization) ? rawAuthorization[0] : rawAuthorization;
+
+  if (typeof authHeader !== 'string' || !authHeader.toLowerCase().startsWith('bearer ')) {
+    unauthorized('Missing Authorization header');
+  }
+
+  const token = authHeader.slice(7).trim();
+  if (!token) {
+    unauthorized('Invalid Authorization header');
+  }
+
+  const verifiedClaims = await verifyJwt(token).catch((error): never => {
+    logger.warn({ err: error instanceof Error ? error.message : String(error) }, 'Failed to verify JWT');
+    return unauthorized('Invalid or expired token');
+  });
+
+
   const requestLogger = logger;
-  return buildContext(requestLogger);
+  return buildContext(requestLogger, verifiedClaims.tfcToken);
 }

@@ -50,11 +50,10 @@ npm install
 
 Ensure the runtime environment has the following variables:
 
-### Environment Configuration
-
 | Variable                          | Description                                | Default                         | Required |
 |----------------------------------|--------------------------------------------|----------------------------------|----------|
-| `TFC_TOKEN`                      | API token for TFC/TFE                      | —                                | ✅       |
+| `TFCE_JWT_ENCRYPTION_KEY`        | Symmetric key used to encrypt issued JWTs. Provide a 32-byte Base64/hex string for stable tokens. | — | ❌ (auto-generated in-memory when omitted) |
+| `TFCE_AUTH_TOKEN_TTL`            | JWT lifetime (seconds)                     | 30 days                          | ❌       |
 | `TFE_BASE_URL`                   | Base URL for TFE API (normalized to end with `/api/v2`) | `https://app.terraform.io/api/v2` | ❌       |
 | `TFCE_GRAPHQL_BATCH_SIZE`        | Max items per batch operation              | `10`                             | ❌       |
 | `TFCE_GRAPHQL_PAGE_SIZE`         | Max items per page when paginating         | `100` (max: 100)                 | ❌       |
@@ -62,11 +61,11 @@ Ensure the runtime environment has the following variables:
 | `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` | Max retries after 5xx responses      | `20`                             | ❌       |
 | `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` | Delay (ms) between 5xx retries      | `60000`                          | ❌       |
 | `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` | Max entries for request-level cache     | `5000`                           | ❌       |
-| `TFCE_GRAPHQL_DISABLE_EXPLORER` | Disable the built-in Apollo Explorer landing page when set to `true` | `false` | ❌ |
-| `TFCE_SERVER_TLS_CERT_FILE`        | Path to PEM-encoded certificate (and chain) for HTTPS termination | — | ❌ |
-| `TFCE_SERVER_TLS_KEY_FILE`         | Path to PEM-encoded private key for HTTPS termination           | — | ❌ |
-| `TFCE_SERVER_TLS_CA_FILE`          | Optional PEM bundle for client auth / certificate chain         | — | ❌ |
-| `TFCE_SERVER_TLS_KEY_PASSPHRASE`   | Optional passphrase for the HTTPS private key                   | — | ❌ |
+| `TFCE_GRAPHQL_DISABLE_EXPLORER`  | Disable the built-in Apollo Explorer landing page when set to `true` | `false` | ❌ |
+| `TFCE_SERVER_TLS_CERT_FILE`      | Path to PEM-encoded certificate (and chain) for HTTPS termination | — | ❌ |
+| `TFCE_SERVER_TLS_KEY_FILE`       | Path to PEM-encoded private key for HTTPS termination           | — | ❌ |
+| `TFCE_SERVER_TLS_CA_FILE`        | Optional PEM bundle for client auth / certificate chain         | — | ❌ |
+| `TFCE_SERVER_TLS_KEY_PASSPHRASE` | Optional passphrase for the HTTPS private key                   | — | ❌ |
 | `LOG_LEVEL`                      | Pino log level (`fatal`,`error`,`warn`,`info`,`debug`,`trace`) | `info` | ❌ |
 | `NODE_ENV`                       | Node environment; `development` enables pretty logs           | —      | ❌ |
 
@@ -77,6 +76,55 @@ npm start
 ```
 
 The GraphQL API will start on http://localhost:4000 by default. If `TFCE_SERVER_TLS_CERT_FILE` and `TFCE_SERVER_TLS_KEY_FILE` are provided, the server listens with HTTPS/HTTP2 (with HTTP/1.1 fallback) inside the Node.js process. See [TLS.md](TLS.md) for deployment guidance and performance caveats.
+
+### Authentication Flow
+
+1. **Exchange a TFC/E API token for a JWT**
+
+   ```bash
+   curl -X POST http://<endpoint>/auth/token \
+     -H 'content-type: application/json' \
+     -d '{"tfcToken":"<your real tfc api token>"}'
+   ```
+
+   The response contains an encrypted JWT (JWE) and an `expiresAt` timestamp. The token payload is AES-256-GCM encrypted; if `TFCE_JWT_ENCRYPTION_KEY` was not provided, the server will auto-generate an in-memory key and log a warning (tokens become invalid on restart).
+
+2. **Call GraphQL with the JWT**
+
+   ```bash
+   curl http://<endpoint>/graphql \
+     -H 'content-type: application/json' \
+     -H 'authorization: Bearer <jwt-from-auth-endpoint>' \
+     --data '{"query":"{ __typename }"}'
+   ```
+
+   Every GraphQL request must include the `Authorization: Bearer` header. The server decrypts the token per-request, extracts the underlying TFC/E token, and attaches it to outbound REST calls.
+
+   **Apollo Explorer setup**
+
+   If you prefer the Apollo Sandbox/Explorer UI, add a preflight script so each request automatically exchanges your Terraform token for a JWT:
+
+   ```js
+   const token = explorer.environment.get("tfcToken");
+
+   const resp = await explorer.fetch('http://<endpoint>/auth/token', {
+     method: 'POST',
+     headers: {'content-type': 'application/json'},
+     body: `{"tfcToken":"${token}"}`
+   });
+
+   const jwt = (await resp.json()).token;
+
+   explorer.environment.set("JWT", jwt);
+   ```
+
+   Then set your authorization header to `Bearer {{JWT}}`
+
+   Store your Terraform API token in the Explorer environment as `tfcToken`; the script saves the resulting JWT as `JWT`.
+
+3. **Health checks**
+
+   A lightweight readiness probe is exposed at `GET /health` (used by the container `HEALTHCHECK`).
 
 ## Project Structure
 
@@ -257,7 +305,7 @@ Use the following launch config:
                 "<node_internals>/**"
             ],
             "env": {
-                "TFC_TOKEN": <token>,
+                "TFCE_JWT_ENCRYPTION_KEY": "<32-byte-base64-key>",
                 "LOG_LEVEL": "trace",
                 "NODE_ENV": "development"
             }

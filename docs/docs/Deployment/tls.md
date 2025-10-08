@@ -63,7 +63,8 @@ certificates and define an alias that starts the server with HTTPS:
 
 ```bash
 source ./generate-test-certs.sh
-export TFC_TOKEN=... # real token
+# Optionally pin the JWT encryption key for repeatable tokens
+export TFCE_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32)
 start_tfce_tls
 ```
 

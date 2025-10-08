@@ -57,10 +57,11 @@ cd tfce-graphql
 
 ### Environment Variables
 
-Create a `.env` file in the project root with the following:
+Create a `.env` file in the project root with the following (customize as needed):
 
 ```env
-TFC_TOKEN=your_terraform_api_token_here
+TFCE_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32) # stable JWTs across restarts
+TFCE_AUTH_TOKEN_TTL=2600000
 TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
 PORT=4000
 # Logging
@@ -75,7 +76,7 @@ PORT=4000
 # TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE=5000
 ```
 
-Keep your API token secure; do not commit `.env` to source control.
+Tokens for Terraform Cloud/Enterprise are now supplied per-request when you exchange them for a JWT (details below), so they no longer live in the environment.
 
 ---
 
@@ -96,6 +97,49 @@ docker run -p 4000:4000 --env-file .env tfce-graphql
 ```
 
 The API will be available at `http://localhost:4000/graphql`.
+
+### Exchange a TFC Token for a JWT
+
+Every GraphQL request must include a JWT issued by the server. Exchange your Terraform API token by calling the auth endpoint:
+
+```bash
+curl -X POST http://<endpoint>/auth/token \
+  -H 'content-type: application/json' \
+  -d '{"tfcToken":"<your terraform api token>"}'
+```
+
+The response contains an encrypted token and expiration timestamp:
+
+```json
+{ "token": "<jwe>", "expiresAt": "2025-02-07T18:21:34.000Z" }
+```
+
+Include the token in the `Authorization` header for all GraphQL calls:
+
+```bash
+curl http://<endpoint>/graphql \
+  -H 'content-type: application/json' \
+  -H 'authorization: Bearer <jwe>' \
+  --data '{"query":"{ __typename }"}'
+```
+
+Using Apollo Explorer? Add a preflight script so the UI automatically exchanges the Terraform token you store in its environment (`tfcToken`) and sets the `Authorization` header:
+
+```js
+const token = explorer.environment.get("tfcToken");
+
+const resp = await explorer.fetch('http://<endpoint>/auth/token', {
+  method: 'POST',
+  headers: {'content-type': 'application/json'},
+  body: `{"tfcToken":"${token}"}`
+});
+
+const jwt = (await resp.json()).token;
+
+explorer.environment.set("JWT", jwt);
+```
+
+Then set your authorization header to `Bearer {{JWT}}`
 
 ---
 

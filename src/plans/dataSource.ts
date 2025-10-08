@@ -1,4 +1,4 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import { Plan, PlanFilter, PlanResponse } from './types';
@@ -6,15 +6,15 @@ import { planMapper } from './mapper';
 import { RequestCache } from '../common/requestCache';
 
 export class PlansAPI {
-  private requestCache: RequestCache;
-
-  constructor(requestCache: RequestCache) {
-    this.requestCache = requestCache;
-  }
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache
+  ) {}
 
 
   async *listPlans(runId: string, filter?: PlanFilter): AsyncGenerator<Plan[], void, unknown> {
     yield* streamPages<Plan, PlanFilter>(
+      this.httpClient,
       `/runs/${runId}/plan`,
       planMapper,
       undefined,
@@ -23,7 +23,7 @@ export class PlansAPI {
   }
 
   async getPlan(id: string): Promise<Plan | null> {
-    return axiosClient.get<PlanResponse>(`/plans/${id}`)
+    return this.httpClient.get<PlanResponse>(`/plans/${id}`)
       .then(res => planMapper.map(res.data.data))
       .catch(err => {
         if (isNotFound(err)) {
@@ -34,7 +34,7 @@ export class PlansAPI {
   }
 
   async getPlanForRun(runId: string): Promise<Plan | null> {
-    return axiosClient.get<PlanResponse>(`/runs/${runId}/plan`)
+    return this.httpClient.get<PlanResponse>(`/runs/${runId}/plan`)
       .then(res => planMapper.map(res.data.data))
       .catch(err => {
         if (isNotFound(err)) {
@@ -68,7 +68,7 @@ export class PlansAPI {
       }
     };
 
-    const resp = await axiosClient.post<PlanExportResponse>(`/plan-exports`, payload);
+    const resp = await this.httpClient.post<PlanExportResponse>(`/plan-exports`, payload);
     return resp.data.data;
   }
 
@@ -86,13 +86,13 @@ export class PlansAPI {
     };
     type PlanExportResponse = { data: PlanExportResource };
 
-    const resp = await axiosClient.get<PlanExportResponse>(`/plan-exports/${planExportId}`);
+    const resp = await this.httpClient.get<PlanExportResponse>(`/plan-exports/${planExportId}`);
     return resp.data.data;
   }
 
   private async findExistingPlanExportId(planId: string, dataType = 'sentinel-mock-bundle-v0'): Promise<string | null> {
     // Fetch raw plan to read relationships.exports (not mapped in domain model)
-    const resp = await axiosClient.get<PlanResponse>(`/plans/${planId}`);
+    const resp = await this.httpClient.get<PlanResponse>(`/plans/${planId}`);
     const refs = resp?.data?.data?.relationships?.exports?.data ?? [];
     for (const ref of refs) {
       if (ref.type !== 'plan-exports') continue;
@@ -147,7 +147,7 @@ export class PlansAPI {
 
       // Request the download endpoint with redirects disabled so we can grab the temporary URL
       const downloadPath = `/plan-exports/${planExportId}/download`;
-      const resp = await axiosClient.get(downloadPath, {
+      const resp = await this.httpClient.get(downloadPath, {
         maxRedirects: 0,
         validateStatus: (s) => s === 302
       });

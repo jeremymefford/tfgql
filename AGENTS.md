@@ -17,8 +17,8 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
   - `src/server/schema.ts`: Aggregates all entity schemas and resolvers; registers scalars.
 - Common modules
   - `src/common/logger.ts`: Pino logger configured with AsyncLocalStorage mixin.
-  - `src/common/trace.ts`: Utilities for W3C trace context.
-  - `src/common/httpClient.ts`: Axios instance with retries and outbound header propagation.
+- `src/common/trace.ts`: Utilities for W3C trace context.
+- `src/common/httpClient.ts`: Factory for constructing request-scoped Axios clients with retries and outbound header propagation.
   - `src/common/conf.ts`: Env config parsing and defaults.
   - `src/common/filtering/*`: Filter input schema and evaluation helpers.
   - `src/common/streamPages.ts`: Pagination streamer and `gatherAsyncGeneratorPromises`.
@@ -30,7 +30,6 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
   - Each contains `types.ts`, `mapper.ts`, `dataSource.ts`, `schema.ts`, `resolvers.ts`.
 
 ## Run & Build
-- Env: `TFC_TOKEN` required; see Config below
 - Compile: `npm run compile`
 - Start: `npm start` (compiles then runs `dist/index.js`)
 - Tests: `npm test` (Vitest); `npm run coverage` for coverage
@@ -48,18 +47,19 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
   - Child loggers should only add domain bindings (e.g., `workspaceId`).
 
 ## HTTP Calls
-- Use the shared `axiosClient` (`src/common/httpClient.ts`). It provides:
+- Use the request-scoped Axios client from the GraphQL context (`createHttpClient` in `src/common/httpClient.ts`). It provides:
+  - Authorization header injection using the decrypted JWT token for the current request.
   - Outbound header propagation: sets `traceparent` and `x-request-id` (same value) from current request context.
   - Retry on 5xx (configurable): up to `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES`, with delay `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` ms.
   - Retry on 429: uses `Retry-After` or `X-RateLimit-Reset`, capped at 60s, up to `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES`.
-- Avoid creating bespoke Axios instances; if necessary, copy the interceptors to preserve propagation/retries.
+- Avoid creating bespoke Axios instances; rely on the factory so each request gets the correct auth/trace wiring.
 
 ## Configuration
 - Source: `src/common/conf.ts` reads environment variables at startup.
-- Required
-  - `TFC_TOKEN`: Terraform Cloud/Enterprise API token.
 - Optional (with defaults)
   - `TFE_BASE_URL`: API base; normalized to include `/api/v2` (default `https://app.terraform.io/api/v2`).
+  - `TFCE_AUTH_TOKEN_TTL` (default 3600): lifetime (seconds) of issued JWTs.
+  - `TFCE_JWT_ENCRYPTION_KEY`: Base64/hex/string used to derive AES key for JWT encryption. When omitted a random in-memory key is generated at startup.
   - `TFCE_GRAPHQL_BATCH_SIZE` (default 10): concurrency for GraphQL-side batching.
   - `TFCE_GRAPHQL_PAGE_SIZE` (default 100, max 100): TFE page size.
   - `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` (default 50): 429 retries.
@@ -78,7 +78,7 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 - Files per entity
   - `types.ts`: Raw JSON:API response types and Domain types used by resolvers.
   - `mapper.ts`: `DomainMapper` implementation that converts API `attributes`/`relationships` to Domain type; no IO.
-  - `dataSource.ts`: Outbound HTTP calls (via `axiosClient`), pagination with `streamPages`, optional `RequestCache` usage.
+  - `dataSource.ts`: Outbound HTTP calls (via the context-provided Axios client), pagination with `streamPages`, optional `RequestCache` usage.
   - `schema.ts`: Default export GraphQL schema (using `gql`) defining types, queries, and filter inputs.
   - `resolvers.ts`: Query and type resolvers; keep side effects minimal and delegate to data sources.
 - Naming and mapping

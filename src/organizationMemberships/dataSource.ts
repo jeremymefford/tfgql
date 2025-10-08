@@ -1,4 +1,4 @@
-import { axiosClient } from '../common/httpClient';
+import type { AxiosInstance } from 'axios';
 import { isNotFound } from '../common/http';
 import { streamPages } from '../common/streamPages';
 import {
@@ -11,12 +11,15 @@ import { organizationMembershipMapper } from './mapper';
 import { evaluateWhereClause } from '../common/filtering/filtering';
 
 export class OrganizationMembershipsAPI {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   async *listOrganizationMemberships(orgName: string, filter?: OrganizationMembershipFilter): AsyncGenerator<
     OrganizationMembership[],
     void,
     unknown
   > {
     yield* streamPages<OrganizationMembership, OrganizationMembershipFilter>(
+      this.httpClient,
       `/organizations/${orgName}/organization-memberships`,
       organizationMembershipMapper,
       undefined,
@@ -25,7 +28,7 @@ export class OrganizationMembershipsAPI {
   }
 
   async getOrganizationMembership(id: string): Promise<OrganizationMembership | null> {
-    return axiosClient.get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
+    return this.httpClient.get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
       .then(res => organizationMembershipMapper.map(res.data.data))
       .catch(err => {
         if (isNotFound(err)) {
@@ -36,7 +39,7 @@ export class OrganizationMembershipsAPI {
   }
 
   async myOrganizationMemberships(filter?: OrganizationMembershipFilter): Promise<OrganizationMembership[]> {
-    return axiosClient.get<OrganizationMembershipListResponse>(`/organization-memberships`)
+    return this.httpClient.get<OrganizationMembershipListResponse>(`/organization-memberships`)
       .then(res =>
         res.data.data
           .map(organizationMembershipMapper.map)

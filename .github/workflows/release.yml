@@ -6,12 +6,15 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   cut-release:
     runs-on: ubuntu-latest
     environment:
       name: prod
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,6 +89,8 @@ jobs:
           gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
           passphrase: ${{ secrets.ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
+          git_tag_gpgsign: true
+          git_push_gpgsign: true
           git_commit_gpgsign: true
 
       - name: Build docs
@@ -95,11 +100,12 @@ jobs:
 
       - name: Upload docs artifact
         if: steps.bump.outputs.should_release == 'true'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs/build
 
       - name: Deploy to GitHub Pages
+        if: steps.bump.outputs.should_release == 'true'
         id: deploy
         uses: actions/deploy-pages@v4
 

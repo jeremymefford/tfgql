@@ -32,6 +32,15 @@ The **TFCE GraphQL** project provides a flexible GraphQL API for interacting wit
 
 ---
 
+## Basic Drive with Docker
+
+```bash
+docker run -p 4000:4000 ghcr.io/jeremymefford/tfce-graphql:latest
+export JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d '{"tfcToken":"<token>"}' | jq -r '.token')
+curl -s -X POST -H "content-type: application/json" -H "Authorization: Bearer $JWT" http://localhost:4000/ \
+  -d '{"query":"query { me { username } }"}'
+```
+
 ## Installation and Setup
 
 ### Prerequisites

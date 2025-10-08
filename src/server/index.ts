@@ -88,7 +88,7 @@ export async function startServer(): Promise<void> {
   });
 
   const port = Number(process.env.PORT) || 4000;
-  const host = process.env.HOST;
+  const host = process.env.HOST ?? '0.0.0.0';
 
   const address = await fastify.listen({ port, host });
   const isHttps = Boolean(applicationConfiguration.serverTlsConfig);

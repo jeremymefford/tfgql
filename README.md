@@ -8,6 +8,7 @@ TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise
 - 🔍 Advanced Hasura-style filtering
 - 🌊 Streaming pagination for efficient retrieval of pages
 - 🚦 Rate limit protection with exponential backoffs
+- 🧭 Explorer views with nested workspace/project/run entities and per-request caching
 
 ## Documentation
 

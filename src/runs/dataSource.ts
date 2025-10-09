@@ -4,9 +4,13 @@ import { RunResponse, Run, RunFilter, RunPermissionsFilter, RunActionsFilter, Ru
 import { runMapper, runEventMapper } from './mapper';
 import { logger } from '../common/logger';
 import { isNotFound } from '../common/http';
+import { RequestCache } from '../common/requestCache';
 
 export class RunsAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache
+  ) {}
 
   /** List all runs for a given workspace */
   async *listRuns(workspaceId: string, filter?: RunFilter): AsyncGenerator<Run[], void, unknown> {
@@ -19,14 +23,19 @@ export class RunsAPI {
   }
 
   async getRun(runId: string): Promise<Run | null> {
-    return this.httpClient.get<RunResponse>(`/runs/${runId}`)
-      .then(res => runMapper.map(res.data.data))
-      .catch(err => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<Run | null>(
+      'RunGET',
+      runId,
+      async () =>
+        this.httpClient.get<RunResponse>(`/runs/${runId}`)
+          .then(res => runMapper.map(res.data.data))
+          .catch(err => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          })
+    );
   }
 
   async *listRunEvents(runId: string): AsyncGenerator<RunEvent[], void, unknown> {

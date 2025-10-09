@@ -1,0 +1,192 @@
+*** Begin Patch
+*** Update File: src/explorer/dataSource.ts
+@@
+-/**
+- * Explorer data source placeholder.
+- * Implementation will be added once the schema is finalized.
+- */
+-export class ExplorerAPI {}
++import { URLSearchParams } from 'url';
++import type { AxiosInstance } from 'axios';
++import {
++  ExplorerModuleField,
++  ExplorerModuleListResponse,
++  ExplorerModuleResult,
++  ExplorerProviderField,
++  ExplorerProviderListResponse,
++  ExplorerProviderResult,
++  ExplorerQueryOptions,
++  ExplorerTerraformVersionField,
++  ExplorerTerraformVersionListResponse,
++  ExplorerTerraformVersionResult,
++  ExplorerWorkspaceField,
++  ExplorerWorkspaceListResponse,
++  ExplorerWorkspaceResult,
++  ExplorerWorkspaceRow,
++  ExplorerTerraformVersionRow,
++  ExplorerProviderRow,
++  ExplorerModuleRow,
++} from './types';
++import { gatherAsyncGeneratorPromises, streamPages } from '../common/streamPages';
++import { DomainMapper } from '../common/middleware/domainMapper';
++
++export class ExplorerAPI {
++  constructor(private readonly httpClient: AxiosInstance) {}
++
++  async queryWorkspaces(orgName: string, options: ExplorerQueryOptions<ExplorerWorkspaceField>): Promise<ExplorerWorkspaceResult> {
++    const generator = streamPages<ExplorerWorkspaceRow>(
++      () => this.httpClient,
++      () => this.buildUrl(orgName, 'workspaces', options),
++      explorerWorkspaceMapper
++    );
++    const data = await gatherAsyncGeneratorPromises(generator);
++    return { data };
++  }
++
++  async queryTerraformVersions(orgName: string, options: ExplorerQueryOptions<ExplorerTerraformVersionField>): Promise<ExplorerTerraformVersionResult> {
++    const generator = streamPages<ExplorerTerraformVersionRow>(
++      () => this.httpClient,
++      () => this.buildUrl(orgName, 'tf_versions', options),
++      explorerTerraformVersionMapper
++    );
++    const data = await gatherAsyncGeneratorPromises(generator);
++    return { data };
++  }
++
++  async queryProviders(orgName: string, options: ExplorerQueryOptions<ExplorerProviderField>): Promise<ExplorerProviderResult> {
++    const generator = streamPages<ExplorerProviderRow>(
++      () => this.httpClient,
++      () => this.buildUrl(orgName, 'providers', options),
++      explorerProviderMapper
++    );
++    const data = await gatherAsyncGeneratorPromises(generator);
++    return { data };
++  }
++
++  async queryModules(orgName: string, options: ExplorerQueryOptions<ExplorerModuleField>): Promise<ExplorerModuleResult> {
++    const generator = streamPages<ExplorerModuleRow>(
++      () => this.httpClient,
++      () => this.buildUrl(orgName, 'modules', options),
++      explorerModuleMapper
++    );
++    const data = await gatherAsyncGeneratorPromises(generator);
++    return { data };
++  }
++
++  private buildUrl<Field extends string>(orgName: string, type: string, options: ExplorerQueryOptions<Field>): string {
++    const params = new URLSearchParams();
++    params.set('type', type);
++
++    options.fields?.forEach((field) => {
++      params.append('fields', field);
++    });
++
++    options.sort?.forEach((entry) => {
++      params.append('sort', entry.ascending ? entry.field : `-${entry.field}`);
++    });
++
++    options.filters?.forEach((filter, index) => {
++      params.append(`filter[${index}][${filter.field}][${filter.operator}][0]`, filter.value);
++    });
++
++    return `/organizations/${encodeURIComponent(orgName)}/explorer?${params.toString()}`;
++  }
++}
++
++const explorerWorkspaceMapper: DomainMapper<any, ExplorerWorkspaceRow> = {
++  map: (resource) => ({
++    allChecksSucceeded: coerceBoolean(resource.attributes?.['all-checks-succeeded']),
++    currentRumCount: coerceNumber(resource.attributes?.['current_rum_count']),
++    checksErrored: coerceNumber(resource.attributes?.['checks-errored']),
++    checksFailed: coerceNumber(resource.attributes?.['checks-failed']),
++    checksPassed: coerceNumber(resource.attributes?.['checks-passed']),
++    checksUnknown: coerceNumber(resource.attributes?.['checks-unknown']),
++    currentRunAppliedAt: coerceDate(resource.attributes?.['current-run-applied-at']),
++    currentRunExternalId: coerceString(resource.attributes?.['current-run-external-id']),
++    currentRunStatus: coerceString(resource.attributes?.['current-run-status']),
++    drifted: coerceBoolean(resource.attributes?.drifted),
++    externalId: coerceString(resource.attributes?.['external-id']),
++    moduleCount: coerceNumber(resource.attributes?.['module-count']),
++    modules: coerceString(resource.attributes?.modules),
++    organizationName: coerceString(resource.attributes?.['organization-name']),
++    projectExternalId: coerceString(resource.attributes?.['project-external-id']),
++    projectName: coerceString(resource.attributes?.['project-name']),
++    providerCount: coerceNumber(resource.attributes?.['provider-count']),
++    providers: coerceString(resource.attributes?.providers),
++    resourcesDrifted: coerceNumber(resource.attributes?.['resources-drifted']),
++    resourcesUndrifted: coerceNumber(resource.attributes?.['resources-undrifted']),
++    stateVersionTerraformVersion: coerceString(resource.attributes?.['state-version-terraform-version']),
++    tags: coerceString(resource.attributes?.tags),
++    vcsRepoIdentifier: coerceString(resource.attributes?.['vcs-repo-identifier']),
++    workspaceCreatedAt: coerceDate(resource.attributes?.['workspace-created-at']),
++    workspaceName: coerceString(resource.attributes?.['workspace-name']),
++    workspaceTerraformVersion: coerceString(resource.attributes?.['workspace-terraform-version']),
++    workspaceUpdatedAt: coerceDate(resource.attributes?.['workspace-updated-at'])
++  })
++};
++
++const explorerTerraformVersionMapper: DomainMapper<any, ExplorerTerraformVersionRow> = {
++  map: (resource) => ({
++    version: coerceString(resource.attributes?.version),
++    workspaceCount: coerceNumber(resource.attributes?.['workspace-count']),
++    workspaces: coerceString(resource.attributes?.workspaces)
++  })
++};
++
++const explorerProviderMapper: DomainMapper<any, ExplorerProviderRow> = {
++  map: (resource) => ({
++    name: coerceString(resource.attributes?.name),
++    source: coerceString(resource.attributes?.source),
++    version: coerceString(resource.attributes?.version),
++    workspaceCount: coerceNumber(resource.attributes?.['workspace-count']),
++    workspaces: coerceString(resource.attributes?.workspaces)
++  })
++};
++
++const explorerModuleMapper: DomainMapper<any, ExplorerModuleRow> = {
++  map: (resource) => ({
++    name: coerceString(resource.attributes?.name),
++    source: coerceString(resource.attributes?.source),
++    version: coerceString(resource.attributes?.version),
++    workspaceCount: coerceNumber(resource.attributes?.['workspace-count']),
++    workspaces: coerceString(resource.attributes?.workspaces)
++  })
++};
++
++const coerceNumber = (value: unknown): number | null => {
++  if (typeof value === 'number') {
++    return value;
++  }
++  if (typeof value === 'string') {
++    const parsed = Number(value);
++    return Number.isFinite(parsed) ? parsed : null;
++  }
++  return null;
++};
++
++const coerceBoolean = (value: unknown): boolean | null => {
++  if (typeof value === 'boolean') {
++    return value;
++  }
++  if (typeof value === 'string') {
++    if (value === 'true') return true;
++    if (value === 'false') return false;
++  }
++  return null;
++};
++
++const coerceString = (value: unknown): string | null => {
++  if (value === undefined || value === null) {
++    return null;
++  }
++  return String(value);
++};
++
++const coerceDate = (value: unknown): Date | null => {
++  if (typeof value !== 'string') {
++    return null;
++  }
++  const date = new Date(value);
++  return Number.isNaN(date.getTime()) ? null : date;
++};
+*** End Patch

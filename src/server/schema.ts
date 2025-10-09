@@ -31,6 +31,7 @@ import { resolvers as stateVersionsResolvers } from '../stateVersions/resolvers'
 import { resolvers as runTriggersResolvers } from '../runTriggers/resolvers';
 import { resolvers as teamTokensResolvers } from '../teamTokens/resolvers';
 import { resolvers as teamAccessResolvers } from '../workspaceTeamAccess/resolvers';
+import { resolvers as explorerResolvers } from '../explorer/resolvers';
 import configurationVersionSchema from '../configurationVersions/schema';
 import organizationSchema from '../organizations/schema';
 import workspaceSchema from '../workspaces/schema';
@@ -61,6 +62,7 @@ import runTriggersSchema from '../runTriggers/schema';
 import teamTokensSchema from '../teamTokens/schema';
 import teamAccessSchema from '../workspaceTeamAccess/schema';
 import stateVersionsSchema from '../stateVersions/schema';
+import explorerSchema from '../explorer/schema';
 import { Config } from '../common/conf';
 
 /** Utility to load a schema file as a GraphQL string */
@@ -114,7 +116,8 @@ export const typeDefs = [
   stateVersionsSchema,
   runTriggersSchema,
   teamTokensSchema,
-  teamAccessSchema
+  teamAccessSchema,
+  explorerSchema
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -149,7 +152,8 @@ export const resolvers = {
     ...stateVersionsResolvers.Query,
     ...runTriggersResolvers.Query,
     ...teamTokensResolvers.Query,
-    ...teamAccessResolvers.Query
+    ...teamAccessResolvers.Query,
+    ...explorerResolvers.Query
   },
   Organization: {
     ...organizationsResolvers.Organization
@@ -192,5 +196,17 @@ export const resolvers = {
   },
   Apply: {
     ...appliesResolvers.Apply
+  },
+  ExplorerWorkspaceRow: {
+    ...explorerResolvers.ExplorerWorkspaceRow
+  },
+  ExplorerTerraformVersionRow: {
+    ...explorerResolvers.ExplorerTerraformVersionRow
+  },
+  ExplorerProviderRow: {
+    ...explorerResolvers.ExplorerProviderRow
+  },
+  ExplorerModuleRow: {
+    ...explorerResolvers.ExplorerModuleRow
   }
 };

@@ -30,6 +30,7 @@ import { StateVersionsAPI } from '../stateVersions/dataSource';
 import { TeamTokensAPI } from '../teamTokens/dataSource';
 import { TeamAccessAPI } from '../workspaceTeamAccess/dataSource';
 import { RunTriggersAPI } from '../runTriggers/dataSource';
+import { ExplorerAPI } from '../explorer/dataSource';
 import { createHttpClient } from '../common/httpClient';
 
 /** GraphQL context type */
@@ -64,6 +65,7 @@ export interface Context {
     teamTokensAPI: TeamTokensAPI;
     teamAccessAPI: TeamAccessAPI;
     runTriggersAPI: RunTriggersAPI;
+    explorerAPI: ExplorerAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
@@ -81,12 +83,12 @@ export async function buildContext(baseLogger: Logger, token: string): Promise<C
     dataSources: {
       usersAPI: new UsersAPI(httpClient, requestCache),
       organizationsAPI: new OrganizationsAPI(httpClient, requestCache),
-      workspacesAPI: new WorkspacesAPI(httpClient),
-      runsAPI: new RunsAPI(httpClient),
+      workspacesAPI: new WorkspacesAPI(httpClient, requestCache),
+      runsAPI: new RunsAPI(httpClient, requestCache),
       teamsAPI: new TeamsAPI(httpClient),
       configurationVersionsAPI: new ConfigurationVersionsAPI(httpClient, requestCache),
       variableSetsAPI: new VariableSetsAPI(httpClient, requestCache),
-      projectsAPI: new ProjectsAPI(httpClient),
+      projectsAPI: new ProjectsAPI(httpClient, requestCache),
       variablesAPI: new VariablesAPI(httpClient),
       workspaceResourcesAPI: new WorkspaceResourcesAPI(httpClient),
       agentPoolsAPI: new AgentPoolsAPI(httpClient),
@@ -107,7 +109,8 @@ export async function buildContext(baseLogger: Logger, token: string): Promise<C
       stateVersionsAPI: new StateVersionsAPI(httpClient, requestCache),
       teamTokensAPI: new TeamTokensAPI(httpClient),
       teamAccessAPI: new TeamAccessAPI(httpClient),
-      runTriggersAPI: new RunTriggersAPI(httpClient)
+      runTriggersAPI: new RunTriggersAPI(httpClient),
+      explorerAPI: new ExplorerAPI(httpClient)
     },
     requestCache,
     logger: baseLogger,

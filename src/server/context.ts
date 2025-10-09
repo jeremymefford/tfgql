@@ -1,37 +1,37 @@
-import { OrganizationsAPI } from '../organizations/dataSource';
-import { WorkspacesAPI } from '../workspaces/dataSource';
-import { UsersAPI } from '../users/dataSource';
-import { RunsAPI } from '../runs/dataSource';
-import { TeamsAPI } from '../teams/dataSource';
-import { ConfigurationVersionsAPI } from '../configurationVersions/dataSource';
-import { VariableSetsAPI } from '../variableSets/dataSource';
-import { ProjectsAPI } from '../projects/dataSource';
-import { VariablesAPI } from '../variables/dataSource';
-import type { AxiosInstance } from 'axios';
-import { RequestCache } from '../common/requestCache';
-import type { Logger } from 'pino';
-import { WorkspaceResourcesAPI } from '../workspaceResources/dataSource';
-import { AgentPoolsAPI } from '../agentPools/dataSource';
-import { AgentTokensAPI } from '../agentTokens/dataSource';
-import { AgentsAPI } from '../agents/dataSource';
-import { AppliesAPI } from '../applies/dataSource';
-import { AssessmentResultsAPI } from '../assessmentResults/dataSource';
-import { CommentsAPI } from '../comments/dataSource';
-import { OrganizationMembershipsAPI } from '../organizationMemberships/dataSource';
-import { OrganizationTagsAPI } from '../organizationTags/dataSource';
-import { PlansAPI } from '../plans/dataSource';
-import { PoliciesAPI } from '../policies/dataSource';
-import { PolicySetsAPI } from '../policySets/dataSource';
-import { PolicyEvaluationsAPI } from '../policyEvaluations/dataSource';
-import { PolicySetParametersAPI } from '../policySetParameters/dataSource';
-import { ProjectTeamAccessAPI } from '../projectTeamAccess/dataSource';
-import { StateVersionOutputsAPI } from '../stateVersionOutputs/dataSource';
-import { StateVersionsAPI } from '../stateVersions/dataSource';
-import { TeamTokensAPI } from '../teamTokens/dataSource';
-import { TeamAccessAPI } from '../workspaceTeamAccess/dataSource';
-import { RunTriggersAPI } from '../runTriggers/dataSource';
-import { ExplorerAPI } from '../explorer/dataSource';
-import { createHttpClient } from '../common/httpClient';
+import { OrganizationsAPI } from "../organizations/dataSource";
+import { WorkspacesAPI } from "../workspaces/dataSource";
+import { UsersAPI } from "../users/dataSource";
+import { RunsAPI } from "../runs/dataSource";
+import { TeamsAPI } from "../teams/dataSource";
+import { ConfigurationVersionsAPI } from "../configurationVersions/dataSource";
+import { VariableSetsAPI } from "../variableSets/dataSource";
+import { ProjectsAPI } from "../projects/dataSource";
+import { VariablesAPI } from "../variables/dataSource";
+import type { AxiosInstance } from "axios";
+import { RequestCache } from "../common/requestCache";
+import type { Logger } from "pino";
+import { WorkspaceResourcesAPI } from "../workspaceResources/dataSource";
+import { AgentPoolsAPI } from "../agentPools/dataSource";
+import { AgentTokensAPI } from "../agentTokens/dataSource";
+import { AgentsAPI } from "../agents/dataSource";
+import { AppliesAPI } from "../applies/dataSource";
+import { AssessmentResultsAPI } from "../assessmentResults/dataSource";
+import { CommentsAPI } from "../comments/dataSource";
+import { OrganizationMembershipsAPI } from "../organizationMemberships/dataSource";
+import { OrganizationTagsAPI } from "../organizationTags/dataSource";
+import { PlansAPI } from "../plans/dataSource";
+import { PoliciesAPI } from "../policies/dataSource";
+import { PolicySetsAPI } from "../policySets/dataSource";
+import { PolicyEvaluationsAPI } from "../policyEvaluations/dataSource";
+import { PolicySetParametersAPI } from "../policySetParameters/dataSource";
+import { ProjectTeamAccessAPI } from "../projectTeamAccess/dataSource";
+import { StateVersionOutputsAPI } from "../stateVersionOutputs/dataSource";
+import { StateVersionsAPI } from "../stateVersions/dataSource";
+import { TeamTokensAPI } from "../teamTokens/dataSource";
+import { TeamAccessAPI } from "../workspaceTeamAccess/dataSource";
+import { RunTriggersAPI } from "../runTriggers/dataSource";
+import { ExplorerAPI } from "../explorer/dataSource";
+import { createHttpClient } from "../common/httpClient";
 
 /** GraphQL context type */
 export interface Context {
@@ -75,7 +75,10 @@ export interface Context {
 /**
  * Build the context for each GraphQL request, including data source instances.
  */
-export async function buildContext(baseLogger: Logger, token: string): Promise<Context> {
+export async function buildContext(
+  baseLogger: Logger,
+  token: string,
+): Promise<Context> {
   const requestCache = new RequestCache();
   const httpClient = createHttpClient(token);
 
@@ -86,7 +89,10 @@ export async function buildContext(baseLogger: Logger, token: string): Promise<C
       workspacesAPI: new WorkspacesAPI(httpClient, requestCache),
       runsAPI: new RunsAPI(httpClient, requestCache),
       teamsAPI: new TeamsAPI(httpClient),
-      configurationVersionsAPI: new ConfigurationVersionsAPI(httpClient, requestCache),
+      configurationVersionsAPI: new ConfigurationVersionsAPI(
+        httpClient,
+        requestCache,
+      ),
       variableSetsAPI: new VariableSetsAPI(httpClient, requestCache),
       projectsAPI: new ProjectsAPI(httpClient, requestCache),
       variablesAPI: new VariablesAPI(httpClient),
@@ -110,10 +116,10 @@ export async function buildContext(baseLogger: Logger, token: string): Promise<C
       teamTokensAPI: new TeamTokensAPI(httpClient),
       teamAccessAPI: new TeamAccessAPI(httpClient),
       runTriggersAPI: new RunTriggersAPI(httpClient),
-      explorerAPI: new ExplorerAPI(httpClient)
+      explorerAPI: new ExplorerAPI(httpClient),
     },
     requestCache,
     logger: baseLogger,
-    httpClient
+    httpClient,
   };
 }

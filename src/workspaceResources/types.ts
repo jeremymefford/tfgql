@@ -1,5 +1,8 @@
-import { ResourceObject, ListResponse } from '../common/types/jsonApi';
-import { StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
+import { ResourceObject, ListResponse } from "../common/types/jsonApi";
+import {
+  StringComparisonExp,
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
 
 export interface WorkspaceResourceAttributes {
   address: string;
@@ -13,8 +16,10 @@ export interface WorkspaceResourceAttributes {
   "name-index": string | null;
 }
 
-export type WorkspaceResourceResource = ResourceObject<WorkspaceResourceAttributes>;
-export type WorkspaceResourceListResponse = ListResponse<WorkspaceResourceResource>;
+export type WorkspaceResourceResource =
+  ResourceObject<WorkspaceResourceAttributes>;
+export type WorkspaceResourceListResponse =
+  ListResponse<WorkspaceResourceResource>;
 
 export interface WorkspaceResource {
   id: string;

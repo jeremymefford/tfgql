@@ -1,7 +1,10 @@
-import { DomainMapper } from '../common/middleware/domainMapper';
-import { PolicySetParameterResource, PolicySetParameter } from './types';
+import { DomainMapper } from "../common/middleware/domainMapper";
+import { PolicySetParameterResource, PolicySetParameter } from "./types";
 
-export const policySetParameterMapper: DomainMapper<PolicySetParameterResource, PolicySetParameter> = {
+export const policySetParameterMapper: DomainMapper<
+  PolicySetParameterResource,
+  PolicySetParameter
+> = {
   map(resource: PolicySetParameterResource): PolicySetParameter {
     return {
       id: resource.id,
@@ -9,7 +12,7 @@ export const policySetParameterMapper: DomainMapper<PolicySetParameterResource, 
       value: resource.attributes.value,
       sensitive: resource.attributes.sensitive,
       category: resource.attributes.category,
-      policySetId: resource.relationships?.configurable.data.id
+      policySetId: resource.relationships?.configurable.data.id,
     };
-  }
+  },
 };

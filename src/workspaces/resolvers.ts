@@ -1,29 +1,48 @@
-import { Context } from '../server/context';
-import { Workspace, WorkspaceFilter, WorkspaceProvider, WorkspaceModule } from './types';
-import { Organization } from '../organizations/types';
-import { Run, RunFilter } from '../runs/types';
-import { ConfigurationVersion, ConfigurationVersionFilter } from '../configurationVersions/types';
-import { gatherAsyncGeneratorPromises } from '../common/streamPages';
-import { Variable, VariableFilter } from '../variables/types';
-import { parallelizeBounded } from '../common/concurrency/parallelizeBounded';
-import { RunTrigger, WorkspaceRunTrigger } from '../runTriggers/types';
-import { StateVersion, StateVersionFilter } from '../stateVersions/types';
-import { WorkspaceResourceFilter, WorkspaceResource } from '../workspaceResources/types';
-import { coalesceOrgs } from '../common/orgHelper';
+import { Context } from "../server/context";
+import {
+  Workspace,
+  WorkspaceFilter,
+  WorkspaceProvider,
+  WorkspaceModule,
+} from "./types";
+import { Organization } from "../organizations/types";
+import { Run, RunFilter } from "../runs/types";
+import {
+  ConfigurationVersion,
+  ConfigurationVersionFilter,
+} from "../configurationVersions/types";
+import { gatherAsyncGeneratorPromises } from "../common/streamPages";
+import { Variable, VariableFilter } from "../variables/types";
+import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
+import { WorkspaceRunTrigger } from "../runTriggers/types";
+import { StateVersion, StateVersionFilter } from "../stateVersions/types";
+import {
+  WorkspaceResourceFilter,
+  WorkspaceResource,
+} from "../workspaceResources/types";
+import { coalesceOrgs } from "../common/orgHelper";
 import type {
   ExplorerFilterInput,
   ExplorerProviderField,
   ExplorerProviderRow,
-  ExplorerQueryOptions
-} from '../explorer/types';
-import type { ExplorerModuleField, ExplorerModuleRow } from '../explorer/types';
+  ExplorerQueryOptions,
+} from "../explorer/types";
+import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
 
 export const resolvers = {
   Query: {
     workspaces: async (
       _: unknown,
-      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: WorkspaceFilter },
-      ctx: Context
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: {
+        includeOrgs?: string[];
+        excludeOrgs?: string[];
+        filter?: WorkspaceFilter;
+      },
+      ctx: Context,
     ): Promise<Workspace[]> => {
       const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
       if (orgs.length === 0) {
@@ -33,7 +52,7 @@ export const resolvers = {
       const results: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
         const workspaces = await gatherAsyncGeneratorPromises(
-          ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter)
+          ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter),
         );
         results.push(...workspaces);
       });
@@ -41,22 +60,40 @@ export const resolvers = {
     },
     workspaceByName: async (
       _: unknown,
-      { organization, workspaceName }: { organization: string; workspaceName: string },
-      ctx: Context
+      {
+        organization,
+        workspaceName,
+      }: { organization: string; workspaceName: string },
+      ctx: Context,
     ): Promise<Workspace | null> => {
-      const workspace = await ctx.dataSources.workspacesAPI.getWorkspaceByName(organization, workspaceName);
+      const workspace = await ctx.dataSources.workspacesAPI.getWorkspaceByName(
+        organization,
+        workspaceName,
+      );
       if (!workspace) return null;
       return workspace;
     },
-    workspace: async (_: unknown, { id }: { id: string }, ctx: Context): Promise<Workspace | null> => {
+    workspace: async (
+      _: unknown,
+      { id }: { id: string },
+      ctx: Context,
+    ): Promise<Workspace | null> => {
       const workspace = await ctx.dataSources.workspacesAPI.getWorkspace(id);
       if (!workspace) return null;
       return workspace;
     },
     workspacesWithNoResources: async (
       _: unknown,
-      { includeOrgs, excludeOrgs, filter }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: WorkspaceFilter },
-      ctx: Context
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: {
+        includeOrgs?: string[];
+        excludeOrgs?: string[];
+        filter?: WorkspaceFilter;
+      },
+      ctx: Context,
     ): Promise<Workspace[]> => {
       const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
       if (orgs.length === 0) {
@@ -65,24 +102,37 @@ export const resolvers = {
 
       const matches: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        ctx.logger.info({ orgName: orgId }, 'Finding workspaces with no resources');
-        const workspaceGenerator = ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter);
+        ctx.logger.info(
+          { orgName: orgId },
+          "Finding workspaces with no resources",
+        );
+        const workspaceGenerator = ctx.dataSources.workspacesAPI.listWorkspaces(
+          orgId,
+          filter,
+        );
         const localMatches: Workspace[] = [];
         for await (const workspacePage of workspaceGenerator) {
-          await parallelizeBounded(workspacePage, async (workspace: Workspace) => {
-            const resourcesGenerator = ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(
-              workspace.id,
-              undefined,
-              1
-            );
-            const resources = await resourcesGenerator.next();
-            if (!resources.value || resources.value.length === 0) {
-              localMatches.push(workspace);
-            }
-            resourcesGenerator.return(undefined);
-          });
+          await parallelizeBounded(
+            workspacePage,
+            async (workspace: Workspace) => {
+              const resourcesGenerator =
+                ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(
+                  workspace.id,
+                  undefined,
+                  1,
+                );
+              const resources = await resourcesGenerator.next();
+              if (!resources.value || resources.value.length === 0) {
+                localMatches.push(workspace);
+              }
+              resourcesGenerator.return(undefined);
+            },
+          );
         }
-        ctx.logger.info({ orgName: orgId, count: localMatches.length }, 'Found workspaces with no resources');
+        ctx.logger.info(
+          { orgName: orgId, count: localMatches.length },
+          "Found workspaces with no resources",
+        );
         matches.push(...localMatches);
       });
       return matches;
@@ -93,14 +143,14 @@ export const resolvers = {
         includeOrgs,
         excludeOrgs,
         filter,
-        runFilter
+        runFilter,
       }: {
         includeOrgs?: string[];
         excludeOrgs?: string[];
         filter?: WorkspaceFilter;
         runFilter: RunFilter;
       },
-      ctx: Context
+      ctx: Context,
     ): Promise<Workspace[]> => {
       const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
       if (orgs.length === 0) {
@@ -109,11 +159,20 @@ export const resolvers = {
 
       const result: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        ctx.logger.info({ orgName: orgId }, 'Finding workspaces with open runs');
+        ctx.logger.info(
+          { orgName: orgId },
+          "Finding workspaces with open runs",
+        );
         const localMatches: Workspace[] = [];
-        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter)) {
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
+          orgId,
+          filter,
+        )) {
           await parallelizeBounded(page, async (workspace: Workspace) => {
-            const runsIterator = ctx.dataSources.runsAPI.listRuns(workspace.id, runFilter);
+            const runsIterator = ctx.dataSources.runsAPI.listRuns(
+              workspace.id,
+              runFilter,
+            );
             const { value: runs } = await runsIterator.next();
             if (runs && runs.length > 0) {
               localMatches.push(workspace);
@@ -121,16 +180,21 @@ export const resolvers = {
             runsIterator.return(undefined);
           });
         }
-        ctx.logger.info({ orgName: orgId, count: localMatches.length }, 'Found workspaces with open runs');
+        ctx.logger.info(
+          { orgName: orgId, count: localMatches.length },
+          "Found workspaces with open runs",
+        );
         result.push(...localMatches);
       });
       return result;
-    }
-    ,
+    },
     stackGraph: async (
       _: unknown,
-      { includeOrgs, excludeOrgs }: { includeOrgs?: string[]; excludeOrgs?: string[] },
-      ctx: Context
+      {
+        includeOrgs,
+        excludeOrgs,
+      }: { includeOrgs?: string[]; excludeOrgs?: string[] },
+      ctx: Context,
     ): Promise<WorkspaceRunTrigger[]> => {
       const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
       if (orgs.length === 0) {
@@ -139,49 +203,110 @@ export const resolvers = {
 
       const edges: WorkspaceRunTrigger[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        ctx.logger.info({ orgName: orgId }, 'Building workspace stack graph');
+        ctx.logger.info({ orgName: orgId }, "Building workspace stack graph");
         const localEdges: WorkspaceRunTrigger[] = [];
-        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
+          orgId,
+        )) {
           await parallelizeBounded(page, async (workspace: Workspace) => {
-            for await (const triggers of ctx.dataSources.runTriggersAPI.listRunTriggers(workspace.id)) {
+            for await (const triggers of ctx.dataSources.runTriggersAPI.listRunTriggers(
+              workspace.id,
+            )) {
               localEdges.push(...triggers);
             }
           });
         }
-        ctx.logger.info({ orgName: orgId, edgeCount: localEdges.length }, 'Workspace stack graph complete');
+        ctx.logger.info(
+          { orgName: orgId, edgeCount: localEdges.length },
+          "Workspace stack graph complete",
+        );
         edges.push(...localEdges);
       });
       return edges;
-    }
+    },
   },
   Workspace: {
-    organization: async (workspace: Workspace, _: unknown, ctx: Context): Promise<Organization | null> => {
+    organization: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<Organization | null> => {
       const orgName = workspace.organizationName;
       if (!orgName) return null;
-      const organization = await ctx.dataSources.organizationsAPI.getOrganization(orgName);
-      return organization
+      const organization =
+        await ctx.dataSources.organizationsAPI.getOrganization(orgName);
+      return organization;
     },
-    runs: async (workspace: Workspace, { filter }: { filter?: RunFilter }, ctx: Context): Promise<Run[]> => {
-      return gatherAsyncGeneratorPromises(ctx.dataSources.runsAPI.listRuns(workspace.id, filter));
+    runs: async (
+      workspace: Workspace,
+      { filter }: { filter?: RunFilter },
+      ctx: Context,
+    ): Promise<Run[]> => {
+      return gatherAsyncGeneratorPromises(
+        ctx.dataSources.runsAPI.listRuns(workspace.id, filter),
+      );
     },
-    workspaceResources: async (workspace: Workspace, { filter }: { filter?: WorkspaceResourceFilter }, ctx: Context): Promise<WorkspaceResource[]> => {
-      return gatherAsyncGeneratorPromises(ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(workspace.id, filter));
+    workspaceResources: async (
+      workspace: Workspace,
+      { filter }: { filter?: WorkspaceResourceFilter },
+      ctx: Context,
+    ): Promise<WorkspaceResource[]> => {
+      return gatherAsyncGeneratorPromises(
+        ctx.dataSources.workspaceResourcesAPI.getResourcesByWorkspaceId(
+          workspace.id,
+          filter,
+        ),
+      );
     },
-    configurationVersions: async (workspace: Workspace, { filter }: { filter?: ConfigurationVersionFilter }, ctx: Context): Promise<ConfigurationVersion[]> => {
-      return ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(workspace.id, filter);
+    configurationVersions: async (
+      workspace: Workspace,
+      { filter }: { filter?: ConfigurationVersionFilter },
+      ctx: Context,
+    ): Promise<ConfigurationVersion[]> => {
+      return ctx.dataSources.configurationVersionsAPI.listConfigurationVersions(
+        workspace.id,
+        filter,
+      );
     },
-    variables: async (workspace: Workspace, { filter }: { filter?: VariableFilter }, ctx: Context): Promise<Variable[]> => {
-      ctx.logger.info({ workspaceId: workspace.id }, 'Fetching variables for workspace');
-      return ctx.dataSources.variablesAPI.getVariablesForWorkspace(workspace.id, filter);
+    variables: async (
+      workspace: Workspace,
+      { filter }: { filter?: VariableFilter },
+      ctx: Context,
+    ): Promise<Variable[]> => {
+      ctx.logger.info(
+        { workspaceId: workspace.id },
+        "Fetching variables for workspace",
+      );
+      return ctx.dataSources.variablesAPI.getVariablesForWorkspace(
+        workspace.id,
+        filter,
+      );
     },
-    stateVersions: async (workspace: Workspace, { filter }: { filter?: StateVersionFilter }, ctx: Context): Promise<StateVersion[]> => {
+    stateVersions: async (
+      workspace: Workspace,
+      { filter }: { filter?: StateVersionFilter },
+      ctx: Context,
+    ): Promise<StateVersion[]> => {
       if (!workspace.organizationName) {
-        throw new Error(`Workspace ${workspace.id} does not have an organizationName set, cannot fetch state versions.`);
+        throw new Error(
+          `Workspace ${workspace.id} does not have an organizationName set, cannot fetch state versions.`,
+        );
       }
-      return gatherAsyncGeneratorPromises(ctx.dataSources.stateVersionsAPI.listStateVersions(workspace.organizationName, workspace.id, filter));
+      return gatherAsyncGeneratorPromises(
+        ctx.dataSources.stateVersionsAPI.listStateVersions(
+          workspace.organizationName,
+          workspace.id,
+          filter,
+        ),
+      );
     },
-    currentStateVersion: async (workspace: Workspace, _: unknown, ctx: Context): Promise<StateVersion | null> => {
-      return await ctx.dataSources.stateVersionsAPI.getCurrentStateVersion(workspace.id)
+    currentStateVersion: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<StateVersion | null> => {
+      return await ctx.dataSources.stateVersionsAPI
+        .getCurrentStateVersion(workspace.id)
         .catch(async (error) => {
           if (error.response && error.response.status === 404) {
             return null;
@@ -190,7 +315,11 @@ export const resolvers = {
           }
         });
     },
-    providers: async (workspace: Workspace, _: unknown, ctx: Context): Promise<WorkspaceProvider[]> => {
+    providers: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<WorkspaceProvider[]> => {
       const orgName = workspace.organizationName;
       if (!orgName || !workspace.name) {
         return [];
@@ -198,25 +327,33 @@ export const resolvers = {
 
       const filters: ExplorerFilterInput<ExplorerProviderField>[] = [
         {
-          field: 'workspaces',
-          operator: 'contains',
-          value: workspace.name
-        }
+          field: "workspaces",
+          operator: "contains",
+          value: workspace.name,
+        },
       ];
       const options: ExplorerQueryOptions<ExplorerProviderField> = {
-        fields: ['name', 'source', 'version'],
-        filters: filters
+        filters,
       };
 
-      const { data } = await ctx.dataSources.explorerAPI.queryProviders(orgName, options);
+      const { data } = await ctx.dataSources.explorerAPI.queryProviders(
+        orgName,
+        options,
+      );
 
-      return data.map((provider: ExplorerProviderRow): WorkspaceProvider => ({
-        name: provider.name ?? null,
-        version: provider.version ?? null,
-        source: provider.source ?? null
-      }));
+      return data.map(
+        (provider: ExplorerProviderRow): WorkspaceProvider => ({
+          name: provider.name ?? null,
+          version: provider.version ?? null,
+          source: provider.source ?? null,
+        }),
+      );
     },
-    modules: async (workspace: Workspace, _: unknown, ctx: Context): Promise<WorkspaceModule[]> => {
+    modules: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<WorkspaceModule[]> => {
       const orgName = workspace.organizationName;
       if (!orgName || !workspace.name) {
         return [];
@@ -224,20 +361,25 @@ export const resolvers = {
 
       const filters: ExplorerFilterInput<ExplorerModuleField>[] = [
         {
-          field: 'workspaces',
-          operator: 'contains',
-          value: workspace.name
-        }
+          field: "workspaces",
+          operator: "contains",
+          value: workspace.name,
+        },
       ];
       const options: ExplorerQueryOptions<ExplorerModuleField> = { filters };
 
-      const { data } = await ctx.dataSources.explorerAPI.queryModules(orgName, options);
+      const { data } = await ctx.dataSources.explorerAPI.queryModules(
+        orgName,
+        options,
+      );
 
-      return data.map((module: ExplorerModuleRow): WorkspaceModule => ({
-        name: module.name ?? null,
-        version: module.version ?? null,
-        source: module.source ?? null
-      }));
-    }
-  }
+      return data.map(
+        (module: ExplorerModuleRow): WorkspaceModule => ({
+          name: module.name ?? null,
+          version: module.version ?? null,
+          source: module.source ?? null,
+        }),
+      );
+    },
+  },
 };

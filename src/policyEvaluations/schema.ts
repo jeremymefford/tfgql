@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const policyEvaluationsSchema = gql`
   """
@@ -46,7 +46,10 @@ const policyEvaluationsSchema = gql`
   }
 
   extend type Query {
-    policyEvaluations(taskStageId: ID!, filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
+    policyEvaluations(
+      taskStageId: ID!
+      filter: PolicyEvaluationFilter
+    ): [PolicyEvaluation!]!
   }
 `;
 

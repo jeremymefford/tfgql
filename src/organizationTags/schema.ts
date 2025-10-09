@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 // TODO come back and review
 
@@ -23,7 +23,11 @@ const organizationTagsSchema = gql`
   }
 
   extend type Query {
-    organizationTags(includeOrgs: [String!], excludeOrgs: [String!], filter: OrganizationTagFilter): [OrganizationTag!]!
+    organizationTags(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: OrganizationTagFilter
+    ): [OrganizationTag!]!
   }
 `;
 

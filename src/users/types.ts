@@ -1,30 +1,30 @@
-import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import { ResourceObject, SingleResponse } from "../common/types/jsonApi";
 import {
   StringComparisonExp,
   BooleanComparisonExp,
-  WhereClause
-} from '../common/filtering/types';
+  WhereClause,
+} from "../common/filtering/types";
 
 export interface UserAttributes {
   username: string;
   email: string;
-  'avatar-url'?: string;
-  'is-service-account': boolean;
-  'auth-method': string;
-  'v2-only': boolean;
+  "avatar-url"?: string;
+  "is-service-account": boolean;
+  "auth-method": string;
+  "v2-only": boolean;
   permissions: {
-    'can-create-organizations': boolean;
-    'can-view-settings': boolean;
-    'can-view-profile': boolean;
-    'can-change-email': boolean;
-    'can-change-username': boolean;
-    'can-change-password': boolean;
-    'can-manage-sessions': boolean;
-    'can-manage-sso-identities': boolean;
-    'can-manage-user-tokens': boolean;
-    'can-update-user': boolean;
-    'can-reenable-2fa-by-unlinking': boolean;
-    'can-manage-hcp-account': boolean;
+    "can-create-organizations": boolean;
+    "can-view-settings": boolean;
+    "can-view-profile": boolean;
+    "can-change-email": boolean;
+    "can-change-username": boolean;
+    "can-change-password": boolean;
+    "can-manage-sessions": boolean;
+    "can-manage-sso-identities": boolean;
+    "can-manage-user-tokens": boolean;
+    "can-update-user": boolean;
+    "can-reenable-2fa-by-unlinking": boolean;
+    "can-manage-hcp-account": boolean;
   };
 }
 
@@ -55,7 +55,8 @@ export interface User {
   };
 }
 
-export interface UserPermissionsFilter extends WhereClause<User['permissions']> {
+export interface UserPermissionsFilter
+  extends WhereClause<User["permissions"]> {
   _and?: UserPermissionsFilter[];
   _or?: UserPermissionsFilter[];
   _not?: UserPermissionsFilter;
@@ -72,10 +73,10 @@ export interface UserPermissionsFilter extends WhereClause<User['permissions']> 
   canUpdateUser?: BooleanComparisonExp;
   canReenable2faByUnlinking?: BooleanComparisonExp;
   canManageHcpAccount?: BooleanComparisonExp;
-
 }
 
-export interface UserFilter extends WhereClause<User, { permissions: UserPermissionsFilter }> {
+export interface UserFilter
+  extends WhereClause<User, { permissions: UserPermissionsFilter }> {
   _and?: UserFilter[];
   _or?: UserFilter[];
   _not?: UserFilter;

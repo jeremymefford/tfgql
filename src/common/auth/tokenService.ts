@@ -1,15 +1,19 @@
-import { randomBytes, createHash, createSecretKey } from 'node:crypto';
-import { EncryptJWT, jwtDecrypt, type JWTPayload } from 'jose';
-import { applicationConfiguration } from '../conf';
-import { logger } from '../logger';
+import { randomBytes, createHash, createSecretKey } from "node:crypto";
+import { EncryptJWT, jwtDecrypt, type JWTPayload } from "jose";
+import { applicationConfiguration } from "../conf";
+import { logger } from "../logger";
 
 const AES_KEY_LENGTH = 32;
 
-const encryptionKey = initializeEncryptionKey(applicationConfiguration.jwtEncryptionKeyMaterial);
+const encryptionKey = initializeEncryptionKey(
+  applicationConfiguration.jwtEncryptionKeyMaterial,
+);
 
 function initializeEncryptionKey(keyMaterial?: string) {
   if (!keyMaterial || keyMaterial.trim().length === 0) {
-    logger.warn('TFCE_JWT_ENCRYPTION_KEY not provided; generating ephemeral in-memory key. JWTs will be invalid after process restart.');
+    logger.warn(
+      "TFCE_JWT_ENCRYPTION_KEY not provided; generating ephemeral in-memory key. JWTs will be invalid after process restart.",
+    );
     return createSecretKey(randomBytes(AES_KEY_LENGTH));
   }
 
@@ -18,8 +22,10 @@ function initializeEncryptionKey(keyMaterial?: string) {
   // Attempt base64url/base64 decode
   const base64Key = (() => {
     try {
-      const padded = padBase64(normalized.replace(/-/g, '+').replace(/_/g, '/'));
-      return Buffer.from(padded, 'base64');
+      const padded = padBase64(
+        normalized.replace(/-/g, "+").replace(/_/g, "/"),
+      );
+      return Buffer.from(padded, "base64");
     } catch {
       return null;
     }
@@ -30,19 +36,24 @@ function initializeEncryptionKey(keyMaterial?: string) {
   }
 
   // Attempt hex decode
-  if (/^[0-9a-fA-F]+$/.test(normalized) && normalized.length === AES_KEY_LENGTH * 2) {
-    return createSecretKey(Buffer.from(normalized, 'hex'));
+  if (
+    /^[0-9a-fA-F]+$/.test(normalized) &&
+    normalized.length === AES_KEY_LENGTH * 2
+  ) {
+    return createSecretKey(Buffer.from(normalized, "hex"));
   }
 
   // Fall back to SHA-256 hash of provided material
-  logger.warn('TFCE_JWT_ENCRYPTION_KEY provided but not 32 bytes; deriving AES key via SHA-256 hash.');
-  return createSecretKey(createHash('sha256').update(normalized).digest());
+  logger.warn(
+    "TFCE_JWT_ENCRYPTION_KEY provided but not 32 bytes; deriving AES key via SHA-256 hash.",
+  );
+  return createSecretKey(createHash("sha256").update(normalized).digest());
 }
 
 function padBase64(value: string): string {
   const remainder = value.length % 4;
   if (remainder === 0) return value;
-  return value + '='.repeat(4 - remainder);
+  return value + "=".repeat(4 - remainder);
 }
 
 export interface MintedToken {
@@ -57,15 +68,15 @@ export interface VerifiedTokenClaims {
 }
 
 export async function mintJwt(tfcToken: string): Promise<MintedToken> {
-  if (!tfcToken || typeof tfcToken !== 'string') {
-    throw new Error('Cannot mint JWT without TFC token');
+  if (!tfcToken || typeof tfcToken !== "string") {
+    throw new Error("Cannot mint JWT without TFC token");
   }
 
   const ttlSeconds = Math.max(1, applicationConfiguration.authTokenTtlSeconds);
   const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
 
   const token = await new EncryptJWT({ tfcToken })
-    .setProtectedHeader({ alg: 'dir', enc: 'A256GCM', typ: 'JWT' })
+    .setProtectedHeader({ alg: "dir", enc: "A256GCM", typ: "JWT" })
     .setIssuedAt()
     .setExpirationTime(`+${ttlSeconds}s`)
     .encrypt(encryptionKey);
@@ -78,25 +89,28 @@ export async function mintJwt(tfcToken: string): Promise<MintedToken> {
 
 export async function verifyJwt(token: string): Promise<VerifiedTokenClaims> {
   if (!token) {
-    throw new Error('Missing JWT');
+    throw new Error("Missing JWT");
   }
 
   const { payload } = await jwtDecrypt(token, encryptionKey, {
-    clockTolerance: '0s',
+    clockTolerance: "0s",
   });
 
   const typedPayload = payload as JWTPayload & { tfcToken?: unknown };
 
-  if (typeof typedPayload.tfcToken !== 'string' || typedPayload.tfcToken.length === 0) {
-    throw new Error('Token missing TFC token claim');
+  if (
+    typeof typedPayload.tfcToken !== "string" ||
+    typedPayload.tfcToken.length === 0
+  ) {
+    throw new Error("Token missing TFC token claim");
   }
 
-  if (typeof typedPayload.iat !== 'number') {
-    throw new Error('Token missing issued-at claim');
+  if (typeof typedPayload.iat !== "number") {
+    throw new Error("Token missing issued-at claim");
   }
 
-  if (typeof typedPayload.exp !== 'number') {
-    throw new Error('Token missing expiration claim');
+  if (typeof typedPayload.exp !== "number") {
+    throw new Error("Token missing expiration claim");
   }
 
   return {

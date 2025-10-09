@@ -1,24 +1,30 @@
-import { Context } from '../server/context';
-import { StateVersionOutput, StateVersionOutputFilter } from './types';
-import { gatherAsyncGeneratorPromises } from '../common/streamPages';
+import { Context } from "../server/context";
+import { StateVersionOutput, StateVersionOutputFilter } from "./types";
+import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 
 export const resolvers = {
   Query: {
     stateVersionOutputs: async (
       _: unknown,
-      { stateVersionId, filter }: { stateVersionId: string; filter?: StateVersionOutputFilter },
-      { dataSources }: Context
+      {
+        stateVersionId,
+        filter,
+      }: { stateVersionId: string; filter?: StateVersionOutputFilter },
+      { dataSources }: Context,
     ): Promise<StateVersionOutput[]> => {
       return gatherAsyncGeneratorPromises(
-        dataSources.stateVersionOutputsAPI.listStateVersionOutputs(stateVersionId, filter)
+        dataSources.stateVersionOutputsAPI.listStateVersionOutputs(
+          stateVersionId,
+          filter,
+        ),
       );
     },
     stateVersionOutput: async (
       _: unknown,
       { id }: { id: string },
-      { dataSources }: Context
+      { dataSources }: Context,
     ): Promise<StateVersionOutput | null> => {
       return dataSources.stateVersionOutputsAPI.getStateVersionOutput(id);
-    }
-  }
+    },
+  },
 };

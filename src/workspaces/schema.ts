@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const workspaceSchema = gql`
   type Workspace {
@@ -48,7 +48,9 @@ const workspaceSchema = gql`
     settingOverwrites: WorkspaceSettingOverwrites
     organization: Organization
     runs(filter: RunFilter): [Run!]!
-    configurationVersions(filter: ConfigurationVersionFilter): [ConfigurationVersion!]!
+    configurationVersions(
+      filter: ConfigurationVersionFilter
+    ): [ConfigurationVersion!]!
     variables(filter: VariableFilter): [Variable!]!
     stateVersions(filter: StateVersionFilter): [StateVersion!]!
     currentStateVersion: StateVersion
@@ -151,10 +153,18 @@ const workspaceSchema = gql`
   }
 
   extend type Query {
-    workspaces(includeOrgs: [String!], excludeOrgs: [String!], filter: WorkspaceFilter): [Workspace!]!
+    workspaces(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: WorkspaceFilter
+    ): [Workspace!]!
     workspace(id: ID!): Workspace
     workspaceByName(organization: String!, workspaceName: String!): Workspace
-    workspacesWithNoResources(includeOrgs: [String!], excludeOrgs: [String!], filter: WorkspaceFilter): [Workspace!]!
+    workspacesWithNoResources(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: WorkspaceFilter
+    ): [Workspace!]!
     """
     List all workspaces across the selected organizations that have at least one run matching the given runFilter (e.g. non-terminal states).
     """
@@ -167,7 +177,10 @@ const workspaceSchema = gql`
     """
     List all run-trigger edges (workspace dependency graph) across the selected organizations.
     """
-    stackGraph(includeOrgs: [String!], excludeOrgs: [String!]): [WorkspaceRunTrigger!]!
+    stackGraph(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+    ): [WorkspaceRunTrigger!]!
   }
 `;
 export default workspaceSchema;

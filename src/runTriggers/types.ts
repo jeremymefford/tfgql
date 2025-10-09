@@ -1,10 +1,19 @@
-import { DateTimeComparisonExp, StringComparisonExp, WhereClause } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  DateTimeComparisonExp,
+  StringComparisonExp,
+  WhereClause,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface RunTriggerAttributes {
-  'workspace-name': string;
-  'sourceable-name': string;
-  'created-at': string;
+  "workspace-name": string;
+  "sourceable-name": string;
+  "created-at": string;
 }
 
 export interface RunTriggerRelationships {
@@ -12,7 +21,9 @@ export interface RunTriggerRelationships {
   sourceable?: { data: ResourceRef };
 }
 
-export type RunTriggerResource = ResourceObject<RunTriggerAttributes> & { relationships?: RunTriggerRelationships };
+export type RunTriggerResource = ResourceObject<RunTriggerAttributes> & {
+  relationships?: RunTriggerRelationships;
+};
 export type RunTriggerListResponse = ListResponse<RunTriggerResource>;
 export type RunTriggerResponse = SingleResponse<RunTriggerResource>;
 
@@ -28,7 +39,7 @@ export interface RunTrigger {
   sourceable?: ResourceRef;
 }
 
-export interface WorkspaceRunTrigger extends RunTrigger{
+export interface WorkspaceRunTrigger extends RunTrigger {
   inbound: boolean; // true if this is an inbound trigger, false if outbound
 }
 

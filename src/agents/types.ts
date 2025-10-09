@@ -1,19 +1,19 @@
 import {
   WhereClause,
   StringComparisonExp,
-  DateTimeComparisonExp
-} from '../common/filtering/types';
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
 import {
   ResourceObject,
   ListResponse,
-  SingleResponse
-} from '../common/types/jsonApi';
+  SingleResponse,
+} from "../common/types/jsonApi";
 
 export interface AgentAttributes {
   name?: string;
   status: string;
-  'ip-address': string;
-  'last-ping-at': string;
+  "ip-address": string;
+  "last-ping-at": string;
 }
 
 export type AgentResource = ResourceObject<AgentAttributes>;

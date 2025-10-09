@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const teamSchema = gql`
   type Team {
@@ -60,7 +60,6 @@ const teamSchema = gql`
     organizationAccess: TeamOrganizationAccessFilter
   }
 
-
   input TeamPermissionsFilter {
     _and: [TeamPermissionsFilter!]
     _or: [TeamPermissionsFilter!]
@@ -100,10 +99,22 @@ const teamSchema = gql`
   }
 
   extend type Query {
-    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
+    teams(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: TeamFilter
+    ): [Team!]!
     # teams(organization: String!, filter: TeamFilter): [Team!]!
-    teamsByQuery(organization: String!, query: String!, filter: TeamFilter): [Team!]!
-    teamsByName(organization: String!, names: [String!]!, filter: TeamFilter): [Team!]!
+    teamsByQuery(
+      organization: String!
+      query: String!
+      filter: TeamFilter
+    ): [Team!]!
+    teamsByName(
+      organization: String!
+      names: [String!]!
+      filter: TeamFilter
+    ): [Team!]!
     team(id: ID!): Team
   }
 `;

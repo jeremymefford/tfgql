@@ -1,5 +1,14 @@
-import { WhereClause, StringComparisonExp, BooleanComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  BooleanComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface PolicySetParameterAttributes {
   key: string;
@@ -14,12 +23,15 @@ export interface PolicySetParameterRelationships {
   };
 }
 
-export type PolicySetParameterResource = ResourceObject<PolicySetParameterAttributes> & {
-  relationships?: PolicySetParameterRelationships;
-};
+export type PolicySetParameterResource =
+  ResourceObject<PolicySetParameterAttributes> & {
+    relationships?: PolicySetParameterRelationships;
+  };
 
-export type PolicySetParameterResponse = SingleResponse<PolicySetParameterResource>;
-export type PolicySetParameterListResponse = ListResponse<PolicySetParameterResource>;
+export type PolicySetParameterResponse =
+  SingleResponse<PolicySetParameterResource>;
+export type PolicySetParameterListResponse =
+  ListResponse<PolicySetParameterResource>;
 
 export interface PolicySetParameter {
   id: string;
@@ -30,7 +42,8 @@ export interface PolicySetParameter {
   policySetId?: string;
 }
 
-export interface PolicySetParameterFilter extends WhereClause<PolicySetParameter> {
+export interface PolicySetParameterFilter
+  extends WhereClause<PolicySetParameter> {
   _and?: PolicySetParameterFilter[];
   _or?: PolicySetParameterFilter[];
   _not?: PolicySetParameterFilter;

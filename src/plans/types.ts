@@ -2,45 +2,50 @@ import {
   WhereClause,
   StringComparisonExp,
   IntComparisonExp,
-  BooleanComparisonExp
-} from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+  BooleanComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface PlanAttributes {
-  'execution-details': {
+  "execution-details": {
     mode: string;
-    'agent-id'?: string;
-    'agent-name'?: string;
-    'agent-pool-id'?: string;
-    'agent-pool-name'?: string;
+    "agent-id"?: string;
+    "agent-name"?: string;
+    "agent-pool-id"?: string;
+    "agent-pool-name"?: string;
   };
-  'generated-configuration': boolean;
-  'has-changes': boolean;
-  'resource-additions': number;
-  'resource-changes': number;
-  'resource-destructions': number;
-  'resource-imports': number;
-  'structured-run-output-enabled': boolean;
+  "generated-configuration": boolean;
+  "has-changes": boolean;
+  "resource-additions": number;
+  "resource-changes": number;
+  "resource-destructions": number;
+  "resource-imports": number;
+  "structured-run-output-enabled": boolean;
   status: string;
-  'status-timestamps': {
-    'agent-queued-at': string;
-    'pending-at': string;
-    'started-at': string;
-    'finished-at': string;
+  "status-timestamps": {
+    "agent-queued-at": string;
+    "pending-at": string;
+    "started-at": string;
+    "finished-at": string;
   };
-  'log-read-url': string;
+  "log-read-url": string;
   actions: {
-    'is-exportable': boolean;
-  }
+    "is-exportable": boolean;
+  };
   permissions: {
-    'can-export': boolean;
-  }
+    "can-export": boolean;
+  };
 }
 
 export interface PlanLinks {
-  'json-output': string;
-  'json-output-redacted': string;
-  'json-schema': string;
+  "json-output": string;
+  "json-output-redacted": string;
+  "json-schema": string;
 }
 
 export interface PlanRelationships {
@@ -48,7 +53,6 @@ export interface PlanRelationships {
     data: ResourceRef[];
   };
 }
-
 
 export type PlanResource = ResourceObject<PlanAttributes> & {
   links: PlanLinks;

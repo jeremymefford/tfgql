@@ -1,3 +1,3 @@
-import { WorkspaceFilter } from '../workspaces/types';
+import { WorkspaceFilter } from "../workspaces/types";
 
 export type TeamAccessFilter = WorkspaceFilter;

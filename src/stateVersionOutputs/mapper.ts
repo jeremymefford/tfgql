@@ -1,7 +1,10 @@
-import { DomainMapper } from '../common/middleware/domainMapper';
-import { StateVersionOutputResource, StateVersionOutput } from './types';
+import { DomainMapper } from "../common/middleware/domainMapper";
+import { StateVersionOutputResource, StateVersionOutput } from "./types";
 
-export const stateVersionOutputMapper: DomainMapper<StateVersionOutputResource, StateVersionOutput> = {
+export const stateVersionOutputMapper: DomainMapper<
+  StateVersionOutputResource,
+  StateVersionOutput
+> = {
   map(resource: StateVersionOutputResource): StateVersionOutput {
     const attrs = resource.attributes;
     return {
@@ -10,7 +13,7 @@ export const stateVersionOutputMapper: DomainMapper<StateVersionOutputResource, 
       sensitive: attrs.sensitive,
       type: attrs.type,
       value: attrs.value,
-      detailedType: attrs['detailed-type']
+      detailedType: attrs["detailed-type"],
     };
   },
 };

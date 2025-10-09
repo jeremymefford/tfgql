@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const projectTeamAccessSchema = gql`
   type ProjectTeamAccess {
@@ -39,7 +39,10 @@ const projectTeamAccessSchema = gql`
   }
 
   extend type Query {
-    projectTeamAccess(projectId: ID!, filter: ProjectTeamAccessFilter): [ProjectTeamAccess!]!
+    projectTeamAccess(
+      projectId: ID!
+      filter: ProjectTeamAccessFilter
+    ): [ProjectTeamAccess!]!
     projectTeamAccessById(id: ID!): ProjectTeamAccess
   }
 `;

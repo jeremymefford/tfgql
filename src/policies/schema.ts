@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const policiesSchema = gql`
   type Policy {
@@ -30,7 +30,11 @@ const policiesSchema = gql`
   }
 
   extend type Query {
-    policies(includeOrgs: [String!], excludeOrgs: [String!], filter: PolicyFilter): [Policy!]!
+    policies(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: PolicyFilter
+    ): [Policy!]!
     policy(id: ID!): Policy
   }
 `;

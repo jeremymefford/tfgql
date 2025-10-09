@@ -1,5 +1,5 @@
-import pino from 'pino';
-import { AsyncLocalStorage } from 'node:async_hooks';
+import pino from "pino";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 export type LogTraceContext = {
   traceId?: string;
@@ -13,22 +13,23 @@ export type LogTraceContext = {
 export const logContext = new AsyncLocalStorage<LogTraceContext>();
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? 'info',
+  level: process.env.LOG_LEVEL ?? "info",
   transport:
-    process.env.NODE_ENV === 'development'
-      ? { target: 'pino-pretty', options: { colorize: true, singleLine: true } }
+    process.env.NODE_ENV === "development"
+      ? { target: "pino-pretty", options: { colorize: true, singleLine: true } }
       : undefined,
-  base: { service: 'tfce-graphql' },
-  redact: ['req.headers.authorization', 'password', '*.token'],
+  base: { service: "tfce-graphql" },
+  redact: ["req.headers.authorization", "password", "*.token"],
   // Add trace context to every log line if present
   mixin() {
     const ctx = logContext.getStore();
     if (!ctx) return {};
     const { traceId, spanId } = ctx;
     return {
-      ...(traceId ? { trace_id: traceId } : {})
+      ...(traceId ? { trace_id: traceId } : {}),
+      ...(spanId ? { span_id: spanId } : {}),
     };
-  }
+  },
 });
 
 /**

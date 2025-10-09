@@ -1,5 +1,14 @@
-import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface TeamTokenAttributes {
   "created-at": string;

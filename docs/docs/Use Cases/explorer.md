@@ -18,7 +18,6 @@ The Explorer endpoints surface an aggregated view of Terraform Cloud / Enterpris
 Each query accepts the following arguments:
 
 - `includeOrgs` / `excludeOrgs` — optional organization scoping helpers (see [Multi-Organization Selection](../Concepts/concepts.md#multi-organization-selection)).
-- `fields` — an optional list of field names to project. When omitted, all fields for the selected view are returned.
 - `sort` — optional sort instructions in REST Explorer syntax (`field` or `-field`).
 - `filters` — zero or more filter instructions mirroring the REST Explorer filter operators.
 

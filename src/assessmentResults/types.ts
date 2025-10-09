@@ -1,21 +1,32 @@
-import { WhereClause, StringComparisonExp, BooleanComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  BooleanComparisonExp,
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+} from "../common/types/jsonApi";
 
 export interface AssessmentResultAttributes {
   drifted: boolean;
   succeeded: boolean;
-  'error-msg': string | null;
-  'created-at': string;
+  "error-msg": string | null;
+  "created-at": string;
 }
 
 export interface AssessmentResultRelationships {}
 
-export type AssessmentResultResource = ResourceObject<AssessmentResultAttributes> & {
-  relationships?: AssessmentResultRelationships;
-};
+export type AssessmentResultResource =
+  ResourceObject<AssessmentResultAttributes> & {
+    relationships?: AssessmentResultRelationships;
+  };
 
 export type AssessmentResultResponse = SingleResponse<AssessmentResultResource>;
-export type AssessmentResultListResponse = ListResponse<AssessmentResultResource>;
+export type AssessmentResultListResponse =
+  ListResponse<AssessmentResultResource>;
 
 export interface AssessmentResult {
   id: string;

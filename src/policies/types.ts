@@ -3,28 +3,33 @@ import {
   StringComparisonExp,
   IntComparisonExp,
   DateTimeComparisonExp,
-} from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface PolicyAttributes {
   name: string;
   description: string | null;
   kind: string;
   query?: string;
-  'enforcement-level': string;
+  "enforcement-level": string;
   enforce?: {
     path: string;
     mode: string;
   }[];
-  'policy-set-count': number;
-  'updated-at': string | null;
+  "policy-set-count": number;
+  "updated-at": string | null;
 }
 
 export interface PolicyRelationships {
   organization: {
     data: ResourceRef;
   };
-  'policy-sets': {
+  "policy-sets": {
     data: ResourceRef[];
   };
 }

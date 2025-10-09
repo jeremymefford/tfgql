@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const stateVersionOutputsSchema = gql`
   type StateVersionOutput {
@@ -22,7 +22,10 @@ const stateVersionOutputsSchema = gql`
   }
 
   extend type Query {
-    stateVersionOutputs(stateVersionId: ID!, filter: StateVersionOutputFilter): [StateVersionOutput!]!
+    stateVersionOutputs(
+      stateVersionId: ID!
+      filter: StateVersionOutputFilter
+    ): [StateVersionOutput!]!
     stateVersionOutput(id: ID!): StateVersionOutput
   }
 `;

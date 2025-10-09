@@ -1,12 +1,17 @@
-import { WhereClause, StringComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import { WhereClause, StringComparisonExp } from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface CommentAttributes {
   body: string;
 }
 
 export interface CommentRelationships {
-  'run-event'?: {
+  "run-event"?: {
     data: ResourceRef;
   };
 }

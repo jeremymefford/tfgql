@@ -3,20 +3,20 @@ import {
   StringComparisonExp,
   IntComparisonExp,
   BooleanComparisonExp,
-  DateTimeComparisonExp
-} from '../common/filtering/types';
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
 import {
   ResourceObject,
   ListResponse,
   SingleResponse,
-  ResourceRef
-} from '../common/types/jsonApi';
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface AgentPoolAttributes {
   name: string;
-  'created-at': string;
-  'organization-scoped': boolean;
-  'agent-count': number;
+  "created-at": string;
+  "organization-scoped": boolean;
+  "agent-count": number;
 }
 
 export interface AgentPoolRelationships {
@@ -33,7 +33,7 @@ export interface AgentPoolRelationships {
   workspaces: {
     data: ResourceRef[];
   };
-  'allowed-workspaces': {
+  "allowed-workspaces": {
     data: ResourceRef[];
   };
 }

@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const stateVersionsSchema = gql`
   """
@@ -39,7 +39,7 @@ const stateVersionsSchema = gql`
     status: StringComparisonExp
     intermediate: BooleanComparisonExp
     serial: IntComparisonExp
-    billableRumCount: IntComparisonExp  
+    billableRumCount: IntComparisonExp
     createdAt: DateTimeComparisonExp
     size: IntComparisonExp
     resourcesProcessed: BooleanComparisonExp

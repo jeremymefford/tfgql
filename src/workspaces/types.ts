@@ -1,83 +1,94 @@
-import { BooleanComparisonExp, DateTimeComparisonExp, IntComparisonExp, StringComparisonExp, WhereClause } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  BooleanComparisonExp,
+  DateTimeComparisonExp,
+  IntComparisonExp,
+  StringComparisonExp,
+  WhereClause,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface WorkspaceAttributes {
   name: string;
   description?: string;
   locked: boolean;
-  'locked-reason'?: string;
-  'auto-apply': boolean;
-  'created-at': string;
-  'updated-at': string;
-  'apply-duration-average'?: number;
-  'plan-duration-average'?: number;
-  'policy-check-failures'?: number;
-  'queue-all-runs'?: boolean;
-  'resource-count'?: number;
-  'run-failures'?: number;
+  "locked-reason"?: string;
+  "auto-apply": boolean;
+  "created-at": string;
+  "updated-at": string;
+  "apply-duration-average"?: number;
+  "plan-duration-average"?: number;
+  "policy-check-failures"?: number;
+  "queue-all-runs"?: boolean;
+  "resource-count"?: number;
+  "run-failures"?: number;
   source?: string;
-  'source-name'?: string;
-  'source-url'?: string;
-  'speculative-enabled': boolean;
-  'structured-run-output-enabled': boolean;
-  'tag-names': string[];
-  'terraform-version': string;
-  'trigger-prefixes': string[];
-  'vcs-repo'?: any;
-  'vcs-repo-identifier'?: string;
-  'working-directory'?: string;
-  'workspace-kpis-runs-count'?: number;
-  'execution-mode': string;
+  "source-name"?: string;
+  "source-url"?: string;
+  "speculative-enabled": boolean;
+  "structured-run-output-enabled": boolean;
+  "tag-names": string[];
+  "terraform-version": string;
+  "trigger-prefixes": string[];
+  "vcs-repo"?: any;
+  "vcs-repo-identifier"?: string;
+  "working-directory"?: string;
+  "workspace-kpis-runs-count"?: number;
+  "execution-mode": string;
   environment?: string;
   operations: boolean;
-  'file-triggers-enabled': boolean;
-  'global-remote-state': boolean;
-  'latest-change-at'?: string;
-  'last-assessment-result-at'?: string;
-  'auto-destroy-at'?: string;
-  'auto-destroy-status'?: string;
-  'auto-destroy-activity-duration'?: number;
-  'inherits-project-auto-destroy'?: boolean;
-  'assessments-enabled': boolean;
-  'allow-destroy-plan': boolean;
-  'auto-apply-run-trigger': boolean;
-  'oauth-client-name'?: string;
+  "file-triggers-enabled": boolean;
+  "global-remote-state": boolean;
+  "latest-change-at"?: string;
+  "last-assessment-result-at"?: string;
+  "auto-destroy-at"?: string;
+  "auto-destroy-status"?: string;
+  "auto-destroy-activity-duration"?: number;
+  "inherits-project-auto-destroy"?: boolean;
+  "assessments-enabled": boolean;
+  "allow-destroy-plan": boolean;
+  "auto-apply-run-trigger": boolean;
+  "oauth-client-name"?: string;
   actions: WorkspaceActions;
   permissions: WorkspacePermissions;
-  'setting-overwrites': WorkspaceSettingOverwrites;
+  "setting-overwrites": WorkspaceSettingOverwrites;
 }
 
 export interface WorkspaceActions {
-  'is-destroyable': boolean;
+  "is-destroyable": boolean;
 }
 
 export interface WorkspacePermissions {
-  'can-update': boolean;
-  'can-destroy': boolean;
-  'can-queue-run': boolean;
-  'can-read-run': boolean;
-  'can-read-variable': boolean;
-  'can-update-variable': boolean;
-  'can-read-state-versions': boolean;
-  'can-read-state-outputs': boolean;
-  'can-create-state-versions': boolean;
-  'can-queue-apply': boolean;
-  'can-lock': boolean;
-  'can-unlock': boolean;
-  'can-force-unlock': boolean;
-  'can-read-settings': boolean;
-  'can-manage-tags': boolean;
-  'can-manage-run-tasks': boolean;
-  'can-force-delete': boolean;
-  'can-manage-assessments': boolean;
-  'can-manage-ephemeral-workspaces': boolean;
-  'can-read-assessment-results': boolean;
-  'can-queue-destroy': boolean;
+  "can-update": boolean;
+  "can-destroy": boolean;
+  "can-queue-run": boolean;
+  "can-read-run": boolean;
+  "can-read-variable": boolean;
+  "can-update-variable": boolean;
+  "can-read-state-versions": boolean;
+  "can-read-state-outputs": boolean;
+  "can-create-state-versions": boolean;
+  "can-queue-apply": boolean;
+  "can-lock": boolean;
+  "can-unlock": boolean;
+  "can-force-unlock": boolean;
+  "can-read-settings": boolean;
+  "can-manage-tags": boolean;
+  "can-manage-run-tasks": boolean;
+  "can-force-delete": boolean;
+  "can-manage-assessments": boolean;
+  "can-manage-ephemeral-workspaces": boolean;
+  "can-read-assessment-results": boolean;
+  "can-queue-destroy": boolean;
 }
 
 export interface WorkspaceSettingOverwrites {
-  'execution-mode'?: boolean;
-  'agent-pool'?: boolean;
+  "execution-mode"?: boolean;
+  "agent-pool"?: boolean;
 }
 
 export interface WorkspaceRelationships {
@@ -86,7 +97,9 @@ export interface WorkspaceRelationships {
   };
 }
 
-export type WorkspaceResource = ResourceObject<WorkspaceAttributes> & { relationships?: WorkspaceRelationships };
+export type WorkspaceResource = ResourceObject<WorkspaceAttributes> & {
+  relationships?: WorkspaceRelationships;
+};
 export type WorkspaceListResponse = ListResponse<WorkspaceResource>;
 export type WorkspaceResponse = SingleResponse<WorkspaceResource>;
 
@@ -177,7 +190,8 @@ export interface WorkspaceModule {
   source: string | null;
 }
 
-export interface WorkspaceSettingOverwritesFilter extends WhereClause<Workspace['settingOverwrites']> {
+export interface WorkspaceSettingOverwritesFilter
+  extends WhereClause<Workspace["settingOverwrites"]> {
   _and?: WorkspaceSettingOverwritesFilter[];
   _or?: WorkspaceSettingOverwritesFilter[];
   _not?: WorkspaceSettingOverwritesFilter;
@@ -186,11 +200,13 @@ export interface WorkspaceSettingOverwritesFilter extends WhereClause<Workspace[
   agentPool?: BooleanComparisonExp;
 }
 
-export interface WorkspaceActionsFilter extends WhereClause<Workspace['actions']> {
+export interface WorkspaceActionsFilter
+  extends WhereClause<Workspace["actions"]> {
   isDestroyable?: BooleanComparisonExp;
 }
 
-export interface WorkspacePermissionsFilter extends WhereClause<Workspace['permissions']> {
+export interface WorkspacePermissionsFilter
+  extends WhereClause<Workspace["permissions"]> {
   _and?: WorkspacePermissionsFilter[];
   _or?: WorkspacePermissionsFilter[];
   _not?: WorkspacePermissionsFilter;
@@ -218,12 +234,15 @@ export interface WorkspacePermissionsFilter extends WhereClause<Workspace['permi
   canQueueDestroy?: BooleanComparisonExp;
 }
 
-export interface WorkspaceFilter extends WhereClause<
-  Workspace, {
-    actions: WorkspaceActionsFilter;
-    permissions: WorkspacePermissionsFilter;
-    settingOverwrites: WorkspaceSettingOverwritesFilter;
-  }> {
+export interface WorkspaceFilter
+  extends WhereClause<
+    Workspace,
+    {
+      actions: WorkspaceActionsFilter;
+      permissions: WorkspacePermissionsFilter;
+      settingOverwrites: WorkspaceSettingOverwritesFilter;
+    }
+  > {
   _and?: WorkspaceFilter[];
   _or?: WorkspaceFilter[];
   _not?: WorkspaceFilter;

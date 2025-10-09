@@ -52,6 +52,8 @@ const workspaceSchema = gql`
     variables(filter: VariableFilter): [Variable!]!
     stateVersions(filter: StateVersionFilter): [StateVersion!]!
     currentStateVersion: StateVersion
+    providers: [WorkspaceProvider!]!
+    modules: [WorkspaceModule!]!
   }
 
   type WorkspaceActions {
@@ -80,6 +82,18 @@ const workspaceSchema = gql`
     canManageEphemeralWorkspaces: Boolean!
     canReadAssessmentResults: Boolean!
     canQueueDestroy: Boolean!
+  }
+
+  type WorkspaceProvider {
+    name: String
+    version: String
+    source: String
+  }
+
+  type WorkspaceModule {
+    name: String
+    version: String
+    source: String
   }
 
   type WorkspaceSettingOverwrites {

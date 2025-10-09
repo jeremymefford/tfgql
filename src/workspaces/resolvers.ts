@@ -1,5 +1,5 @@
 import { Context } from '../server/context';
-import { Workspace, WorkspaceFilter } from './types';
+import { Workspace, WorkspaceFilter, WorkspaceProvider, WorkspaceModule } from './types';
 import { Organization } from '../organizations/types';
 import { Run, RunFilter } from '../runs/types';
 import { ConfigurationVersion, ConfigurationVersionFilter } from '../configurationVersions/types';
@@ -10,6 +10,13 @@ import { RunTrigger, WorkspaceRunTrigger } from '../runTriggers/types';
 import { StateVersion, StateVersionFilter } from '../stateVersions/types';
 import { WorkspaceResourceFilter, WorkspaceResource } from '../workspaceResources/types';
 import { coalesceOrgs } from '../common/orgHelper';
+import type {
+  ExplorerFilterInput,
+  ExplorerProviderField,
+  ExplorerProviderRow,
+  ExplorerQueryOptions
+} from '../explorer/types';
+import type { ExplorerModuleField, ExplorerModuleRow } from '../explorer/types';
 
 export const resolvers = {
   Query: {
@@ -182,6 +189,55 @@ export const resolvers = {
             throw error;
           }
         });
+    },
+    providers: async (workspace: Workspace, _: unknown, ctx: Context): Promise<WorkspaceProvider[]> => {
+      const orgName = workspace.organizationName;
+      if (!orgName || !workspace.name) {
+        return [];
+      }
+
+      const filters: ExplorerFilterInput<ExplorerProviderField>[] = [
+        {
+          field: 'workspaces',
+          operator: 'contains',
+          value: workspace.name
+        }
+      ];
+      const options: ExplorerQueryOptions<ExplorerProviderField> = {
+        fields: ['name', 'source', 'version'],
+        filters: filters
+      };
+
+      const { data } = await ctx.dataSources.explorerAPI.queryProviders(orgName, options);
+
+      return data.map((provider: ExplorerProviderRow): WorkspaceProvider => ({
+        name: provider.name ?? null,
+        version: provider.version ?? null,
+        source: provider.source ?? null
+      }));
+    },
+    modules: async (workspace: Workspace, _: unknown, ctx: Context): Promise<WorkspaceModule[]> => {
+      const orgName = workspace.organizationName;
+      if (!orgName || !workspace.name) {
+        return [];
+      }
+
+      const filters: ExplorerFilterInput<ExplorerModuleField>[] = [
+        {
+          field: 'workspaces',
+          operator: 'contains',
+          value: workspace.name
+        }
+      ];
+      const options: ExplorerQueryOptions<ExplorerModuleField> = { filters };
+
+      const { data } = await ctx.dataSources.explorerAPI.queryModules(orgName, options);
+
+      return data.map((module: ExplorerModuleRow): WorkspaceModule => ({
+        name: module.name ?? null,
+        version: module.version ?? null,
+        source: module.source ?? null
+      }));
     }
   }
 };

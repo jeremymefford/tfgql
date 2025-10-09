@@ -65,6 +65,7 @@ export interface VerifiedTokenClaims {
   tfcToken: string;
   exp: number;
   iat: number;
+  tokenHash: string;
 }
 
 export async function mintJwt(tfcToken: string): Promise<MintedToken> {
@@ -113,9 +114,15 @@ export async function verifyJwt(token: string): Promise<VerifiedTokenClaims> {
     throw new Error("Token missing expiration claim");
   }
 
+  const tfcToken = typedPayload.tfcToken;
+  const tokenHash = createHash("sha256")
+    .update(tfcToken, "utf8")
+    .digest("base64url");
+
   return {
     tfcToken: typedPayload.tfcToken,
     exp: typedPayload.exp,
     iat: typedPayload.iat,
+    tokenHash,
   };
 }

@@ -7,6 +7,7 @@ export type LogTraceContext = {
   traceFlags?: string;
   traceparent?: string;
   requestId?: string;
+  tokenHash?: string;
 };
 
 // AsyncLocalStorage used to inject per-request context into every log line
@@ -24,10 +25,10 @@ export const logger = pino({
   mixin() {
     const ctx = logContext.getStore();
     if (!ctx) return {};
-    const { traceId, spanId } = ctx;
+    const { traceId, tokenHash } = ctx;
     return {
       ...(traceId ? { trace_id: traceId } : {}),
-      ...(spanId ? { span_id: spanId } : {}),
+      ...(tokenHash ? { token_hash: tokenHash } : {}),
     };
   },
 });
@@ -45,5 +46,16 @@ export function runWithLogContext<T>(ctx: LogTraceContext, fn: () => T): T {
  * async operations derived from here (useful at request start).
  */
 export function enterLogContext(ctx: LogTraceContext): void {
-  logContext.enterWith(ctx);
+  const current = logContext.getStore() ?? {};
+  Object.assign(current, ctx);
+  logContext.enterWith(current);
+}
+
+export function updateLogContext(ctx: Partial<LogTraceContext>): void {
+  const current = logContext.getStore();
+  if (current) {
+    Object.assign(current, ctx);
+    return;
+  }
+  logContext.enterWith({ ...ctx });
 }

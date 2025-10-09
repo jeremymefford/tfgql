@@ -12,11 +12,10 @@ TFE GraphQL is a GraphQL interface for interacting with the Terraform Enterprise
 
 ## Documentation
 
-[Official latest docs](https://jeremymefford.github.io/tfce-graphql/)
+## [Official latest docs](https://jeremymefford.github.io/tfce-graphql/)
 
 This README is generally kept up-to-date, the docs folder contains a lot more useful information
-and should be considered the primary place to author and consume docs.  It is currently not hosted
-so please build and view locally.
+and should be considered the primary place to author and consume docs. 
 
 This project uses [Docusaurus](https://docusaurus.io/) to host developer documentation.
 
@@ -36,7 +35,7 @@ This will start a local dev server (typically on http://localhost:3000) where yo
 
 ### Prerequisites
 
-- Node.js v18+
+- Node.js v20+
 - npm or yarn
 - Terraform Cloud or Enterprise account
 - A valid TFC/E API Token
@@ -131,29 +130,11 @@ The GraphQL API will start on http://localhost:4000 by default. If `TFCE_SERVER_
 
 The project is structured by domain entity.
 
-```
-src/
-  common/               # Shared types, utilities, filters, etc.
-  organizations/        # Organization schema, resolvers, and datasource
-  workspaces/           # Workspace schema, resolvers, and datasource
-  users/                # User schema, resolvers, and datasource
-  teams/                # Team schema, resolvers, and datasource
-  runs/                 # Run schema, resolvers, and datasource
-  configurationVersions/ # Configuration Version schema, resolvers, and datasource
-  variableSets/         # Variable Set schema, resolvers, and datasource
-  variables/            # Variable schema, resolvers, and datasource
-  projects/             # Project schema, resolvers, and datasource
-  runTriggers/          # Run Trigger schema, resolvers, and datasource
-  workspaceTeamAccess/  # Workspace Team Access schema, resolvers, and datasource
-  workspaceResources/   # Workspace Resource schema, resolvers, and datasource
-  server/               # Apollo server setup
-  index.ts              # Entry point
-```
-
 | File            | Description                                |
 |------------------|--------------------------------------------|
 | `schema.ts`      | GraphQL schema for that domain.  Uses graphql-tag syntax in gql blocks |
 | `resolvers.ts`   | Resolver logic                             |
+| `mapper.ts`   | Mappers from API to internal types                             |
 | `types.ts`       | TypeScript types and domain models         |
 | `dataSource.ts`  | REST API integration layer                 |
 
@@ -163,20 +144,13 @@ src/
 
 The server emits structured logs via Pino. Each log line includes:
 
-- `trace_id`, `span_id` for cross-service correlation (W3C trace context)
+- `trace_id` for cross-service correlation (W3C trace context)
 
 Request handling:
 
 - The server parses an incoming `traceparent` header or generates one if absent.
 - The same `traceparent` value is used as the `x-request-id` for consistency.
 - Outbound HTTP calls propagate `traceparent` and `x-request-id` headers automatically.
-
-The log context is bound per request using AsyncLocalStorage so both resolver-level and shared-module logs are correlated.
-
-Log configuration:
-
-- Set `LOG_LEVEL` to control verbosity (default `info`).
-- When `NODE_ENV=development`, logs are human-friendly via `pino-pretty` (single-line, colorized).
 
 ## Usage
 
@@ -204,15 +178,11 @@ query Workspaces($orgName: String!) {
 
 ### Filtering
 
-This project implements Hasura-style filtering to allow expressive and efficient queries against the TFC/E API. You can apply filters at any query level, including nested fields.
+This project implements Hasura-style filtering to allow expressive and efficient queries against the TFC/E API. You can apply filters at any query level, usually including nested fields.
 
 Filtering supports both logical operators and type-specific comparison operators.
 
-In general, filtering is done after retrieving the data from TFC/E.  When supported by the TFC/E API, filtering will be passed
-down to the API for server-side filtering. Be aware that even though the GraphQL return may be small, the query could still be
-retrieving large amounts of data from TFC/E.
-
-When filtering nested entities, it is important to remember that the 
+In general, filtering is done after retrieving the data from TFC/E.  When supported by the TFC/E API, filtering may be delegated to the API for server-side filtering. Be aware that even though the GraphQL return may be small, the query could still be retrieving large amounts of data from TFC/E.
 
 #### Logical Operators (applies to any filter object)
 

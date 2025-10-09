@@ -14,7 +14,7 @@ import { buildContext, Context } from "./context";
 import { typeDefs, resolvers } from "./schema";
 import { applicationConfiguration } from "../common/conf";
 import { createLoggingPlugin } from "../common/middleware/logging";
-import { enterLogContext, logger } from "../common/logger";
+import { enterLogContext, updateLogContext, logger } from "../common/logger";
 import {
   parseTraceparent,
   generateTraceId,
@@ -155,12 +155,18 @@ async function buildFastifyContext(
   const traceId = incoming?.traceId ?? generateTraceId();
   const spanId = generateSpanId();
   const traceFlags = incoming?.traceFlags ?? "01";
-  const traceparent = formatTraceparent(traceId, spanId);
+  const traceparent = formatTraceparent(traceId, spanId, traceFlags);
 
-  const requestId = traceparent;
-  enterLogContext({ requestId, traceId, spanId, traceFlags, traceparent });
-  reply.header("x-request-id", requestId);
+  reply.header("x-request-id", traceparent);
   reply.header("traceparent", traceparent);
+
+  enterLogContext({
+    requestId: traceparent,
+    traceId,
+    spanId,
+    traceFlags,
+    traceparent,
+  });
 
   const unauthorized = (message: string): never => {
     const err = new Error(message);
@@ -193,6 +199,9 @@ async function buildFastifyContext(
     return unauthorized("Invalid or expired token");
   });
 
-  const requestLogger = logger;
+  updateLogContext({ tokenHash: verifiedClaims.tokenHash });
+
+  const requestLogger = logger.child({ token_hash: verifiedClaims.tokenHash });
+
   return buildContext(requestLogger, verifiedClaims.tfcToken);
 }

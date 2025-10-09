@@ -10,11 +10,7 @@ This page covers key architectural and functional concepts behind `tfce-graphql`
 
 ### Concurrency Control
 
-Parallelization is governed by the `applicationConfiguration.graphqlBatchSize` parameter, which defines the maximum number of in-flight operations at any given time. This ensures we maintain high throughput without overwhelming the API or violating rate limits.
-
-### Batching Strategies
-
-The system implements a streaming loop pattern using async generators and bounded concurrency. Each data source uses `parallelizeBounded`—a utility that accepts an iterable of async operations and executes them while respecting the configured concurrency ceiling.
+Parallelization is governed by the `applicationConfiguration.graphqlBatchSize` parameter, which defines the maximum number of in-flight operations at any given time. This ensures we maintain high throughput without overwhelming the API or excessive rate limiting.
 
 ### Concurrency Utilities
 

@@ -4,4 +4,5 @@ This directory contains Architecture Decision Records (ADRs) for significant des
 
 ## List of ADRs
 
+- [Authentication Facade](authentication-facade)
 - [Deprecating `where` Clauses in Favor of `filter`](filter-vs-where)

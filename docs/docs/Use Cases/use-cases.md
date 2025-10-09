@@ -8,6 +8,8 @@ sidebar_label: Use Cases
 
 This page walks through ten frequent Terraform Cloud/Enterprise (TFC/E) administration tasks and shows how to accomplish each using the TFCE GraphQL API.  When the built‑in GraphQL schema is sufficient, we provide example queries.  For more specialized needs, we highlight the custom queries you can add (and note where API support is missing).
 
+Looking for aggregated Explorer data across organizations? See the dedicated [Explorer Views](./explorer.md) guide for details on the `explorer*` queries and their nested workspace relationships.
+
 > **Multi-org selection:** Unless noted otherwise, workspace-centric queries accept optional `includeOrgs` and `excludeOrgs` arguments. Omitting `includeOrgs` (or passing an empty array) uses every organization you can access; any organization listed in both arrays is excluded.
 
 ---

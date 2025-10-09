@@ -127,6 +127,7 @@ This cache enables deduplication of operations like:
 
 - Fetching the same user multiple times in a single request
 - Resolving an entity once for `where` and again for `query`
+- Resolving Explorer workspace rows where multiple Explorer views reference the same workspace, project, or run by name
 
 ---
 

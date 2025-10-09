@@ -1,0 +1,120 @@
+import { DomainMapper } from '../common/middleware/domainMapper';
+import type {
+  ExplorerModuleResource,
+  ExplorerModuleRow,
+  ExplorerProviderResource,
+  ExplorerProviderRow,
+  ExplorerTerraformVersionResource,
+  ExplorerTerraformVersionRow,
+  ExplorerWorkspaceResource,
+  ExplorerWorkspaceRow
+} from './types';
+
+const coerceNumber = (value: unknown): number | null => {
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const coerceBoolean = (value: unknown): boolean | null => {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+  }
+  return null;
+};
+
+const coerceString = (value: unknown): string | null => {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  return String(value);
+};
+
+const coerceDate = (value: unknown): Date | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+export const mapExplorerWorkspace: DomainMapper<ExplorerWorkspaceResource, ExplorerWorkspaceRow> = {
+  map: (resource) => {
+    const attributes = resource.attributes ?? {};
+    return {
+      allChecksSucceeded: coerceBoolean(attributes['all-checks-succeeded']),
+      currentRumCount: coerceNumber(attributes['current_rum_count']),
+      checksErrored: coerceNumber(attributes['checks-errored']),
+      checksFailed: coerceNumber(attributes['checks-failed']),
+      checksPassed: coerceNumber(attributes['checks-passed']),
+      checksUnknown: coerceNumber(attributes['checks-unknown']),
+      currentRunAppliedAt: coerceDate(attributes['current-run-applied-at']),
+      currentRunExternalId: coerceString(attributes['current-run-external-id']),
+      currentRunStatus: coerceString(attributes['current-run-status']),
+      drifted: coerceBoolean(attributes.drifted),
+      externalId: coerceString(attributes['external-id']),
+      moduleCount: coerceNumber(attributes['module-count']),
+      modules: coerceString(attributes.modules),
+      organizationName: coerceString(attributes['organization-name']),
+      projectExternalId: coerceString(attributes['project-external-id']),
+      projectName: coerceString(attributes['project-name']),
+      providerCount: coerceNumber(attributes['provider-count']),
+      providers: coerceString(attributes.providers),
+      resourcesDrifted: coerceNumber(attributes['resources-drifted']),
+      resourcesUndrifted: coerceNumber(attributes['resources-undrifted']),
+      stateVersionTerraformVersion: coerceString(attributes['state-version-terraform-version']),
+      tags: coerceString(attributes.tags),
+      vcsRepoIdentifier: coerceString(attributes['vcs-repo-identifier']),
+      workspaceCreatedAt: coerceDate(attributes['workspace-created-at']),
+      workspaceName: coerceString(attributes['workspace-name']),
+      workspaceTerraformVersion: coerceString(attributes['workspace-terraform-version']),
+      workspaceUpdatedAt: coerceDate(attributes['workspace-updated-at'])
+    };
+  }
+};
+
+export const mapExplorerTerraformVersion: DomainMapper<ExplorerTerraformVersionResource, ExplorerTerraformVersionRow> = {
+  map: (resource) => {
+    const attributes = resource.attributes ?? {};
+    return {
+      version: coerceString(attributes.version),
+      workspaceCount: coerceNumber(attributes['workspace-count']),
+      workspaces: coerceString(attributes.workspaces)
+    };
+  }
+};
+
+export const mapExplorerProvider: DomainMapper<ExplorerProviderResource, ExplorerProviderRow> = {
+  map: (resource) => {
+    const attributes = resource.attributes ?? {};
+    return {
+      name: coerceString(attributes.name),
+      source: coerceString(attributes.source),
+      version: coerceString(attributes.version),
+      workspaceCount: coerceNumber(attributes['workspace-count']),
+      workspaces: coerceString(attributes.workspaces)
+    };
+  }
+};
+
+export const mapExplorerModule: DomainMapper<ExplorerModuleResource, ExplorerModuleRow> = {
+  map: (resource) => {
+    const attributes = resource.attributes ?? {};
+    return {
+      name: coerceString(attributes.name),
+      source: coerceString(attributes.source),
+      version: coerceString(attributes.version),
+      workspaceCount: coerceNumber(attributes['workspace-count']),
+      workspaces: coerceString(attributes.workspaces)
+    };
+  }
+};

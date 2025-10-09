@@ -1,66 +1,70 @@
-import { ResourceObject, ListResponse, SingleResponse } from '../common/types/jsonApi';
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+} from "../common/types/jsonApi";
 import {
   StringComparisonExp,
   IntComparisonExp,
   BooleanComparisonExp,
   DateTimeComparisonExp,
   WhereClause,
-} from '../common/filtering/types';
+} from "../common/filtering/types";
 
 export interface OrganizationAttributes {
   name: string;
   email: string;
-  'external-id': string;
-  'created-at': string;
-  'session-timeout': number | null;
-  'session-remember': number | null;
-  'collaborator-auth-policy': string;
-  'plan-expired': boolean;
-  'plan-expires-at': string | null;
-  'plan-is-trial': boolean;
-  'plan-is-enterprise': boolean;
-  'plan-identifier': string;
-  'cost-estimation-enabled': boolean;
-  'send-passing-statuses-for-untriggered-speculative-plans': boolean;
-  'aggregated-commit-status-enabled': boolean;
-  'speculative-plan-management-enabled': boolean;
-  'allow-force-delete-workspaces': boolean;
-  'fair-run-queuing-enabled': boolean;
-  'saml-enabled': boolean;
-  'owners-team-saml-role-id': string | null;
-  'two-factor-conformant': boolean;
-  'assessments-enforced': boolean;
-  'default-execution-mode': string;
+  "external-id": string;
+  "created-at": string;
+  "session-timeout": number | null;
+  "session-remember": number | null;
+  "collaborator-auth-policy": string;
+  "plan-expired": boolean;
+  "plan-expires-at": string | null;
+  "plan-is-trial": boolean;
+  "plan-is-enterprise": boolean;
+  "plan-identifier": string;
+  "cost-estimation-enabled": boolean;
+  "send-passing-statuses-for-untriggered-speculative-plans": boolean;
+  "aggregated-commit-status-enabled": boolean;
+  "speculative-plan-management-enabled": boolean;
+  "allow-force-delete-workspaces": boolean;
+  "fair-run-queuing-enabled": boolean;
+  "saml-enabled": boolean;
+  "owners-team-saml-role-id": string | null;
+  "two-factor-conformant": boolean;
+  "assessments-enforced": boolean;
+  "default-execution-mode": string;
   permissions: OrganizationPermissions;
 }
 
 export interface OrganizationPermissions {
-  'can-update': boolean;
-  'can-destroy': boolean;
-  'can-access-via-teams': boolean;
-  'can-create-module': boolean;
-  'can-create-team': boolean;
-  'can-create-workspace': boolean;
-  'can-manage-users': boolean;
-  'can-manage-subscription': boolean;
-  'can-manage-sso': boolean;
-  'can-update-oauth': boolean;
-  'can-update-sentinel': boolean;
-  'can-update-ssh-keys': boolean;
-  'can-update-api-token': boolean;
-  'can-traverse': boolean;
-  'can-start-trial': boolean;
-  'can-update-agent-pools': boolean;
-  'can-manage-tags': boolean;
-  'can-manage-varsets': boolean;
-  'can-read-varsets': boolean;
-  'can-manage-public-providers': boolean;
-  'can-create-provider': boolean;
-  'can-manage-public-modules': boolean;
-  'can-manage-custom-providers': boolean;
-  'can-manage-run-tasks': boolean;
-  'can-read-run-tasks': boolean;
-  'can-create-project': boolean;
+  "can-update": boolean;
+  "can-destroy": boolean;
+  "can-access-via-teams": boolean;
+  "can-create-module": boolean;
+  "can-create-team": boolean;
+  "can-create-workspace": boolean;
+  "can-manage-users": boolean;
+  "can-manage-subscription": boolean;
+  "can-manage-sso": boolean;
+  "can-update-oauth": boolean;
+  "can-update-sentinel": boolean;
+  "can-update-ssh-keys": boolean;
+  "can-update-api-token": boolean;
+  "can-traverse": boolean;
+  "can-start-trial": boolean;
+  "can-update-agent-pools": boolean;
+  "can-manage-tags": boolean;
+  "can-manage-varsets": boolean;
+  "can-read-varsets": boolean;
+  "can-manage-public-providers": boolean;
+  "can-create-provider": boolean;
+  "can-manage-public-modules": boolean;
+  "can-manage-custom-providers": boolean;
+  "can-manage-run-tasks": boolean;
+  "can-read-run-tasks": boolean;
+  "can-create-project": boolean;
 }
 
 export type OrganizationResource = ResourceObject<OrganizationAttributes>;
@@ -122,7 +126,8 @@ export interface Organization {
   };
 }
 
-export interface OrganizationPermissionsFilter extends WhereClause<Organization['permissions']> {
+export interface OrganizationPermissionsFilter
+  extends WhereClause<Organization["permissions"]> {
   canUpdate?: BooleanComparisonExp;
   canDestroy?: BooleanComparisonExp;
   canAccessViaTeams?: BooleanComparisonExp;
@@ -151,11 +156,13 @@ export interface OrganizationPermissionsFilter extends WhereClause<Organization[
   canCreateProject?: BooleanComparisonExp;
 }
 
-export interface OrganizationFilter extends WhereClause<
-  Organization, {
-    permissions: OrganizationPermissionsFilter
-  }> {
-
+export interface OrganizationFilter
+  extends WhereClause<
+    Organization,
+    {
+      permissions: OrganizationPermissionsFilter;
+    }
+  > {
   _and?: OrganizationFilter[];
   _or?: OrganizationFilter[];
   _not?: OrganizationFilter;

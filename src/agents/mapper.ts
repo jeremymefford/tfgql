@@ -1,5 +1,5 @@
-import { DomainMapper } from '../common/middleware/domainMapper';
-import { AgentResource, Agent } from './types';
+import { DomainMapper } from "../common/middleware/domainMapper";
+import { AgentResource, Agent } from "./types";
 
 export const agentMapper: DomainMapper<AgentResource, Agent> = {
   map(resource: AgentResource): Agent {
@@ -7,8 +7,8 @@ export const agentMapper: DomainMapper<AgentResource, Agent> = {
       id: resource.id,
       name: resource.attributes.name,
       status: resource.attributes.status,
-      ipAddress: resource.attributes['ip-address'],
-      lastPingAt: resource.attributes['last-ping-at']
+      ipAddress: resource.attributes["ip-address"],
+      lastPingAt: resource.attributes["last-ping-at"],
     };
-  }
+  },
 };

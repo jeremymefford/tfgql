@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const policySetsSchema = gql`
   """
@@ -62,7 +62,11 @@ const policySetsSchema = gql`
   }
 
   extend type Query {
-    policySets(includeOrgs: [String!], excludeOrgs: [String!], filter: PolicySetFilter): [PolicySet!]!
+    policySets(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: PolicySetFilter
+    ): [PolicySet!]!
     policySet(id: ID!): PolicySet
   }
 `;

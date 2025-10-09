@@ -3,16 +3,21 @@ import { applicationConfiguration } from "../conf";
 export async function parallelizeBounded<T, R>(
   iterableItems: Iterable<T>,
   operation: (item: T) => Promise<R>,
-  concurrency: number = applicationConfiguration.graphqlBatchSize
+  concurrency: number = applicationConfiguration.graphqlBatchSize,
 ): Promise<R[]> {
-  const items = Array.isArray(iterableItems) ? iterableItems : Array.from(iterableItems);
+  const items = Array.isArray(iterableItems)
+    ? iterableItems
+    : Array.from(iterableItems);
   const results: R[] = new Array(items.length);
   const inflight = new Set<Promise<void>>();
   let i = 0;
   // Logging: bounded parallel processing can be tricky; emit minimal debug
   // Lazy import to avoid circular import at module top
-  const { logger } = await import('../logger');
-  logger.debug({ total: items.length, concurrency }, 'parallelizeBounded start');
+  const { logger } = await import("../logger");
+  logger.debug(
+    { total: items.length, concurrency },
+    "parallelizeBounded start",
+  );
 
   function schedule(index: number, item: T) {
     const p = operation(item)
@@ -34,6 +39,6 @@ export async function parallelizeBounded<T, R>(
   }
 
   await Promise.all(inflight);
-  logger.debug({ total: items.length }, 'parallelizeBounded complete');
+  logger.debug({ total: items.length }, "parallelizeBounded complete");
   return results;
 }

@@ -1,63 +1,77 @@
-import type { AxiosInstance, AxiosError } from 'axios';
-import { WhereClause } from './filtering/types';
-import type { ListResponse } from './types/jsonApi';
-import { evaluateWhereClause } from './filtering/filtering';
-import { DomainMapper } from './middleware/domainMapper';
-import { applicationConfiguration } from './conf';
-import { logger } from './logger';
+import type { AxiosInstance } from "axios";
+import { WhereClause } from "./filtering/types";
+import type { ListResponse } from "./types/jsonApi";
+import { evaluateWhereClause } from "./filtering/filtering";
+import { DomainMapper } from "./middleware/domainMapper";
+import { applicationConfiguration } from "./conf";
+import { logger } from "./logger";
 
-
-export async function* streamPages<T, TFilter = {}>(
+export async function* streamPages<T, TFilter = Record<string, never>>(
   httpClient: AxiosInstance,
   endpoint: string,
-  mapper: DomainMapper<any, T>,
-  params: Record<string, any> = {},
-  filter?: WhereClause<T, TFilter>
+  mapper: DomainMapper<unknown, T>,
+  params: Record<string, unknown> = {},
+  filter?: WhereClause<T, TFilter>,
 ): AsyncGenerator<T[], void, unknown> {
-  const baseParams = { 'page[size]': applicationConfiguration.tfcPageSize, ...(params || {}) };
+  const baseParams = {
+    "page[size]": applicationConfiguration.tfcPageSize,
+    ...(params || {}),
+  };
   let firstRes;
   try {
-    firstRes = await httpClient.get<ListResponse<T>>(endpoint, { params: baseParams });
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
-      logger.debug({ endpoint }, 'No results found');
+    firstRes = await httpClient.get<ListResponse<T>>(endpoint, {
+      params: baseParams,
+    });
+  } catch (error: unknown) {
+    const status = (error as { response?: { status?: number } })?.response
+      ?.status;
+    if (status === 404) {
+      logger.debug({ endpoint }, "No results found");
       return;
     }
     throw error;
   }
 
   const pagination = firstRes.data.meta?.pagination;
-  const totalPages = pagination?.['total-pages'] ?? 1;
-  logger.debug({ endpoint, totalPages }, 'Fetched first page');
+  const totalPages = pagination?.["total-pages"] ?? 1;
+  logger.debug({ endpoint, totalPages }, "Fetched first page");
 
   // some APIs return a single object instead of an array
   // in those cases, subsequent pages shouldn't need to load
-  const responseData = Array.isArray(firstRes.data.data) ?
-    firstRes.data.data :
-    [firstRes.data.data];
+  const responseData = Array.isArray(firstRes.data.data)
+    ? firstRes.data.data
+    : [firstRes.data.data];
   const firstMapped = responseData.map(mapper.map);
   const firstFiltered = filter
-    ? firstMapped.filter(item => evaluateWhereClause(filter, item))
+    ? firstMapped.filter((item) => evaluateWhereClause(filter, item))
     : firstMapped;
   yield firstFiltered;
 
   if (totalPages <= 1) return;
 
-  const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+  const remainingPages = Array.from(
+    { length: totalPages - 1 },
+    (_, i) => i + 2,
+  );
   const inflight = new Set<Promise<T[]>>();
 
   async function loadPage(page: number): Promise<T[]> {
     const res = await httpClient.get<ListResponse<T>>(endpoint, {
-      params: { ...baseParams, 'page[number]': page }
+      params: { ...baseParams, "page[number]": page },
     });
     const mapped = res.data.data.map(mapper.map);
-    return filter ? mapped.filter(item => evaluateWhereClause(filter, item)) : mapped;
+    return filter
+      ? mapped.filter((item) => evaluateWhereClause(filter, item))
+      : mapped;
   }
 
   while (remainingPages.length > 0 || inflight.size > 0) {
-    while (inflight.size < applicationConfiguration.graphqlBatchSize && remainingPages.length > 0) {
+    while (
+      inflight.size < applicationConfiguration.graphqlBatchSize &&
+      remainingPages.length > 0
+    ) {
       const page = remainingPages.shift()!;
-      const p = loadPage(page).then(items => {
+      const p = loadPage(page).then((items) => {
         inflight.delete(p);
         return items;
       });
@@ -70,7 +84,7 @@ export async function* streamPages<T, TFilter = {}>(
 }
 
 export async function gatherAsyncGeneratorPromises<T>(
-  generator: AsyncGenerator<T[]>
+  generator: AsyncGenerator<T[]>,
 ): Promise<T[]> {
   const all: T[] = [];
   for await (const batch of generator) {

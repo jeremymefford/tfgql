@@ -3,13 +3,18 @@ import {
   StringComparisonExp,
   IntComparisonExp,
   DateTimeComparisonExp,
-} from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface OrganizationTagAttributes {
   name: string;
-  'created-at': string;
-  'instance-count': number;
+  "created-at": string;
+  "instance-count": number;
 }
 
 export interface OrganizationTagRelationships {
@@ -18,9 +23,10 @@ export interface OrganizationTagRelationships {
   };
 }
 
-export type OrganizationTagResource = ResourceObject<OrganizationTagAttributes> & {
-  relationships?: OrganizationTagRelationships;
-};
+export type OrganizationTagResource =
+  ResourceObject<OrganizationTagAttributes> & {
+    relationships?: OrganizationTagRelationships;
+  };
 
 export type OrganizationTagResponse = SingleResponse<OrganizationTagResource>;
 export type OrganizationTagListResponse = ListResponse<OrganizationTagResource>;

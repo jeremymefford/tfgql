@@ -4,29 +4,34 @@ import {
   IntComparisonExp,
   DateTimeComparisonExp,
   BooleanComparisonExp,
-} from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface ApplyAttributes {
-  'execution-details': {
+  "execution-details": {
     mode?: string;
   };
   status: string;
-  'status-timestamps': {
-    'agent-queued-at'?: string;
-    'started-at'?: string;
-    'finished-at'?: string;
+  "status-timestamps": {
+    "agent-queued-at"?: string;
+    "started-at"?: string;
+    "finished-at"?: string;
   };
-  'log-read-url': string;
-  'resource-additions'?: number;
-  'resource-changes'?: number;
-  'resource-destructions'?: number;
-  'resource-imports'?: number;
-  'structured-run-output-enabled': boolean;
+  "log-read-url": string;
+  "resource-additions"?: number;
+  "resource-changes"?: number;
+  "resource-destructions"?: number;
+  "resource-imports"?: number;
+  "structured-run-output-enabled": boolean;
 }
 
 export interface ApplyRelationships {
-  'state-versions'?: {
+  "state-versions"?: {
     data: ResourceRef[];
   };
 }

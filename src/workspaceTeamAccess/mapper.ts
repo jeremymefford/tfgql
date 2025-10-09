@@ -1,3 +1,3 @@
-import { workspaceMapper } from '../workspaces/mapper';
+import { workspaceMapper } from "../workspaces/mapper";
 
 export const teamAccessMapper = workspaceMapper;

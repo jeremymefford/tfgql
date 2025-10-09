@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const explorerSchema = gql`
   enum ExplorerFilterOperator {
@@ -147,7 +147,8 @@ const explorerSchema = gql`
     version: String
     workspaceCount: Int
     workspaces: String
-    workspaceEntities(filter:WorkspaceFilter): [Workspace!]!
+    organization: Organization
+    workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
   type ExplorerProviderRow {
@@ -156,7 +157,8 @@ const explorerSchema = gql`
     version: String
     workspaceCount: Int
     workspaces: String
-    workspaceEntities(filter:WorkspaceFilter): [Workspace!]!
+    organization: Organization
+    workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
   type ExplorerModuleRow {
@@ -165,14 +167,14 @@ const explorerSchema = gql`
     version: String
     workspaceCount: Int
     workspaces: String
-    workspaceEntities(filter:WorkspaceFilter): [Workspace!]!
+    organization: Organization
+    workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
   extend type Query {
     explorerWorkspaces(
       includeOrgs: [String!]
       excludeOrgs: [String!]
-      fields: [ExplorerWorkspaceField!]
       sort: [ExplorerWorkspaceSortInput!]
       filters: [ExplorerWorkspaceFilterInput!]
     ): [ExplorerWorkspaceRow!]!
@@ -180,7 +182,6 @@ const explorerSchema = gql`
     explorerTerraformVersions(
       includeOrgs: [String!]
       excludeOrgs: [String!]
-      fields: [ExplorerTerraformVersionField!]
       sort: [ExplorerTerraformVersionSortInput!]
       filters: [ExplorerTerraformVersionFilterInput!]
     ): [ExplorerTerraformVersionRow!]!
@@ -188,7 +189,6 @@ const explorerSchema = gql`
     explorerProviders(
       includeOrgs: [String!]
       excludeOrgs: [String!]
-      fields: [ExplorerProviderField!]
       sort: [ExplorerProviderSortInput!]
       filters: [ExplorerProviderFilterInput!]
     ): [ExplorerProviderRow!]!
@@ -196,7 +196,6 @@ const explorerSchema = gql`
     explorerModules(
       includeOrgs: [String!]
       excludeOrgs: [String!]
-      fields: [ExplorerModuleField!]
       sort: [ExplorerModuleSortInput!]
       filters: [ExplorerModuleFilterInput!]
     ): [ExplorerModuleRow!]!

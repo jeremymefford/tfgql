@@ -1,30 +1,33 @@
-import { DomainMapper } from '../common/middleware/domainMapper';
-import { PolicyEvaluationResource, PolicyEvaluation } from './types';
+import { DomainMapper } from "../common/middleware/domainMapper";
+import { PolicyEvaluationResource, PolicyEvaluation } from "./types";
 
-export const policyEvaluationMapper: DomainMapper<PolicyEvaluationResource, PolicyEvaluation> = {
+export const policyEvaluationMapper: DomainMapper<
+  PolicyEvaluationResource,
+  PolicyEvaluation
+> = {
   map(resource: PolicyEvaluationResource): PolicyEvaluation {
     const attrs = resource.attributes;
-    const rc = attrs['result-count'];
-    const ts = attrs['status-timestamps'];
+    const rc = attrs["result-count"];
+    const ts = attrs["status-timestamps"];
     return {
       id: resource.id,
       status: attrs.status,
-      policyKind: attrs['policy-kind'],
-      policyToolVersion: attrs['policy-tool-version'],
+      policyKind: attrs["policy-kind"],
+      policyToolVersion: attrs["policy-tool-version"],
       resultCount: {
-        advisoryFailed: rc['advisory-failed'],
+        advisoryFailed: rc["advisory-failed"],
         errored: rc.errored,
-        mandatoryFailed: rc['mandatory-failed'],
+        mandatoryFailed: rc["mandatory-failed"],
         passed: rc.passed,
       },
       statusTimestamps: {
-        passedAt: ts['passed-at'],
-        queuedAt: ts['queued-at'],
-        runningAt: ts['running-at'],
+        passedAt: ts["passed-at"],
+        queuedAt: ts["queued-at"],
+        runningAt: ts["running-at"],
       },
-      createdAt: attrs['created-at'],
-      updatedAt: attrs['updated-at'],
-      policyAttachableId: resource.relationships!['policy-attachable'].data.id,
+      createdAt: attrs["created-at"],
+      updatedAt: attrs["updated-at"],
+      policyAttachableId: resource.relationships!["policy-attachable"].data.id,
     };
   },
 };

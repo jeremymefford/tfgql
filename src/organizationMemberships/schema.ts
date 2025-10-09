@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const organizationMembershipsSchema = gql`
   type OrganizationMembership {
@@ -22,9 +22,15 @@ const organizationMembershipsSchema = gql`
   }
 
   extend type Query {
-    organizationMemberships(includeOrgs: [String!], excludeOrgs: [String!], filter: OrganizationMembershipFilter): [OrganizationMembership!]!
+    organizationMemberships(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: OrganizationMembershipFilter
+    ): [OrganizationMembership!]!
     organizationMembership(id: ID!): OrganizationMembership
-    myOrganizationMemberships(filter: OrganizationMembershipFilter): [OrganizationMembership!]!
+    myOrganizationMemberships(
+      filter: OrganizationMembershipFilter
+    ): [OrganizationMembership!]!
   }
 `;
 

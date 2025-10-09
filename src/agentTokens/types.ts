@@ -1,14 +1,23 @@
-import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface AgentTokenAttributes {
-  'created-at': string;
-  'last-used-at': string | null;
+  "created-at": string;
+  "last-used-at": string | null;
   description: string;
 }
 
 export interface AgentTokenRelationships {
-  'created-by': {
+  "created-by": {
     data: ResourceRef;
   };
 }

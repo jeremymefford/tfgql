@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const organizationSchema = gql`
   type Organization {
@@ -31,7 +31,9 @@ const organizationSchema = gql`
     teams(filter: TeamFilter): [Team!]
     users(filter: UserFilter): [User!]
     variableSets(filter: VariableSetFilter): [VariableSet!]
-    memberships(filter: OrganizationMembershipFilter): [OrganizationMembership!]!
+    memberships(
+      filter: OrganizationMembershipFilter
+    ): [OrganizationMembership!]!
     tags(filter: OrganizationTagFilter): [OrganizationTag!]!
     policySets(filter: PolicySetFilter): [PolicySet!]
   }

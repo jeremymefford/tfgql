@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const assessmentResultsSchema = gql`
   type AssessmentResult {
@@ -22,7 +22,10 @@ const assessmentResultsSchema = gql`
   }
 
   extend type Query {
-    assessmentResults(workspaceId: ID!, filter: AssessmentResultFilter): [AssessmentResult!]!
+    assessmentResults(
+      workspaceId: ID!
+      filter: AssessmentResultFilter
+    ): [AssessmentResult!]!
     assessmentResult(id: ID!): AssessmentResult
   }
 `;

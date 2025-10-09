@@ -1,10 +1,10 @@
-import { themes as prismThemes } from 'prism-react-renderer';
-import type { Config } from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
-import versions from './versions.json';
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
+import versions from "./versions.json";
 
 const versionList = versions as string[];
-const latestVersion = versionList[0] ?? 'current';
+const latestVersion = versionList[0] ?? "current";
 const taggedVersionMetadata = Object.fromEntries(
   versionList.map((version) => [
     version,
@@ -18,29 +18,29 @@ const taggedVersionMetadata = Object.fromEntries(
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'TF GraphQL API',
-  tagline: 'GraphQL API for HCP Terraform and Terraform Enterprise',
-  favicon: 'img/favicon.ico',
+  title: "TF GraphQL API",
+  tagline: "GraphQL API for HCP Terraform and Terraform Enterprise",
+  favicon: "img/favicon.ico",
 
   future: {
     v4: true,
   },
 
   // Set the production url of your site here
-  url: 'https://jeremymefford.github.io',
+  url: "https://jeremymefford.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/tfce-graphql/',
+  baseUrl: "/tfce-graphql/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'jeremymefford', // Usually your GitHub org/user name.
-  projectName: 'tfce-graphql', // Usually your repo name.
+  organizationName: "jeremymefford", // Usually your GitHub org/user name.
+  projectName: "tfce-graphql", // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: "throw",
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'throw',
+      onBrokenMarkdownLinks: "throw",
     },
   },
 
@@ -48,75 +48,74 @@ const config: Config = {
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   presets: [
     [
-      'classic',
+      "classic",
       {
         docs: {
-          sidebarPath: './sidebars.ts',
-          routeBasePath: '/',
-          editUrl:
-            'https://github.com/jeremymefford/tfce-graphql/tree/main/',
+          sidebarPath: "./sidebars.ts",
+          routeBasePath: "/",
+          editUrl: "https://github.com/jeremymefford/tfce-graphql/tree/main/",
           lastVersion: latestVersion,
           includeCurrentVersion: true,
           versions: {
             current: {
-              label: 'Next',
-              banner: 'unreleased',
+              label: "Next",
+              banner: "unreleased",
             },
             ...taggedVersionMetadata,
           },
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: "./src/css/custom.css",
         },
       } satisfies Preset.Options,
     ],
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
+    image: "img/docusaurus-social-card.jpg",
     navbar: {
-      title: 'TF GraphQL API',
+      title: "TF GraphQL API",
       logo: {
-        alt: 'TF GraphQL Logo',
-        src: 'img/logo.svg',
+        alt: "TF GraphQL Logo",
+        src: "img/logo.svg",
       },
       items: [
         {
-          type: 'docsVersion',
-          label: 'Docs',
-          position: 'left',
+          type: "docsVersion",
+          label: "Docs",
+          position: "left",
         },
         {
-          type: 'docsVersionDropdown',
-          position: 'right',
+          type: "docsVersionDropdown",
+          position: "right",
           dropdownActiveClassDisabled: true,
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Docs',
+          title: "Docs",
           items: [
             {
-              label: 'Tutorial',
-              to: '/',
+              label: "Tutorial",
+              to: "/",
             },
           ],
         },
         {
-          title: 'More',
+          title: "More",
           items: [
             {
-              label: 'GitHub',
-              href: 'https://github.com/jeremymefford/tfce-graphql',
+              label: "GitHub",
+              href: "https://github.com/jeremymefford/tfce-graphql",
             },
           ],
         },

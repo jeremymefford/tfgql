@@ -5,18 +5,18 @@ import { applicationConfiguration } from "./conf";
 export async function* streamResources<T, R, RFilter>(
   resources: Iterable<T>,
   operation: (resource: T) => Promise<R>,
-  filter?: WhereClause<R, RFilter>
+  filter?: WhereClause<R, RFilter>,
 ): AsyncGenerator<R> {
   const maxConcurrency = applicationConfiguration.graphqlBatchSize;
   const inflight = new Set<Promise<void>>();
   const resultsQueue: R[] = [];
   const resourceIterator = resources[Symbol.iterator]();
-  const { logger } = await import('./logger');
+  const { logger } = await import("./logger");
   let scheduled = 0;
 
-  const dispatch = (item: T, index: number) => {
+  const dispatch = (item: T, _index: number) => {
     const p = operation(item)
-      .then(result => {
+      .then((result) => {
         if (!filter || evaluateWhereClause(filter, result)) {
           resultsQueue.push(result);
         }
@@ -46,14 +46,13 @@ export async function* streamResources<T, R, RFilter>(
       await Promise.race(inflight);
     }
   }
-  logger.debug({ scheduled }, 'streamResources complete');
-
+  logger.debug({ scheduled }, "streamResources complete");
 }
 
 export async function fetchResources<T, R, RFilter>(
   resources: Iterable<T>,
   operation: (resource: T) => Promise<R | null> | Promise<R>,
-  filter?: WhereClause<R, RFilter>
+  filter?: WhereClause<R, RFilter>,
 ): Promise<R[]> {
   const results: R[] = [];
   for await (const item of streamResources(resources, operation, filter)) {

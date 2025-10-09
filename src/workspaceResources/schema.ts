@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const workspaceResourcesSchema = gql`
   type WorkspaceResource {
@@ -36,7 +36,10 @@ const workspaceResourcesSchema = gql`
   }
 
   extend type Query {
-    workspaceResources(workspaceId: ID!, filter: WorkspaceResourceFilter): [WorkspaceResource!]!
+    workspaceResources(
+      workspaceId: ID!
+      filter: WorkspaceResourceFilter
+    ): [WorkspaceResource!]!
   }
 `;
 

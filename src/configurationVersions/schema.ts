@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const configurationVersionSchema = gql`
   type ConfigurationVersion {
@@ -78,8 +78,15 @@ const configurationVersionSchema = gql`
 
   extend type Query {
     configurationVersion(id: ID!): ConfigurationVersion
-    configurationVersions(workspaceId: ID!, filter: ConfigurationVersionFilter): [ConfigurationVersion]!
-    workspacesWithConfigurationVersionsLargerThan(includeOrgs: [String!], excludeOrgs: [String!], bytes: Int!): [Workspace]!
+    configurationVersions(
+      workspaceId: ID!
+      filter: ConfigurationVersionFilter
+    ): [ConfigurationVersion]!
+    workspacesWithConfigurationVersionsLargerThan(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      bytes: Int!
+    ): [Workspace]!
   }
 `;
 

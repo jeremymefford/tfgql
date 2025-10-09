@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const runTriggersSchema = gql`
   """
@@ -44,7 +44,10 @@ const runTriggersSchema = gql`
   }
 
   extend type Query {
-    runTriggers(workspaceId: ID!, filter: RunTriggerFilter): [WorkspaceRunTrigger!]!
+    runTriggers(
+      workspaceId: ID!
+      filter: RunTriggerFilter
+    ): [WorkspaceRunTrigger!]!
     runTrigger(id: ID!): RunTrigger
   }
 `;

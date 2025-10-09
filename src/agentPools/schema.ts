@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const agentPoolsSchema = gql`
   type AgentPool {
@@ -28,7 +28,11 @@ const agentPoolsSchema = gql`
   }
 
   extend type Query {
-    agentPools(includeOrgs: [String!], excludeOrgs: [String!], filter: AgentPoolFilter): [AgentPool!]!
+    agentPools(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: AgentPoolFilter
+    ): [AgentPool!]!
     agentPool(id: ID!): AgentPool
   }
 `;

@@ -1,43 +1,52 @@
-import { BooleanComparisonExp, DateTimeComparisonExp, StringComparisonExp, WhereClause } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
-
+import {
+  BooleanComparisonExp,
+  DateTimeComparisonExp,
+  StringComparisonExp,
+  WhereClause,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface RunAttributes {
   status: string;
-  'created-at': string;
-  'canceled-at': string | null;
-  'is-destroy': boolean;
+  "created-at": string;
+  "canceled-at": string | null;
+  "is-destroy": boolean;
   message?: string;
-  'has-changes': boolean;
-  'auto-apply': boolean;
-  'allow-empty-apply': boolean;
-  'allow-config-generation': boolean;
-  'plan-only': boolean;
+  "has-changes": boolean;
+  "auto-apply": boolean;
+  "allow-empty-apply": boolean;
+  "allow-config-generation": boolean;
+  "plan-only": boolean;
   source: string;
-  'status-timestamps': {
-    'plan-queueable-at'?: string;
+  "status-timestamps": {
+    "plan-queueable-at"?: string;
   };
-  'trigger-reason': string;
-  'target-addrs': string[] | null;
-  'replace-addrs': string[] | null;
+  "trigger-reason": string;
+  "target-addrs": string[] | null;
+  "replace-addrs": string[] | null;
   permissions: {
-    'can-apply': boolean;
-    'can-cancel': boolean;
-    'can-comment': boolean;
-    'can-discard': boolean;
-    'can-force-execute': boolean;
-    'can-force-cancel': boolean;
-    'can-override-policy-check': boolean;
+    "can-apply": boolean;
+    "can-cancel": boolean;
+    "can-comment": boolean;
+    "can-discard": boolean;
+    "can-force-execute": boolean;
+    "can-force-cancel": boolean;
+    "can-override-policy-check": boolean;
   };
   refresh: boolean;
-  'refresh-only': boolean;
-  'save-plan': boolean;
+  "refresh-only": boolean;
+  "save-plan": boolean;
   variables: string[];
   actions: {
-    'is-cancelable': boolean;
-    'is-confirmable': boolean;
-    'is-discardable': boolean;
-    'is-force-cancelable': boolean;
+    "is-cancelable": boolean;
+    "is-confirmable": boolean;
+    "is-discardable": boolean;
+    "is-force-cancelable": boolean;
   };
   relationships?: {
     workspace?: {
@@ -52,13 +61,13 @@ export interface RunAttributes {
         type: string;
       };
     };
-    'configuration-version'?: {
+    "configuration-version"?: {
       data?: {
         id: string;
         type: string;
       };
     };
-    'confirmed-by'?: {
+    "confirmed-by"?: {
       data?: {
         id: string;
         type: string;
@@ -70,19 +79,19 @@ export interface RunAttributes {
         type: string;
       };
     };
-    'run-events'?: {
+    "run-events"?: {
       data?: {
         id: string;
         type: string;
       }[];
     };
-    'task-stages'?: {
+    "task-stages"?: {
       data?: {
         id: string;
         type: string;
       }[];
     };
-    'policy-checks'?: {
+    "policy-checks"?: {
       data?: {
         id: string;
         type: string;
@@ -162,7 +171,7 @@ export interface RunEvent {
   body: Record<string, any>;
 }
 
-export interface RunPermissionsFilter extends WhereClause<Run['permissions']> {
+export interface RunPermissionsFilter extends WhereClause<Run["permissions"]> {
   _and?: RunPermissionsFilter[];
   _or?: RunPermissionsFilter[];
   _not?: RunPermissionsFilter;
@@ -176,7 +185,7 @@ export interface RunPermissionsFilter extends WhereClause<Run['permissions']> {
   canOverridePolicyCheck?: BooleanComparisonExp;
 }
 
-export interface RunActionsFilter extends WhereClause<Run['actions']> {
+export interface RunActionsFilter extends WhereClause<Run["actions"]> {
   _and?: RunActionsFilter[];
   _or?: RunActionsFilter[];
   _not?: RunActionsFilter;
@@ -187,16 +196,20 @@ export interface RunActionsFilter extends WhereClause<Run['actions']> {
   isForceCancelable?: BooleanComparisonExp;
 }
 
-export interface RunStatusTimestampsFilter extends WhereClause<Run['statusTimestamps']> {
+export interface RunStatusTimestampsFilter
+  extends WhereClause<Run["statusTimestamps"]> {
   planQueueableAt?: DateTimeComparisonExp;
 }
 
-export interface RunFilter extends WhereClause<
-  Run, {
-    permissions: RunPermissionsFilter;
-    actions: RunActionsFilter;
-    statusTimestamps: RunStatusTimestampsFilter;
-  }> {
+export interface RunFilter
+  extends WhereClause<
+    Run,
+    {
+      permissions: RunPermissionsFilter;
+      actions: RunActionsFilter;
+      statusTimestamps: RunStatusTimestampsFilter;
+    }
+  > {
   _and?: RunFilter[];
   _or?: RunFilter[];
   _not?: RunFilter;

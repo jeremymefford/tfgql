@@ -1,5 +1,14 @@
-import { WhereClause, StringComparisonExp, DateTimeComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import {
+  WhereClause,
+  StringComparisonExp,
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface PolicyEvaluationAttributes {
   status: string;
@@ -31,12 +40,14 @@ export interface PolicyEvaluationRelationships {
   };
 }
 
-export type PolicyEvaluationResource = ResourceObject<PolicyEvaluationAttributes> & {
-  relationships?: PolicyEvaluationRelationships;
-};
+export type PolicyEvaluationResource =
+  ResourceObject<PolicyEvaluationAttributes> & {
+    relationships?: PolicyEvaluationRelationships;
+  };
 
 export type PolicyEvaluationResponse = SingleResponse<PolicyEvaluationResource>;
-export type PolicyEvaluationListResponse = ListResponse<PolicyEvaluationResource>;
+export type PolicyEvaluationListResponse =
+  ListResponse<PolicyEvaluationResource>;
 
 export interface PolicyEvaluation {
   id: string;

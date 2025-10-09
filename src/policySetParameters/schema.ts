@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const policySetParametersSchema = gql`
   type PolicySetParameter {
@@ -23,7 +23,10 @@ const policySetParametersSchema = gql`
   }
 
   extend type Query {
-    policySetParameters(policySetId: ID!, filter: PolicySetParameterFilter): [PolicySetParameter!]!
+    policySetParameters(
+      policySetId: ID!
+      filter: PolicySetParameterFilter
+    ): [PolicySetParameter!]!
   }
 `;
 

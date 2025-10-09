@@ -1,14 +1,18 @@
-import type { AxiosInstance } from 'axios';
-import { RequestCache } from '../common/requestCache';
-import { streamPages } from '../common/streamPages';
-import { stateVersionMapper } from './mapper';
-import { StateVersion, StateVersionFilter, StateVersionResponse, StateVersionListResponse } from './types';
-import { isNotFound } from '../common/http';
+import type { AxiosInstance } from "axios";
+import { RequestCache } from "../common/requestCache";
+import { streamPages } from "../common/streamPages";
+import { stateVersionMapper } from "./mapper";
+import {
+  StateVersion,
+  StateVersionFilter,
+  StateVersionResponse,
+} from "./types";
+import { isNotFound } from "../common/http";
 
 export class StateVersionsAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
-    private readonly requestCache: RequestCache
+    private readonly requestCache: RequestCache,
   ) {}
 
   /**
@@ -17,18 +21,18 @@ export class StateVersionsAPI {
   async *listStateVersions(
     organizationName: string,
     workspaceName: string,
-    filter?: StateVersionFilter
+    filter?: StateVersionFilter,
   ): AsyncGenerator<StateVersion[], void, unknown> {
     const params: Record<string, any> = {
-      'filter[organization][name]': organizationName,
-      'filter[workspace][name]': workspaceName
+      "filter[organization][name]": organizationName,
+      "filter[workspace][name]": workspaceName,
     };
     yield* streamPages<StateVersion, StateVersionFilter>(
       this.httpClient,
       `/state-versions`,
       stateVersionMapper,
       params,
-      filter
+      filter,
     );
   }
 
@@ -37,25 +41,30 @@ export class StateVersionsAPI {
    */
   async getStateVersion(id: string): Promise<StateVersion | null> {
     return await this.requestCache.getOrSet(`state-version`, id, async () =>
-      this.httpClient.get<StateVersionResponse>(`/state-versions/${id}`)
-        .then(res => stateVersionMapper.map(res.data.data))
-        .catch(err => {
+      this.httpClient
+        .get<StateVersionResponse>(`/state-versions/${id}`)
+        .then((res) => stateVersionMapper.map(res.data.data))
+        .catch((err) => {
           if (isNotFound(err)) {
             return null;
           }
           throw err;
-        }));
+        }),
+    );
   }
 
   /**
    * Fetch the current state version for a given workspace.
    */
-  async getCurrentStateVersion(workspaceId: string): Promise<StateVersion | null> {
-    return this.httpClient.get<StateVersionResponse>(
-      `/workspaces/${workspaceId}/current-state-version`
-    )
-      .then(res => stateVersionMapper.map(res.data.data))
-      .catch(err => {
+  async getCurrentStateVersion(
+    workspaceId: string,
+  ): Promise<StateVersion | null> {
+    return this.httpClient
+      .get<StateVersionResponse>(
+        `/workspaces/${workspaceId}/current-state-version`,
+      )
+      .then((res) => stateVersionMapper.map(res.data.data))
+      .catch((err) => {
         if (isNotFound(err)) {
           return null;
         }

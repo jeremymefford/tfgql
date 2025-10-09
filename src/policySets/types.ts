@@ -3,35 +3,35 @@ import {
   StringComparisonExp,
   BooleanComparisonExp,
   IntComparisonExp,
-  DateTimeComparisonExp
-} from '../common/filtering/types';
+  DateTimeComparisonExp,
+} from "../common/filtering/types";
 import {
   ResourceObject,
   ResourceRef,
   ListResponse,
-  SingleResponse
-} from '../common/types/jsonApi';
+  SingleResponse,
+} from "../common/types/jsonApi";
 
 export interface PolicySetAttributes {
   name: string;
   description: string | null;
   kind: string;
   global: boolean;
-  'agent-enabled': boolean;
-  'policy-tool-version': string;
+  "agent-enabled": boolean;
+  "policy-tool-version": string;
   overridable: boolean;
-  'workspace-count': number;
-  'policy-count'?: number;
-  'policies-path'?: string | null;
+  "workspace-count": number;
+  "policy-count"?: number;
+  "policies-path"?: string | null;
   versioned: boolean;
-  'created-at': string;
-  'updated-at': string;
-  'vcs-repo'?: {
+  "created-at": string;
+  "updated-at": string;
+  "vcs-repo"?: {
     branch?: string | null;
     identifier: string;
-    'ingress-submodules': boolean;
-    'oauth-token-id'?: string;
-    'github-app-installation-id'?: string;
+    "ingress-submodules": boolean;
+    "oauth-token-id"?: string;
+    "github-app-installation-id"?: string;
   };
 }
 
@@ -40,9 +40,9 @@ export interface PolicySetRelationships {
   policies?: { data: ResourceRef[] };
   projects?: { data: ResourceRef[] };
   workspaces?: { data: ResourceRef[] };
-  'workspace-exclusions'?: { data: ResourceRef[] };
-  'current-version'?: { data: ResourceRef };
-  'newest-version'?: { data: ResourceRef };
+  "workspace-exclusions"?: { data: ResourceRef[] };
+  "current-version"?: { data: ResourceRef };
+  "newest-version"?: { data: ResourceRef };
 }
 
 export type PolicySetResource = ResourceObject<PolicySetAttributes> & {

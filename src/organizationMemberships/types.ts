@@ -1,5 +1,10 @@
-import { WhereClause, StringComparisonExp } from '../common/filtering/types';
-import { ResourceObject, ListResponse, SingleResponse, ResourceRef } from '../common/types/jsonApi';
+import { WhereClause, StringComparisonExp } from "../common/filtering/types";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface OrganizationMembershipAttributes {
   status: string;
@@ -17,12 +22,15 @@ export interface OrganizationMembershipRelationships {
   };
 }
 
-export type OrganizationMembershipResource = ResourceObject<OrganizationMembershipAttributes> & {
-  relationships?: OrganizationMembershipRelationships;
-};
+export type OrganizationMembershipResource =
+  ResourceObject<OrganizationMembershipAttributes> & {
+    relationships?: OrganizationMembershipRelationships;
+  };
 
-export type OrganizationMembershipResponse = SingleResponse<OrganizationMembershipResource>;
-export type OrganizationMembershipListResponse = ListResponse<OrganizationMembershipResource>;
+export type OrganizationMembershipResponse =
+  SingleResponse<OrganizationMembershipResource>;
+export type OrganizationMembershipListResponse =
+  ListResponse<OrganizationMembershipResource>;
 
 export interface OrganizationMembership {
   id: string;
@@ -32,7 +40,8 @@ export interface OrganizationMembership {
   teamIds: string[];
 }
 
-export interface OrganizationMembershipFilter extends WhereClause<OrganizationMembership> {
+export interface OrganizationMembershipFilter
+  extends WhereClause<OrganizationMembership> {
   _and?: OrganizationMembershipFilter[];
   _or?: OrganizationMembershipFilter[];
   _not?: OrganizationMembershipFilter;

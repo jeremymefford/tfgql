@@ -22,12 +22,12 @@ export interface Links {
 }
 
 export interface PaginationMeta {
-  'current-page': number;
-  'next-page': number | null;
-  'page-size': number;
-  'prev-page': number | null;
-  'total-count': number;
-  'total-pages': number;
+  "current-page": number;
+  "next-page": number | null;
+  "page-size": number;
+  "prev-page": number | null;
+  "total-count": number;
+  "total-pages": number;
 }
 
 export interface Meta {

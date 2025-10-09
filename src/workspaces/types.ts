@@ -165,6 +165,18 @@ export interface Workspace {
   organizationName?: string;
 }
 
+export interface WorkspaceProvider {
+  name: string | null;
+  version: string | null;
+  source: string | null;
+}
+
+export interface WorkspaceModule {
+  name: string | null;
+  version: string | null;
+  source: string | null;
+}
+
 export interface WorkspaceSettingOverwritesFilter extends WhereClause<Workspace['settingOverwrites']> {
   _and?: WorkspaceSettingOverwritesFilter[];
   _or?: WorkspaceSettingOverwritesFilter[];

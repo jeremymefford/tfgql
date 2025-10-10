@@ -86,6 +86,6 @@ call many times when trying to resolve the same nested entity across multiple pa
 ## Submitting a PR
 
 1. Ensure linter and formatter are clean.
-2. Push your branch and open a pull request, make sure the title of the pull reqeust starts with `[MAJOR]` / `[MINOR]` / `[PATCH]` as this is used to determine how to bump the version.
+2. Push your branch and open a pull request, make sure the title of the pull request starts with `[MAJOR]` / `[MINOR]` / `[PATCH]` as this is used to determine how to bump the version.
 3. Clearly explain what the change does and why.
 

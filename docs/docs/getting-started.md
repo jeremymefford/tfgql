@@ -36,7 +36,7 @@ The **TFCE GraphQL** project provides a flexible GraphQL API for interacting wit
 ## Basic Drive with Docker
 
 :::warning
-Do not forget to replace <token> in this script with your actual token!
+Do not forget to replace `token` in this script with your actual token!
 :::
 
 ```bash
@@ -169,7 +169,7 @@ Add a preflight script so the UI automatically exchanges the TFC/E token with a 
 ![Apollo Explorer Preflight Setup](./assets/preflight.png)
 
 :::warning
-Don't foget to replace `<endpoint>` with your actual endpoint, typically `localhost:4000` 
+Don't forget to replace `<endpoint>` with your actual endpoint, typically `localhost:4000` 
 :::
 
 ```js

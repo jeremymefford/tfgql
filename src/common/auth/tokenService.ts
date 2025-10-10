@@ -83,7 +83,6 @@ export class TokenValidationError extends Error {
 
 export async function validateTfcToken(tfcToken: string): Promise<void> {
   const client = createHttpClient(tfcToken);
-  
 
   try {
     await client.get("/account/details");

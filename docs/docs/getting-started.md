@@ -35,6 +35,10 @@ The **TFCE GraphQL** project provides a flexible GraphQL API for interacting wit
 
 ## Basic Drive with Docker
 
+:::warning
+Do not forget to replace <token> in this script with your actual token!
+:::
+
 ```bash
 docker run -p 4000:4000 ghcr.io/jeremymefford/tfce-graphql:latest
 export JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d '{"tfcToken":"<token>"}' | jq -r '.token')
@@ -51,15 +55,18 @@ Open the GraphQL playground at:
 ```
 http://localhost:4000/graphql
 ```
+:::warning
+Read [this](#exchange-a-tfc-token-for-a-jwt) to learn how to setup the authentication for the requests 
+in the explorer
+:::
 
-Read [this](#exchange-a-tfc-token-for-a-jwt)
 
 ## Installation and Setup
 
 ### Prerequisites
 
-- **Node.js** (version 18 or higher)
-- **npm** or **yarn**
+- **Node.js** (version 20 or higher)
+- **npm** 
 - **Docker** (optional for containerized deployment)
 - A **Terraform Cloud/Enterprise** account with an API token
 
@@ -145,24 +152,52 @@ curl http://<endpoint>/graphql \
   --data '{"query":"{ __typename }"}'
 ```
 
-Using Apollo Explorer? Add a preflight script so the UI automatically exchanges the Terraform token you store in its environment (`tfcToken`) and sets the `Authorization` header:
+#### Apollo explorer authentication setup
+
+##### Step 1
+To use preflight scripts, you need to sign up for a free apollo dev account. Click your profile pic in the top right to start
+that flow or try to save the page and it should prompt you to create or log in.
+
+##### Step 2
+Add your TFC/E token in your apollo environment
+
+![Apollo explorer env setup](./assets/envvar.png)
+
+##### Step 3
+Add a preflight script so the UI automatically exchanges the TFC/E token with a JWT:
+
+![Apollo Explorer Preflight Setup](./assets/preflight.png)
+
+:::warning
+Don't foget to replace `<endpoint>` with your actual endpoint, typically `localhost:4000` 
+:::
 
 ```js
-const token = explorer.environment.get("tfcToken");
+const expiry = explorer.environment.get("jwtExpiry");
 
-const resp = await explorer.fetch('http://<endpoint>/auth/token', {
-  method: 'POST',
-  headers: {'content-type': 'application/json'},
-  body: `{"tfcToken":"${token}"}`
-});
+if (!expiry || Date.now() > new Date(expiry).getTime()) {
+  console.log("JWT expired, fetching new one");
 
-const jwt = (await resp.json()).token;
+  const tfcToken = explorer.environment.get("tfcToken");
 
-explorer.environment.set("JWT", jwt);
+  const resp = await explorer.fetch('http://localhost:4000/auth/token', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({tfcToken})
+  });
+
+
+  const authResponse = await resp.json();
+
+  explorer.environment.set("JWT", authResponse.token);
+  explorer.environment.set("jwtExpiry", authResponse.expiresAt);
+}
 ```
 
-Then set your authorization header to `Bearer {{JWT}}`
+##### Step 4
+Add the `Authorization` header to each new tab
 
+![Apollo Explorer Preflight Setup](./assets/header.png)
 
 
 ---

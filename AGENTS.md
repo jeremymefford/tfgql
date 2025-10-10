@@ -98,6 +98,7 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 - Prefer small, composable functions and clear names.
 - Update or add concise docs where they add value.
 - Do not include license headers unless requested.
+- Prefer fluent style of coding, for example on Promises use .catch() and .finally() instead of try/catch blocks
 
 ## Testing & Validation
 - Compile locally: `npm run compile` to catch TS errors.

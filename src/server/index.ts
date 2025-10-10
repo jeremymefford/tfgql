@@ -21,7 +21,8 @@ import {
   generateSpanId,
   formatTraceparent,
 } from "../common/trace";
-import { mintJwt, verifyJwt } from "../common/auth/tokenService";
+import { verifyJwt } from "../common/auth/tokenService";
+import { registerAuthRoutes } from "./authRoutes";
 
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
@@ -45,33 +46,11 @@ export async function startServer(): Promise<void> {
     credentials: true,
   });
 
+  registerAuthRoutes(fastify);
+
   fastify.get("/health", async () => ({
     status: "ok",
   }));
-
-  fastify.post<{ Body: { tfcToken?: string } }>(
-    "/auth/token",
-    async (request, reply) => {
-      const tfcToken = request.body?.tfcToken?.trim();
-      if (!tfcToken) {
-        reply.code(400);
-        return { error: "tfcToken is required" };
-      }
-
-      try {
-        const minted = await mintJwt(tfcToken);
-        reply.code(200);
-        return {
-          token: minted.token,
-          expiresAt: minted.expiresAt.toISOString(),
-        };
-      } catch (error) {
-        logger.error({ err: error }, "Failed to mint JWT");
-        reply.code(500);
-        return { error: "Failed to mint token" };
-      }
-    },
-  );
 
   const landingPagePlugin = disableExplorer
     ? ApolloServerPluginLandingPageDisabled()

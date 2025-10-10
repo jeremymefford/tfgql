@@ -27,15 +27,6 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 ---
 
-## Writing Tests
-
-- We use **Vitest** for testing and `nock` for mocking HTTP calls.
-- Unit tests should live in the `tests/` folder, mirroring the source file structure.
-- Write tests for new features and regression tests for bug fixes.
-- Run the test suite with `npm run test`.
-
----
-
 ## Commits and Branches
 
 - Use **feature branches** from `main` or `develop`: `feature/short-description`.
@@ -85,18 +76,16 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 - A request-level cache exists for resolver optimization.
 - Use `context.requestCache.getOrSet(entity, id, fetchFn)` to prevent redundant calls.
+:::warning
+Not every API needs to be cached and they are only cached PER request.  This is to prevent making the same
+call many times when trying to resolve the same nested entity across multiple parent entities.
+:::
 
 ---
 
 ## Submitting a PR
 
-1. Make sure all tests pass: `npm run test`.
-2. Ensure linter and formatter are clean.
-3. Push your branch and open a pull request.
-4. Clearly explain what the change does and why.
+1. Ensure linter and formatter are clean.
+2. Push your branch and open a pull request, make sure the title of the pull request starts with `[MAJOR]` / `[MINOR]` / `[PATCH]` as this is used to determine how to bump the version.
+3. Clearly explain what the change does and why.
 
----
-
-## Need Help?
-
-Open an issue or reach out via the discussion board. We appreciate your help improving TFCE GraphQL!

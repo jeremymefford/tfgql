@@ -1,7 +1,9 @@
 import { randomBytes, createHash, createSecretKey } from "node:crypto";
 import { EncryptJWT, jwtDecrypt, type JWTPayload } from "jose";
+import { isAxiosError } from "axios";
 import { applicationConfiguration } from "../conf";
 import { logger } from "../logger";
+import { createHttpClient } from "../httpClient";
 
 const AES_KEY_LENGTH = 32;
 
@@ -66,6 +68,39 @@ export interface VerifiedTokenClaims {
   exp: number;
   iat: number;
   tokenHash: string;
+}
+
+export class TokenValidationError extends Error {
+  constructor(
+    readonly statusCode: number,
+    readonly payload?: unknown,
+    message = "Terraform token validation failed",
+  ) {
+    super(message);
+    this.name = "TokenValidationError";
+  }
+}
+
+export async function validateTfcToken(tfcToken: string): Promise<void> {
+  const client = createHttpClient(tfcToken);
+
+  try {
+    await client.get("/account/details");
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response) {
+      const { status, data } = error.response;
+      if (status >= 400 && status < 500) {
+        const message =
+          status === 401
+            ? "Terraform token was rejected"
+            : "Terraform token validation failed";
+        throw new TokenValidationError(status, data, message);
+      }
+    }
+
+    logger.error({ err: error }, "Terraform API error during token validation");
+    throw error;
+  }
 }
 
 export async function mintJwt(tfcToken: string): Promise<MintedToken> {

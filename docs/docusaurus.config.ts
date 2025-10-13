@@ -24,8 +24,8 @@ const taggedVersionMetadata = Object.fromEntries(
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: "TF GraphQL API",
-  tagline: "GraphQL API for HCP Terraform and Terraform Enterprise",
+  title: "TFGQL",
+  tagline: "GraphQL facade for HCP Terraform and Terraform Enterprise",
   favicon: "img/favicon.ico",
 
   future: {
@@ -48,6 +48,7 @@ const config: Config = {
     hooks: {
       onBrokenMarkdownLinks: "throw",
     },
+    mermaid: true,
   },
 
   // Even if you don't use internationalization, you can use this field to set
@@ -65,13 +66,12 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           routeBasePath: "/",
-          editUrl: "https://github.com/jeremymefford/tfce-graphql/tree/main/",
           lastVersion: "current",
           includeCurrentVersion: true,
           versions: {
             current: {
               label: currentDocsLabel,
-              banner: "unreleased",
+              banner: "none",
             },
             ...taggedVersionMetadata,
           },
@@ -82,18 +82,23 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+  themes: ["@docusaurus/theme-mermaid"],
 
   themeConfig: {
     image: "img/docusaurus-social-card.jpg",
+    mermaid: {
+      theme: { light: "neutral", dark: "dark" },
+    },
     navbar: {
-      title: "TF GraphQL API",
+      title: "TFGQL",
       logo: {
-        alt: "TF GraphQL Logo",
+        alt: "TFGQL Logo",
         src: "img/logo.svg",
       },
       items: [
         {
-          type: "docsVersion",
+          type: "doc",
+          docId: "getting-started",
           label: "Docs",
           position: "left",
         },

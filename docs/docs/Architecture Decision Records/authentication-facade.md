@@ -10,7 +10,7 @@ Accepted – 2025-02-14
 
 ## Context
 
-Some operators of TFCE GraphQL require every service they deploy to enforce authentication, even when the downstream APIs already require credentials. Our initial prototype simply proxied the provided Terraform Cloud/Enterprise (TFC/E) token to the REST API. While functional, that design prevented the facade from doing anything more sophisticated than pass-through token handling:
+Some operators of TFGQL require every service they deploy to enforce authentication, even when the downstream APIs already require credentials. Our initial prototype simply proxied the provided Terraform Cloud/Enterprise (TFC/E) token to the REST API. While functional, that design prevented the facade from doing anything more sophisticated than pass-through token handling:
 
 - We could not distinguish or audit the caller of the GraphQL service itself.
 - We could not introduce additional access controls, multi-tenancy, or rate limiting that depended on the identity of the GraphQL client.

@@ -14,7 +14,7 @@ const encryptionKey = initializeEncryptionKey(
 function initializeEncryptionKey(keyMaterial?: string) {
   if (!keyMaterial || keyMaterial.trim().length === 0) {
     logger.warn(
-      "TFCE_JWT_ENCRYPTION_KEY not provided; generating ephemeral in-memory key. JWTs will be invalid after process restart.",
+      "TFGQL_JWT_ENCRYPTION_KEY not provided; generating ephemeral in-memory key. JWTs will be invalid after process restart.",
     );
     return createSecretKey(randomBytes(AES_KEY_LENGTH));
   }
@@ -47,7 +47,7 @@ function initializeEncryptionKey(keyMaterial?: string) {
 
   // Fall back to SHA-256 hash of provided material
   logger.warn(
-    "TFCE_JWT_ENCRYPTION_KEY provided but not 32 bytes; deriving AES key via SHA-256 hash.",
+    "TFGQL_JWT_ENCRYPTION_KEY provided but not 32 bytes; deriving AES key via SHA-256 hash.",
   );
   return createSecretKey(createHash("sha256").update(normalized).digest());
 }

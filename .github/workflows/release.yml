@@ -18,6 +18,8 @@ jobs:
       name: prod
     outputs:
       should_release: ${{ steps.bump.outputs.should_release }}
+      docs_only: ${{ steps.bump.outputs.docs_only }}
+      snapshot_docs: ${{ steps.bump.outputs.snapshot_docs }}
       version: ${{ steps.version.outputs.new_version }}
     steps:
       - name: Checkout
@@ -38,19 +40,35 @@ jobs:
           ')
           if [[ -n "$TYPE" ]]; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
             echo "type=$TYPE" >> "$GITHUB_OUTPUT"
+            if [[ "$TYPE" == "major" || "$TYPE" == "minor" ]]; then
+              echo "snapshot_docs=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "snapshot_docs=false" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
+
+          if printf '%s\n' "$COMMIT_MSG" | grep -q '\[DOCS\]'; then
+            echo "::notice::Running docs-only publication workflow."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+            echo "snapshot_docs=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [[ "$COMMIT_MSG" =~ ^release:\ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "::notice::Skipping release workflow for release commit."
           else
-            echo "::notice::Skipping release workflow because commit message does not specify [MAJOR|MINOR|PATCH]."
+            echo "::notice::Skipping release workflow because commit message does not specify [MAJOR|MINOR|PATCH] or [DOCS]."
           fi
           echo "should_release=false" >> "$GITHUB_OUTPUT"
+          echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          echo "snapshot_docs=false" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -60,11 +78,11 @@ jobs:
             docs/package-lock.json
 
       - name: Install dependencies
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         run: npm ci
 
       - name: Install docs dependencies
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         working-directory: docs
         run: npm ci
 
@@ -81,7 +99,7 @@ jobs:
         run: npm run compile
 
       - name: Snapshot docs version
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' && steps.bump.outputs.snapshot_docs == 'true'
         working-directory: docs
         run: npm run docusaurus docs:version ${{ steps.version.outputs.new_version }}
 
@@ -95,7 +113,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Build docs
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         working-directory: docs
         run: npm run build
 
@@ -111,13 +129,13 @@ jobs:
           git push origin HEAD:main
       
       - name: Upload docs artifact
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/build
             
       - name: Deploy to GitHub Pages
-        if: steps.bump.outputs.should_release == 'true'
+        if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
         uses: actions/deploy-pages@v4
         id: deploy
 

@@ -4,7 +4,13 @@ import type * as Preset from "@docusaurus/preset-classic";
 import versions from "./versions.json";
 
 const versionList = versions as string[];
-const latestVersion = versionList[0] ?? "current";
+const latestTaggedVersion = versionList[0] ?? null;
+const latestMinorLabel = latestTaggedVersion
+  ? `${latestTaggedVersion.split(".").slice(0, 2).join(".")}.x`
+  : null;
+const currentDocsLabel = latestMinorLabel
+  ? `${latestMinorLabel} (Current)`
+  : "Next";
 const taggedVersionMetadata = Object.fromEntries(
   versionList.map((version) => [
     version,
@@ -60,11 +66,11 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
           routeBasePath: "/",
           editUrl: "https://github.com/jeremymefford/tfce-graphql/tree/main/",
-          lastVersion: latestVersion,
+          lastVersion: "current",
           includeCurrentVersion: true,
           versions: {
             current: {
-              label: "Next",
+              label: currentDocsLabel,
               banner: "unreleased",
             },
             ...taggedVersionMetadata,

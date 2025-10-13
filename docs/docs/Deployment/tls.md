@@ -65,7 +65,7 @@ certificates and define an alias that starts the server with HTTPS:
 source ./generate-test-certs.sh
 # Optionally pin the JWT encryption key for repeatable tokens
 export TFGQL_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32)
-start_tfce_tls
+start_tfgql_tls
 ```
 
 Trust `certs/test-ca.cert.pem` in your browser or HTTP client to avoid TLS

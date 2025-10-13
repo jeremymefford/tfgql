@@ -58,10 +58,10 @@ jobs:
         env:
           PR_TITLE: "${{ github.event.pull_request.title }}"
         run: |
-          if [[ "$PR_TITLE" =~ ^\[(MAJOR|MINOR|PATCH)\][[:space:]].+ ]]; then
+          if [[ "$PR_TITLE" =~ ^\[(MAJOR|MINOR|PATCH|DOCS)\][[:space:]].+ ]]; then
             echo "PR title matches required format: $PR_TITLE"
           else
-            echo "::error::Pull request title must match '[MAJOR|MINOR|PATCH] <description>'." >&2
+            echo "::error::Pull request title must match '[MAJOR|MINOR|PATCH|DOCS] <description>'." >&2
             exit 1
           fi
   ensure-docs-build:

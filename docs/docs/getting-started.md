@@ -171,6 +171,9 @@ Add a preflight script so the UI automatically exchanges the TFC/E token with a 
 :::warning
 Don't forget to replace `<endpoint>` with your actual endpoint, typically `localhost:4000` 
 :::
+:::tip
+Make sure to use a stable `TFGQL_JWT_ENCRYPTION_KEY` in your local environment if using this preflight script so that your tokens are valid across restarts of the application.
+:::
 
 ```js
 const expiry = explorer.environment.get("jwtExpiry");

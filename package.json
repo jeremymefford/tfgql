@@ -1,11 +1,11 @@
 {
-  "name": "tfe-graphql",
+  "name": "tfgql",
   "version": "0.4.0",
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node dist/index.js",
-    "docker:build": "docker buildx build --platform linux/amd64,linux/arm64 -t tfce-graphql --load .",
+    "docker:build": "docker buildx build --platform linux/amd64,linux/arm64 -t tfgql --load .",
     "lint": "eslint --max-warnings=0 \"src/**/*.{ts,tsx}\""
   },
   "keywords": [],

@@ -18,12 +18,12 @@ ARG VERSION="0.0.0"
 ARG VCS_REF="unknown"
 ARG BUILD_DATE="unknown"
 
-LABEL org.opencontainers.image.title="tfce-graphql" \
+LABEL org.opencontainers.image.title="tfgql" \
       org.opencontainers.image.description="GraphQL facade for Terraform Cloud/Enterprise" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.source="https://github.com/jeremymefford/tfce-graphql" \
+      org.opencontainers.image.source="https://github.com/jeremymefford/tfgql" \
       org.opencontainers.image.licenses="MIT"
 
 WORKDIR /app

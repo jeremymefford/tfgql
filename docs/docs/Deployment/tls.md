@@ -22,7 +22,7 @@ and runs `update-ca-certificates`.
 
 ```dockerfile title="Dockerfile"
 # syntax=docker/dockerfile:1.7-labs
-FROM ghcr.io/jeremymefford/tfce-graphql:latest
+FROM ghcr.io/jeremymefford/tfgql:latest
 
 USER root
 RUN apk add --no-cache ca-certificates

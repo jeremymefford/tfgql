@@ -1,12 +1,12 @@
 # Concepts
 
-This page covers key architectural and functional concepts behind `tfce-graphql`. Understanding these foundational elements will help you write performant and scalable queries using this tool.
+This page covers key architectural and functional concepts behind `tfgql`. Understanding these foundational elements will help you write performant and scalable queries using this tool.
 
 ---
 
 ## Parallelization
 
-`tfce-graphql` employs intelligent parallelization to accelerate data fetching while maintaining control over concurrency. This is essential when interfacing with APIs like HCP Terraform and TFE, which can become bottlenecked by sequential requests.
+`tfgql` employs intelligent parallelization to accelerate data fetching while maintaining control over concurrency. This is essential when interfacing with APIs like HCP Terraform and TFE, which can become bottlenecked by sequential requests.
 
 ### Concurrency Control
 
@@ -29,7 +29,7 @@ Two framework level functions exist to assist:
 
 ## Pagination
 
-Most Terraform API endpoints implement pagination. To support seamless traversal, `tfce-graphql` provides pagination-aware data source utilities that can stream results across pages.
+Most Terraform API endpoints implement pagination. To support seamless traversal, `tfgql` provides pagination-aware data source utilities that can stream results across pages.
 
 ### Streaming Pages
 
@@ -58,7 +58,7 @@ for await (const workspace of streamPages(
 
 ## Rate Limiting
 
-Rate limits are a fundamental reality of working with APIs like HCP Terraform and TFE. `tfce-graphql` implements client-side protection to avoid abuse and maximize throughput.
+Rate limits are a fundamental reality of working with APIs like HCP Terraform and TFE. `tfgql` implements client-side protection to avoid abuse and maximize throughput.
 
 ### Mechanisms
 
@@ -77,7 +77,7 @@ By handling rate limits gracefully, we avoid:
 
 ## Entity Graph
 
-Unlike RESTful systems where objects are queried independently, `tfce-graphql` exposes the entire Terraform Enterprise/HCP domain model as an entity graph.
+Unlike RESTful systems where objects are queried independently, `tfgql` exposes the entire Terraform Enterprise/HCP domain model as an entity graph.
 
 ### Resolver Design
 
@@ -111,7 +111,7 @@ This pattern enables expressive, deeply nested queries that mirror how users act
 
 ## Request-Level Cache
 
-To support high-performance querying and avoid redundant fetches, `tfce-graphql` uses a request-level cache.
+To support high-performance querying and avoid redundant fetches, `tfgql` uses a request-level cache.
 
 ### Features
 

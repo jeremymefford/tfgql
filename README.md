@@ -1,10 +1,10 @@
-# TFC/E GraphQL
+# TFC/E GraphQL Facade (TFGQL)
 
-TFC/E GraphQL exposes Terraform Cloud and Terraform Enterprise data through a single GraphQL endpoint with request batching, filtering, and pagination built in.
+TFGQL exposes Terraform Cloud and Terraform Enterprise data through a single GraphQL endpoint with request batching, filtering, and pagination built in.
 
 ## Documentation
 
-### [Official docs](https://jeremymefford.github.io/tfce-graphql/)
+### [Official docs](https://jeremymefford.github.io/tfgql/)
 
 - Primary reference for deployment, usage, and contributing details.
 

@@ -40,7 +40,7 @@ Do not forget to replace `token` in this script with your actual token!
 :::
 
 ```bash
-docker run -p 4000:4000 ghcr.io/jeremymefford/tfce-graphql:latest
+docker run -p 4000:4000 ghcr.io/jeremymefford/tfgql:latest
 export JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d '{"tfcToken":"<token>"}' | jq -r '.token')
 curl -s -X POST -H "content-type: application/json" -H "Authorization: Bearer $JWT" http://localhost:4000/ \
   -d '{"query":"query { me { username } }"}'
@@ -80,8 +80,8 @@ npm -v
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/jeremymefford/tfce-graphql.git
-cd tfce-graphql
+git clone https://github.com/jeremymefford/tfgql.git
+cd tfgql
 ```
 
 ### Environment Variables
@@ -122,7 +122,7 @@ Alternatively, build and run with Docker:
 
 ```bash
 npm run docker:build
-docker run -p 4000:4000 --env-file .env tfce-graphql
+docker run -p 4000:4000 --env-file .env tfgql
 ```
 
 The API will be available at `http://localhost:4000/graphql`.

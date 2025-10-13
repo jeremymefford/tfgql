@@ -6,7 +6,7 @@ sidebar_label: Use Cases
 
 ## Common Admin Workflows
 
-This page walks through ten frequent Terraform Cloud/Enterprise (TFC/E) administration tasks and shows how to accomplish each using the TFCE GraphQL API.  When the built‑in GraphQL schema is sufficient, we provide example queries.  For more specialized needs, we highlight the custom queries you can add (and note where API support is missing).
+This page walks through ten frequent Terraform Cloud/Enterprise (TFC/E) administration tasks and shows how to accomplish each using the TFGQL API.  When the built‑in GraphQL schema is sufficient, we provide example queries.  For more specialized needs, we highlight the custom queries you can add (and note where API support is missing).
 
 Looking for aggregated Explorer data across organizations? See the dedicated [Explorer Views](./explorer.md) guide for details on the `explorer*` queries and their nested workspace relationships.
 

@@ -28,11 +28,11 @@ export class Config {
     this.tfeBaseUrl = baseUrl;
 
     this.graphqlBatchSize = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_BATCH_SIZE,
+      env.TFGQL_BATCH_SIZE,
       10,
     );
     const userGivenPageSize = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_PAGE_SIZE,
+      env.TFGQL_PAGE_SIZE,
       100,
     );
     this.tfcPageSize =
@@ -40,52 +40,53 @@ export class Config {
         ? 100
         : userGivenPageSize;
     this.rateLimitMaxRetries = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES,
+      env.TFGQL_RATE_LIMIT_MAX_RETRIES,
       50,
     );
     this.serverErrorMaxRetries = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES,
+      env.TFGQL_SERVER_ERROR_MAX_RETRIES,
       20,
     );
     this.serverErrorRetryDelay = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY,
+      env.TFGQL_SERVER_ERROR_RETRY_DELAY,
       60000,
     );
     this.requestCacheMaxSize = this.parsePositiveNumber(
-      env.TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE,
+      env.TFGQL_REQUEST_CACHE_MAX_SIZE,
       5000,
     );
     this.authTokenTtlSeconds = this.parsePositiveNumber(
-      env.TFCE_AUTH_TOKEN_TTL,
+      env.TFGQL_AUTH_TOKEN_TTL,
       2600000,
     ); // default 30 days
-    this.jwtEncryptionKeyMaterial = env.TFCE_JWT_ENCRYPTION_KEY;
+    this.jwtEncryptionKeyMaterial = env.TFGQL_JWT_ENCRYPTION_KEY;
 
-    const tlsCertPath = this.normalizePath(env.TFCE_SERVER_TLS_CERT_FILE);
-    const tlsKeyPath = this.normalizePath(env.TFCE_SERVER_TLS_KEY_FILE);
+    const tlsCertPath = this.normalizePath(env.TFGQL_SERVER_TLS_CERT_FILE);
+    const tlsKeyPath = this.normalizePath(env.TFGQL_SERVER_TLS_KEY_FILE);
 
     if ((tlsCertPath && !tlsKeyPath) || (!tlsCertPath && tlsKeyPath)) {
       throw new Error(
-        "Both TFCE_SERVER_TLS_CERT_FILE and TFCE_SERVER_TLS_KEY_FILE must be set to enable HTTPS",
+        "Both TFGQL_SERVER_TLS_CERT_FILE and TFGQL_SERVER_TLS_KEY_FILE must be set to enable HTTPS",
       );
     }
 
     if (tlsCertPath && tlsKeyPath) {
       const tlsConfig: ServerTlsConfig = {
-        cert: this.readFileOrThrow(tlsCertPath, "TFCE_SERVER_TLS_CERT_FILE"),
-        key: this.readFileOrThrow(tlsKeyPath, "TFCE_SERVER_TLS_KEY_FILE"),
+        cert: this.readFileOrThrow(tlsCertPath, "TFGQL_SERVER_TLS_CERT_FILE"),
+        key: this.readFileOrThrow(tlsKeyPath, "TFGQL_SERVER_TLS_KEY_FILE"),
       };
 
-      const tlsCaPath = this.normalizePath(env.TFCE_SERVER_TLS_CA_FILE);
+      const tlsCaPath = this.normalizePath(env.TFGQL_SERVER_TLS_CA_FILE);
       if (tlsCaPath) {
         tlsConfig.ca = this.readFileOrThrow(
           tlsCaPath,
-          "TFCE_SERVER_TLS_CA_FILE",
+          "TFGQL_SERVER_TLS_CA_FILE",
         );
       }
 
-      if (env.TFCE_SERVER_TLS_KEY_PASSPHRASE) {
-        tlsConfig.passphrase = env.TFCE_SERVER_TLS_KEY_PASSPHRASE;
+      const tlsKeyPassphrase = env.TFGQL_SERVER_TLS_KEY_PASSPHRASE;
+      if (tlsKeyPassphrase) {
+        tlsConfig.passphrase = tlsKeyPassphrase;
       }
 
       this.serverTlsConfig = tlsConfig;

@@ -1,6 +1,6 @@
-# Contributing to TFCE GraphQL
+# Contributing to TFGQL
 
-Thank you for your interest in contributing to the TFCE GraphQL project! We welcome your input and collaboration. Please follow the guidelines below to ensure a smooth development process.
+Thank you for your interest in contributing to the TFGQL project! We welcome your input and collaboration. Please follow the guidelines below to ensure a smooth development process.
 
 ---
 
@@ -8,7 +8,7 @@ Thank you for your interest in contributing to the TFCE GraphQL project! We welc
 
 1. **Fork the repository** and clone it to your local machine.
 2. Run `npm install` to install dependencies.
-3. Create a `.env` file in the project root and configure environment variables (e.g., `TFCE_JWT_ENCRYPTION_KEY`, `TFE_BASE_URL`, etc.).
+3. Create a `.env` file in the project root and configure environment variables (e.g., `TFGQL_JWT_ENCRYPTION_KEY`, `TFE_BASE_URL`, etc.).
 4. Build and start the project with:
 
    ```bash

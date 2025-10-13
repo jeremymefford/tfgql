@@ -1,8 +1,8 @@
-# Getting Started with TFCE GraphQL
+# Getting Started with TFGQL
 
-Welcome to the comprehensive guide for getting started with the **TFCE GraphQL** project.
+Welcome to the comprehensive guide for getting started with the **TFGQL** project.
 
-This guide will walk you through installation, configuration, and basic usage of the TFCE GraphQL API.
+This guide will walk you through installation, configuration, and basic usage of the TFGQL API.
 
 ---
 
@@ -28,7 +28,7 @@ This guide will walk you through installation, configuration, and basic usage of
 
 ## Project Overview
 
-The **TFCE GraphQL** project provides a flexible GraphQL API for interacting with Terraform Cloud and Terraform Enterprise resources, including organizations, teams, workspaces, runs, and more. It wraps the underlying REST API, exposing a strongly typed schema with advanced filtering, rate-limit handling, and streaming pagination under the hood.
+The **TFGQL** project provides a flexible GraphQL API for interacting with Terraform Cloud and Terraform Enterprise resources, including organizations, teams, workspaces, runs, and more. It wraps the underlying REST API, exposing a strongly typed schema with advanced filtering, rate-limit handling, and streaming pagination under the hood.
 
 ---
 # No Frills Starter
@@ -89,20 +89,20 @@ cd tfce-graphql
 Create a `.env` file in the project root with the following (customize as needed):
 
 ```env
-TFCE_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32) # stable JWTs across restarts
-TFCE_AUTH_TOKEN_TTL=2600000
+TFGQL_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32) # stable JWTs across restarts
+TFGQL_AUTH_TOKEN_TTL=2600000
 TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
 PORT=4000
 # Logging
 # LOG_LEVEL=info          # fatal,error,warn,info,debug,trace (default: info)
 # NODE_ENV=development    # pretty-prints logs in development
 # Optional tuning:
-# TFCE_GRAPHQL_BATCH_SIZE=10
-# TFCE_GRAPHQL_PAGE_SIZE=100
-# TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES=50
-# TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES=20
-# TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY=60000
-# TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE=5000
+# TFGQL_BATCH_SIZE=10
+# TFGQL_PAGE_SIZE=100
+# TFGQL_RATE_LIMIT_MAX_RETRIES=50
+# TFGQL_SERVER_ERROR_MAX_RETRIES=20
+# TFGQL_SERVER_ERROR_RETRY_DELAY=60000
+# TFGQL_REQUEST_CACHE_MAX_SIZE=5000
 ```
 
 Tokens for Terraform Cloud/Enterprise are now supplied per-request when you exchange them for a JWT (details below), so they no longer live in the environment.
@@ -321,11 +321,11 @@ query {
 
 ## Rate Limit Handling
 
-TFCE GraphQL automatically handles Terraform API rate limits and server errors with retries. You can configure retry settings via environment variables:
+TFGQL automatically handles Terraform API rate limits and server errors with retries. You can configure retry settings via environment variables:
 
-- `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES`
-- `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES`
-- `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY`
+- `TFGQL_RATE_LIMIT_MAX_RETRIES`
+- `TFGQL_SERVER_ERROR_MAX_RETRIES`
+- `TFGQL_SERVER_ERROR_RETRY_DELAY`
 
 Refer to the [Concepts](Concepts/) page for details on rate-limit strategies.
 
@@ -353,6 +353,6 @@ query {
 
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
  - Logging & tracing: The server emits structured logs with `trace_id` and `span_id`, and propagates `traceparent`/`x-request-id` on outbound calls.
-- [TFCE GraphQL Concepts](Concepts/)
+- [TFGQL Concepts](Concepts/)
 - [Contributing Guide](Contributing/)
 - [Full Schema Reference (playground)](http://localhost:4000/graphql)

@@ -16,7 +16,7 @@ function HomepageHeader() {
       <div className="container">
         <img
           src="/tfce-graphql/img/logo.svg"
-          alt="TFCE GraphQL Logo"
+          alt="TFGQL Logo"
           style={{ width: '300px', marginBottom: '1rem' }}
         />
         <Heading as="h1" className="hero__title">

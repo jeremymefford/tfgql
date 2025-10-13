@@ -1,6 +1,6 @@
 # Docker
 
-Build and run the TFCE GraphQL server in a Docker container.
+Build and run the TFGQL server in a Docker container.
 
 ## Build the Docker image
 

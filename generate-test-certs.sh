@@ -26,7 +26,7 @@ openssl req \
   -sha256 \
   -days 365 \
   -out "$CA_CERT" \
-  -subj "/CN=TFCE GraphQL Test CA"
+  -subj "/CN=TFGQL Test CA"
 
 openssl req \
   -new -nodes \
@@ -59,5 +59,4 @@ rm -f "$SERVER_EXT" "$SERVER_CSR"
 echo "Test certificates generated in $CERT_DIR:" \
   && ls -1 "$CERT_DIR"
 
-# alias start_tfce_tls='TFCE_SERVER_TLS_CERT_FILE=certs/server.cert.pem TFCE_SERVER_TLS_KEY_FILE=certs/server.key.pem npm start'
-
+# alias start_tfgql_tls='TFGQL_SERVER_TLS_CERT_FILE=certs/server.cert.pem TFGQL_SERVER_TLS_KEY_FILE=certs/server.key.pem npm start'

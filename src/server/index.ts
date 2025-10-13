@@ -29,7 +29,7 @@ import { registerAuthRoutes } from "./authRoutes";
  */
 export async function startServer(): Promise<void> {
   const disableExplorer =
-    (process.env.TFCE_GRAPHQL_DISABLE_EXPLORER ?? "").toLowerCase() === "true";
+    (process.env.TFGQL_DISABLE_EXPLORER ?? "").toLowerCase() === "true";
 
   const armor = new ApolloArmor({
     maxDepth: { n: 10 },

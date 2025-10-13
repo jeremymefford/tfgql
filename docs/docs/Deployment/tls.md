@@ -10,7 +10,7 @@ description: Configure TLS for outbound trust and in-process HTTPS termination.
 > policy requires the Node.js process to handle TLS directly.
 
 This page explains how to extend the container image with additional trusted
-certificate authorities and how to enable HTTPS inside the TFCE GraphQL server
+certificate authorities and how to enable HTTPS inside the TFGQL server
 when absolutely necessary.
 
 ## Extend the trust store for outbound calls
@@ -41,13 +41,13 @@ CA bundle.
 
 Provide PEM-encoded assets via the following environment variables:
 
-- `TFCE_SERVER_TLS_CERT_FILE` – certificate (and intermediate chain)
-- `TFCE_SERVER_TLS_KEY_FILE` – private key for the certificate
-- `TFCE_SERVER_TLS_CA_FILE` (optional) – bundle to present to clients or use for
+- `TFGQL_SERVER_TLS_CERT_FILE` – certificate (and intermediate chain)
+- `TFGQL_SERVER_TLS_KEY_FILE` – private key for the certificate
+- `TFGQL_SERVER_TLS_CA_FILE` (optional) – bundle to present to clients or use for
   mutual TLS
-- `TFCE_SERVER_TLS_KEY_PASSPHRASE` (optional) – passphrase for the key
+- `TFGQL_SERVER_TLS_KEY_PASSPHRASE` (optional) – passphrase for the key
 
-When both `TFCE_SERVER_TLS_CERT_FILE` and `TFCE_SERVER_TLS_KEY_FILE` are set, the
+When both `TFGQL_SERVER_TLS_CERT_FILE` and `TFGQL_SERVER_TLS_KEY_FILE` are set, the
 server listens with HTTPS, enforces TLS 1.3, and restricts ciphers to
 `TLS_AES_256_GCM_SHA384`, `TLS_CHACHA20_POLY1305_SHA256`, and
 `TLS_AES_128_GCM_SHA256`.
@@ -64,7 +64,7 @@ certificates and define an alias that starts the server with HTTPS:
 ```bash
 source ./generate-test-certs.sh
 # Optionally pin the JWT encryption key for repeatable tokens
-export TFCE_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32)
+export TFGQL_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32)
 start_tfce_tls
 ```
 

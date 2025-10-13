@@ -50,22 +50,22 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 - Use the request-scoped Axios client from the GraphQL context (`createHttpClient` in `src/common/httpClient.ts`). It provides:
   - Authorization header injection using the decrypted JWT token for the current request.
   - Outbound header propagation: sets `traceparent` and `x-request-id` (same value) from current request context.
-  - Retry on 5xx (configurable): up to `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES`, with delay `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` ms.
-  - Retry on 429: uses `Retry-After` or `X-RateLimit-Reset`, capped at 60s, up to `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES`.
+  - Retry on 5xx (configurable): up to `TFGQL_SERVER_ERROR_MAX_RETRIES`, with delay `TFGQL_SERVER_ERROR_RETRY_DELAY` ms.
+  - Retry on 429: uses `Retry-After` or `X-RateLimit-Reset`, capped at 60s, up to `TFGQL_RATE_LIMIT_MAX_RETRIES`.
 - Avoid creating bespoke Axios instances; rely on the factory so each request gets the correct auth/trace wiring.
 
 ## Configuration
 - Source: `src/common/conf.ts` reads environment variables at startup.
 - Optional (with defaults)
   - `TFE_BASE_URL`: API base; normalized to include `/api/v2` (default `https://app.terraform.io/api/v2`).
-  - `TFCE_AUTH_TOKEN_TTL` (default 3600): lifetime (seconds) of issued JWTs.
-  - `TFCE_JWT_ENCRYPTION_KEY`: Base64/hex/string used to derive AES key for JWT encryption. When omitted a random in-memory key is generated at startup.
-  - `TFCE_GRAPHQL_BATCH_SIZE` (default 10): concurrency for GraphQL-side batching.
-  - `TFCE_GRAPHQL_PAGE_SIZE` (default 100, max 100): TFE page size.
-  - `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` (default 50): 429 retries.
-  - `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` (default 20): 5xx retries.
-  - `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY` (default 60000): delay ms between 5xx retries.
-  - `TFCE_GRAPHQL_REQUEST_CACHE_MAX_SIZE` (default 5000): per-request cache entries.
+  - `TFGQL_AUTH_TOKEN_TTL` (default 3600): lifetime (seconds) of issued JWTs.
+  - `TFGQL_JWT_ENCRYPTION_KEY`: Base64/hex/string used to derive AES key for JWT encryption. When omitted a random in-memory key is generated at startup.
+  - `TFGQL_BATCH_SIZE` (default 10): concurrency for GraphQL-side batching.
+  - `TFGQL_PAGE_SIZE` (default 100, max 100): TFE page size.
+  - `TFGQL_RATE_LIMIT_MAX_RETRIES` (default 50): 429 retries.
+  - `TFGQL_SERVER_ERROR_MAX_RETRIES` (default 20): 5xx retries.
+  - `TFGQL_SERVER_ERROR_RETRY_DELAY` (default 60000): delay ms between 5xx retries.
+  - `TFGQL_REQUEST_CACHE_MAX_SIZE` (default 5000): per-request cache entries.
 
 ## GraphQL Conventions
 - Context: built per-request in `src/server/context.ts` with data sources, cache, and logger.

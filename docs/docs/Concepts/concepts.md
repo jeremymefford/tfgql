@@ -62,8 +62,8 @@ Rate limits are a fundamental reality of working with APIs like HCP Terraform an
 
 ### Mechanisms
 
-- 429 handling: When the API returns HTTP 429, we respect `Retry-After` or `X-RateLimit-Reset` headers and back off (capped at 60s). Retries are limited by `TFCE_GRAPHQL_RATE_LIMIT_MAX_RETRIES` (default 50).
-- 5xx handling: For idempotent GETs (and safe non-mutation POSTs), we retry server errors with a fixed delay between attempts, controlled by `TFCE_GRAPHQL_SERVER_ERROR_MAX_RETRIES` and `TFCE_GRAPHQL_SERVER_ERROR_RETRY_DELAY`.
+- 429 handling: When the API returns HTTP 429, we respect `Retry-After` or `X-RateLimit-Reset` headers and back off (capped at 60s). Retries are limited by `TFGQL_RATE_LIMIT_MAX_RETRIES` (default 50).
+- 5xx handling: For idempotent GETs (and safe non-mutation POSTs), we retry server errors with a fixed delay between attempts, controlled by `TFGQL_SERVER_ERROR_MAX_RETRIES` and `TFGQL_SERVER_ERROR_RETRY_DELAY`.
 
 ### Responsible Client Behavior
 

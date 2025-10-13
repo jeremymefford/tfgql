@@ -86,23 +86,23 @@ cd tfgql
 
 ### Environment Variables
 
-Create a `.env` file in the project root with the following (customize as needed):
+Export the required environment variables in your shell (or add them to your profile) before starting the server:
 
-```env
-TFGQL_JWT_ENCRYPTION_KEY=$(openssl rand -base64 32) # stable JWTs across restarts
-TFGQL_AUTH_TOKEN_TTL=2600000
-TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
-PORT=4000
-# Logging
-# LOG_LEVEL=info          # fatal,error,warn,info,debug,trace (default: info)
-# NODE_ENV=development    # pretty-prints logs in development
+```bash
+export TFGQL_JWT_ENCRYPTION_KEY="$(openssl rand -base64 32)" # stable JWTs across restarts
+export TFGQL_AUTH_TOKEN_TTL=2600000
+export TFE_BASE_URL=https://app.terraform.io/api/v2  # normalized to include /api/v2
+export PORT=4000
+# Optional logging
+# export LOG_LEVEL=info          # fatal,error,warn,info,debug,trace (default: info)
+# export NODE_ENV=development    # pretty-prints logs in development
 # Optional tuning:
-# TFGQL_BATCH_SIZE=10
-# TFGQL_PAGE_SIZE=100
-# TFGQL_RATE_LIMIT_MAX_RETRIES=50
-# TFGQL_SERVER_ERROR_MAX_RETRIES=20
-# TFGQL_SERVER_ERROR_RETRY_DELAY=60000
-# TFGQL_REQUEST_CACHE_MAX_SIZE=5000
+# export TFGQL_BATCH_SIZE=10
+# export TFGQL_PAGE_SIZE=100
+# export TFGQL_RATE_LIMIT_MAX_RETRIES=50
+# export TFGQL_SERVER_ERROR_MAX_RETRIES=20
+# export TFGQL_SERVER_ERROR_RETRY_DELAY=60000
+# export TFGQL_REQUEST_CACHE_MAX_SIZE=5000
 ```
 
 Tokens for Terraform Cloud/Enterprise are now supplied per-request when you exchange them for a JWT (details below), so they no longer live in the environment.
@@ -122,7 +122,12 @@ Alternatively, build and run with Docker:
 
 ```bash
 npm run docker:build
-docker run -p 4000:4000 --env-file .env tfgql
+docker run -p 4000:4000 \
+  -e TFGQL_JWT_ENCRYPTION_KEY="$TFGQL_JWT_ENCRYPTION_KEY" \
+  -e TFGQL_AUTH_TOKEN_TTL="$TFGQL_AUTH_TOKEN_TTL" \
+  -e TFE_BASE_URL="$TFE_BASE_URL" \
+  -e PORT=4000 \
+  tfgql
 ```
 
 The API will be available at `http://localhost:4000/graphql`.

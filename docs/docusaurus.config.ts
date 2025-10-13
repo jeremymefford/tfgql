@@ -117,7 +117,7 @@ const config: Config = {
           items: [
             {
               label: "Tutorial",
-              to: "/",
+              to: "getting-started",
             },
           ],
         },

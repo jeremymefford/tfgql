@@ -15,7 +15,7 @@ function HomepageHeader() {
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
         <img
-          src="/tfce-graphql/img/logo.svg"
+          src="/tfgql/img/logo.svg"
           alt="TFGQL Logo"
           style={{ width: '300px', marginBottom: '1rem' }}
         />

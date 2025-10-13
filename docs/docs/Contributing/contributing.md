@@ -54,7 +54,7 @@ Thank you for your interest in contributing to the TFGQL project! We welcome you
 
 - Build with `npm run docker:build`.
 - A lightweight, multi-arch Dockerfile is provided for secure production use.
-- Run the container locally using: `docker run -p 4000:4000 tfce-graphql`.
+- Run the container locally using: `docker run -p 4000:4000 tfgql`.
 
 ---
 

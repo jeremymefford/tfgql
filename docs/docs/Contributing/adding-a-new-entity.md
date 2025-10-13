@@ -1,6 +1,6 @@
 # Adding a New Entity
 
-This guide walks you through adding a new domain entity to the `tfce-graphql` project. This includes schema definitions, resolvers, mappers, types, data source integration, and updates to core system registries and configuration files.
+This guide walks you through adding a new domain entity to the `tfgql` project. This includes schema definitions, resolvers, mappers, types, data source integration, and updates to core system registries and configuration files.
 
 ---
 

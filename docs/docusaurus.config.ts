@@ -36,12 +36,12 @@ const config: Config = {
   url: "https://jeremymefford.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/tfce-graphql/",
+  baseUrl: "/tfgql/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "jeremymefford", // Usually your GitHub org/user name.
-  projectName: "tfce-graphql", // Usually your repo name.
+  projectName: "tfgql", // Usually your repo name.
 
   onBrokenLinks: "throw",
   markdown: {
@@ -126,7 +126,7 @@ const config: Config = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/jeremymefford/tfce-graphql",
+              href: "https://github.com/jeremymefford/tfgql",
             },
           ],
         },

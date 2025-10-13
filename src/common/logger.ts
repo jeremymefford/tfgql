@@ -19,7 +19,7 @@ export const logger = pino({
     process.env.NODE_ENV === "development"
       ? { target: "pino-pretty", options: { colorize: true, singleLine: true } }
       : undefined,
-  base: { service: "tfce-graphql" },
+  base: { service: "tfgql" },
   redact: ["req.headers.authorization", "password", "*.token"],
   // Add trace context to every log line if present
   mixin() {

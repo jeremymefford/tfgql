@@ -13,7 +13,7 @@ This uses Docker Buildx to build multi-platform images (amd64 and arm64).
 ## Run the container
 
 ```bash
-docker run -p 4000:4000 --env-file .env tfce-graphql
+docker run -p 4000:4000 --env-file .env tfgql
 ```
 
 The server will listen on port 4000 by default.

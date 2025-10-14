@@ -13,6 +13,7 @@ const adminSchema = gql`
     isAdmin: Boolean!
     isSuspended: Boolean!
     organizations: [Organization!]!
+    teams(filter: TeamFilter): [Team!]!
   }
 
   extend type Query {
@@ -24,7 +25,6 @@ const adminSchema = gql`
       search: String
       admin: Boolean
       suspended: Boolean
-      includeOrganizations: Boolean = false
     ): [AdminUser!]! @tfeOnly
   }
 `;

@@ -1,5 +1,7 @@
 import { Context } from "../server/context";
 import { User } from "./types";
+import type { Team, TeamFilter } from "../teams/types";
+import { loadTeamsForUser } from "../common/userTeams";
 
 export const resolvers = {
   Query: {
@@ -28,6 +30,15 @@ export const resolvers = {
         }
       }
       return null;
+    },
+  },
+  User: {
+    teams: async (
+      user: User,
+      { filter }: { filter?: TeamFilter },
+      ctx: Context,
+    ): Promise<Team[]> => {
+      return loadTeamsForUser(ctx, user.id, filter);
     },
   },
 };

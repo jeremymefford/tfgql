@@ -20,13 +20,12 @@ export class AdminAPI {
     if (options.search) {
       params.q = options.search;
     }
-    if (options.admin) {
+    if (typeof options.admin === "boolean") {
       params["filter[admin]"] = options.admin;
     }
-    if (options.suspended) {
+    if (typeof options.suspended === "boolean") {
       params["filter[suspended]"] = options.suspended;
     }
-    params.include = "organizations";
 
     yield* streamPages<AdminUser, UserFilter>(
       this.httpClient,

@@ -3,6 +3,8 @@ import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import type { Organization } from "../organizations/types";
 import type { AdminUser } from "./types";
 import type { UserFilter } from "../users/types";
+import type { Team, TeamFilter } from "../teams/types";
+import { loadTeamsForUser } from "../common/userTeams";
 
 export const resolvers = {
   Query: {
@@ -21,7 +23,7 @@ export const resolvers = {
           filter: args.filter,
           search: args.search,
           admin: args.admin,
-          suspended: args.suspended
+          suspended: args.suspended,
         }),
       );
     },
@@ -39,10 +41,19 @@ export const resolvers = {
       const organizations = await Promise.all(
         user.organizationIds.map((id) =>
           ctx.dataSources.organizationsAPI.getOrganization(id),
-        )
-      ).then((results) => results.filter((res) => res !== null));
+        ),
+      );
 
-      return organizations;
+      return organizations.filter(
+        (organization): organization is Organization => organization !== null,
+      );
+    },
+    teams: async (
+      user: AdminUser,
+      { filter }: { filter?: TeamFilter },
+      ctx: Context,
+    ): Promise<Team[]> => {
+      return loadTeamsForUser(ctx, user.id, filter, user.organizationIds);
     },
   },
 };

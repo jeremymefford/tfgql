@@ -27,7 +27,7 @@ export class TeamsAPI {
       this.httpClient,
       `/organizations/${organization}/teams`,
       teamMapper,
-      {},
+      { include: "users" },
       filter,
     );
   }
@@ -38,7 +38,7 @@ export class TeamsAPI {
     filter?: TeamFilter,
   ): AsyncGenerator<Team[]> {
     const nameFilterString = Array.from(nameFilter).join(",");
-    const params = { "filter[name]": nameFilterString };
+    const params = { include: "users", "filter[name]": nameFilterString };
     yield* streamPages<
       Team,
       {
@@ -69,14 +69,16 @@ export class TeamsAPI {
       this.httpClient,
       `/organizations/${organization}/teams`,
       teamMapper,
-      { q: query },
+      { include: "users", q: query },
       filter,
     );
   }
 
   async getTeam(id: string): Promise<Team | null> {
     return this.httpClient
-      .get<TeamResponse>(`/teams/${id}`)
+      .get<TeamResponse>(`/teams/${id}`, {
+        params: { include: "users" },
+      })
       .then((res) => teamMapper.map(res.data.data))
       .catch((err) => {
         if (isNotFound(err)) {

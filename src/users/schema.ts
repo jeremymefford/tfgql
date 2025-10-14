@@ -1,7 +1,15 @@
 import { gql } from "graphql-tag";
 
 const userSchema = gql`
-  type User {
+  interface UserAccount {
+    id: ID!
+    username: String!
+    email: String
+    avatarUrl: String
+    isServiceAccount: Boolean!
+  }
+
+  type User implements UserAccount {
     id: ID!
     username: String!
     email: String

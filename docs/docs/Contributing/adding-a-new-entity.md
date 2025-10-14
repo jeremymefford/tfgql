@@ -204,11 +204,11 @@ export async function buildContext(
 
 ---
 
-## 8. Mark Terraform Enterprise Only Fields
+## 8. Restrict Fields by Deployment Target
 
 File path: `src/{domain}/schema.ts`
 
-If your schema field should only be available when the server targets Terraform Enterprise, decorate it (or the enclosing type) with the `@tfeOnly` directive:
+If your schema field should only be available for a specific deployment target, decorate it (or the enclosing type) with the matching directive:
 
 ```graphql
 extend type Query {
@@ -225,4 +225,14 @@ type TfeOnlyType @tfeOnly {
 }
 ```
 
-When the server points at Terraform Cloud (any host ending in `terraform.io`), resolving a `@tfeOnly` field returns a `403` GraphQL error with code `TFE_ONLY_ENDPOINT`.
+```graphql
+type TfcOnlyType @tfcOnly {
+  id: ID!
+  name: String!
+}
+```
+
+- Use `@tfeOnly` for Terraform Enterprise–specific behavior.
+- Use `@tfcOnly` for Terraform Cloud–only fields.
+
+When a client calls a restricted field while the server targets the opposite platform, the resolver returns a `403` GraphQL error (`TFE_ONLY_ENDPOINT` or `TFC_ONLY_ENDPOINT`).

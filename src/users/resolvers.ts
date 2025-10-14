@@ -16,4 +16,18 @@ export const resolvers = {
       return userResource;
     },
   },
+  UserAccount: {
+    __resolveType(obj: unknown) {
+      if (obj && typeof obj === "object") {
+        const record = obj as Record<string, unknown>;
+        if ("permissions" in record || "authMethod" in record) {
+          return "User";
+        }
+        if ("isAdmin" in record || "isSuspended" in record) {
+          return "AdminUser";
+        }
+      }
+      return null;
+    },
+  },
 };

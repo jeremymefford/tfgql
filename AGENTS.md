@@ -32,7 +32,6 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 ## Run & Build
 - Compile: `npm run compile`
 - Start: `npm start` (compiles then runs `dist/index.js`)
-- Tests: `npm test` (Vitest); `npm run coverage` for coverage
 - Docker build: `npm run docker:build`
 
 ## Logging & Tracing

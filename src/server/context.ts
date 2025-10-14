@@ -32,6 +32,7 @@ import { TeamAccessAPI } from "../workspaceTeamAccess/dataSource";
 import { RunTriggersAPI } from "../runTriggers/dataSource";
 import { ExplorerAPI } from "../explorer/dataSource";
 import { createHttpClient } from "../common/httpClient";
+import { applicationConfiguration } from "../common/conf";
 
 /** GraphQL context type */
 export interface Context {
@@ -70,6 +71,7 @@ export interface Context {
   requestCache: RequestCache;
   logger: Logger;
   httpClient: AxiosInstance;
+  deploymentTarget: "tfc" | "tfe";
 }
 
 /**
@@ -121,5 +123,6 @@ export async function buildContext(
     requestCache,
     logger: baseLogger,
     httpClient,
+    deploymentTarget: applicationConfiguration.deploymentTarget,
   };
 }

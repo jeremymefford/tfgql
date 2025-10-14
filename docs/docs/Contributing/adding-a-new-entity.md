@@ -162,19 +162,67 @@ export const resolvers = {
 File path: `src/server/context.ts`
 
 ```ts
-import { MyEntityAPI } from '../{domain}/dataSource';
+import { MyEntityAPI } from "../{domain}/dataSource";
+import { RequestCache } from "../common/requestCache";
+import { createHttpClient } from "../common/httpClient";
+import { applicationConfiguration } from "../common/conf";
+import type { AxiosInstance } from "axios";
+import type { Logger } from "pino";
 
 export interface Context {
   dataSources: {
     myEntityAPI: MyEntityAPI;
-    ...
+    // ...
+  };
+  deploymentTarget: "tfc" | "tfe";
+  requestCache: RequestCache;
+  logger: Logger;
+  httpClient: AxiosInstance;
+}
 ```
+
 ```ts
-export async function buildContext(): Promise<Context> {
+export async function buildContext(
+  baseLogger: Logger,
+  token: string,
+): Promise<Context> {
   const requestCache = new RequestCache();
-  
+  const httpClient = createHttpClient(token);
+
   return {
     dataSources: {
-      myEntityAPI: new MyEntityAPI(requestCache), // requestCache is optional, if needed
-      ...
+      myEntityAPI: new MyEntityAPI(httpClient, requestCache),
+      // ...
+    },
+    deploymentTarget: applicationConfiguration.deploymentTarget,
+    requestCache,
+    logger: baseLogger,
+    httpClient,
+  };
+}
 ```
+
+---
+
+## 8. Mark Terraform Enterprise Only Fields
+
+File path: `src/{domain}/schema.ts`
+
+If your schema field should only be available when the server targets Terraform Enterprise, decorate it (or the enclosing type) with the `@tfeOnly` directive:
+
+```graphql
+extend type Query {
+  tfeExclusiveThing: MyType @tfeOnly
+}
+```
+
+You can also protect an entire type:
+
+```graphql
+type TfeOnlyType @tfeOnly {
+  id: ID!
+  name: String!
+}
+```
+
+When the server points at Terraform Cloud (any host ending in `terraform.io`), resolving a `@tfeOnly` field returns a `403` GraphQL error with code `TFE_ONLY_ENDPOINT`.

@@ -1,4 +1,13 @@
 import { gql } from "graphql-tag";
+import {
+  defaultFieldResolver,
+  GraphQLError,
+  type DocumentNode,
+  type GraphQLFieldResolver,
+  type ObjectTypeDefinitionNode,
+  type ObjectTypeExtensionNode,
+  visit,
+} from "graphql";
 import { DateTimeScalar } from "../common/scalars/dateTime";
 import { resolvers as organizationsResolvers } from "../organizations/resolvers";
 import { resolvers as workspacesResolvers } from "../workspaces/resolvers";
@@ -30,6 +39,7 @@ import { resolvers as runTriggersResolvers } from "../runTriggers/resolvers";
 import { resolvers as teamTokensResolvers } from "../teamTokens/resolvers";
 import { resolvers as teamAccessResolvers } from "../workspaceTeamAccess/resolvers";
 import { resolvers as explorerResolvers } from "../explorer/resolvers";
+import type { Context } from "./context";
 import configurationVersionSchema from "../configurationVersions/schema";
 import organizationSchema from "../organizations/schema";
 import workspaceSchema from "../workspaces/schema";
@@ -64,6 +74,8 @@ import explorerSchema from "../explorer/schema";
 
 // Base schema definitions for root types and custom scalar
 const baseSchema = gql`
+  directive @tfeOnly on FIELD_DEFINITION | OBJECT
+
   scalar DateTime
 
   type Query {
@@ -112,7 +124,7 @@ export const typeDefs = [
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
-export const resolvers = {
+const baseResolvers = {
   DateTime: DateTimeScalar,
   Query: {
     ...usersResolvers.Query,
@@ -201,3 +213,147 @@ export const resolvers = {
     ...explorerResolvers.ExplorerModuleRow,
   },
 };
+
+applyTfeOnlyGuards(typeDefs, baseResolvers);
+
+export const resolvers = baseResolvers;
+
+type TfeOnlyFieldMap = Map<string, Set<string>>;
+
+function applyTfeOnlyGuards(
+  documents: DocumentNode[],
+  targetResolvers: Record<string, any>,
+): void {
+  const tfeOnlyFields = collectTfeOnlyFields(documents);
+  for (const [typeName, fieldNames] of tfeOnlyFields) {
+    if (!fieldNames.size) {
+      continue;
+    }
+    const typeResolvers =
+      (targetResolvers[typeName] =
+        targetResolvers[typeName] ?? Object.create(null));
+    for (const fieldName of fieldNames) {
+      const existingResolver = typeResolvers[fieldName];
+      const wrappedResolver = wrapWithTfeOnlyGuard(
+        typeName,
+        fieldName,
+        existingResolver,
+      );
+      typeResolvers[fieldName] = wrappedResolver;
+    }
+  }
+}
+
+function collectTfeOnlyFields(documents: DocumentNode[]): TfeOnlyFieldMap {
+  const fieldMap: TfeOnlyFieldMap = new Map();
+
+  const recordFields = (
+    node: ObjectTypeDefinitionNode | ObjectTypeExtensionNode,
+  ) => {
+    if (!node.fields || node.fields.length === 0) {
+      return;
+    }
+
+    const typeHasDirective =
+      node.directives?.some((directive) => directive.name.value === "tfeOnly") ??
+      false;
+
+    for (const field of node.fields) {
+      const fieldHasDirective =
+        typeHasDirective ||
+        (field.directives?.some(
+          (directive) => directive.name.value === "tfeOnly",
+        ) ??
+          false);
+
+      if (!fieldHasDirective) {
+        continue;
+      }
+
+      let fieldSet = fieldMap.get(node.name.value);
+      if (!fieldSet) {
+        fieldSet = new Set<string>();
+        fieldMap.set(node.name.value, fieldSet);
+      }
+      fieldSet.add(field.name.value);
+    }
+  };
+
+  for (const document of documents) {
+    visit(document, {
+      ObjectTypeDefinition(node) {
+        recordFields(node);
+        return false;
+      },
+      ObjectTypeExtension(node) {
+        recordFields(node);
+        return false;
+      },
+    });
+  }
+
+  return fieldMap;
+}
+
+function wrapWithTfeOnlyGuard(
+  typeName: string,
+  fieldName: string,
+  resolverCandidate: unknown,
+): unknown {
+  const fieldPath = `${typeName}.${fieldName}`;
+
+  if (
+    resolverCandidate &&
+    typeof resolverCandidate === "object" &&
+    "resolve" in (resolverCandidate as Record<string, unknown>) &&
+    typeof (resolverCandidate as Record<string, unknown>).resolve === "function"
+  ) {
+    const candidateObject = resolverCandidate as Record<string, unknown>;
+    return {
+      ...candidateObject,
+      resolve: createTfeOnlyGuard(
+        fieldPath,
+        candidateObject.resolve as GraphQLFieldResolver<unknown, Context>,
+      ),
+    };
+  }
+
+  const baseResolver: GraphQLFieldResolver<unknown, Context> =
+    typeof resolverCandidate === "function"
+      ? (resolverCandidate as GraphQLFieldResolver<unknown, Context>)
+      : defaultFieldResolver;
+
+  return createTfeOnlyGuard(fieldPath, baseResolver);
+}
+
+function createTfeOnlyGuard(
+  fieldPath: string,
+  resolver: GraphQLFieldResolver<unknown, Context>,
+): GraphQLFieldResolver<unknown, Context> {
+  return function tfeOnlyGuardedResolver(
+    this: unknown,
+    source,
+    args,
+    context,
+    info,
+  ) {
+    if (context.deploymentTarget === "tfc") {
+      context.logger.warn(
+        { field: fieldPath, deploymentTarget: context.deploymentTarget },
+        "TFE-only GraphQL field invoked while targeting Terraform Cloud",
+      );
+
+      throw new GraphQLError(
+        `${info.parentType.name}.${info.fieldName} is only available when targeting Terraform Enterprise`,
+        {
+          extensions: {
+            code: "TFE_ONLY_ENDPOINT",
+            http: { status: 403 },
+          },
+        },
+      );
+    }
+
+    return resolver.call(this, source, args, context, info);
+  };
+}

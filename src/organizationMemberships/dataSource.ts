@@ -59,17 +59,4 @@ export class OrganizationMembershipsAPI {
         throw err;
       });
   }
-
-  async *listOrganizationMembershipsForUser(
-    userId: string,
-    filter?: OrganizationMembershipFilter,
-  ): AsyncGenerator<OrganizationMembership[], void, unknown> {
-    yield* streamPages<OrganizationMembership, OrganizationMembershipFilter>(
-      this.httpClient,
-      `/users/${userId}/organization-memberships`,
-      organizationMembershipMapper,
-      undefined,
-      filter,
-    );
-  }
 }

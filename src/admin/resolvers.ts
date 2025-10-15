@@ -4,7 +4,7 @@ import type { Organization } from "../organizations/types";
 import type { AdminUser } from "./types";
 import type { UserFilter } from "../users/types";
 import type { Team, TeamFilter } from "../teams/types";
-import { loadTeamsForUser } from "../common/userTeams";
+import { loadTeamsForUser } from "../users/resolvers";
 
 export const resolvers = {
   Query: {
@@ -41,19 +41,17 @@ export const resolvers = {
       const organizations = await Promise.all(
         user.organizationIds.map((id) =>
           ctx.dataSources.organizationsAPI.getOrganization(id),
-        ),
-      );
+        )
+      ).then((results) => results.filter((res) => res !== null));
 
-      return organizations.filter(
-        (organization): organization is Organization => organization !== null,
-      );
+      return organizations;
     },
     teams: async (
       user: AdminUser,
-      { filter }: { filter?: TeamFilter },
+      { includeOrgs, excludeOrgs, filter }: { includeOrgs: string[]; excludeOrgs: string[]; filter?: TeamFilter },
       ctx: Context,
     ): Promise<Team[]> => {
-      return loadTeamsForUser(ctx, user.id, filter, user.organizationIds);
+      return loadTeamsForUser(ctx, user.id, includeOrgs, excludeOrgs, filter);
     },
   },
 };

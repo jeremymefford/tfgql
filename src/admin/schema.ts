@@ -13,7 +13,7 @@ const adminSchema = gql`
     isAdmin: Boolean!
     isSuspended: Boolean!
     organizations: [Organization!]!
-    teams(filter: TeamFilter): [Team!]!
+    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
   }
 
   extend type Query {

@@ -208,6 +208,9 @@ const baseResolvers = {
   ExplorerModuleRow: {
     ...explorerResolvers.ExplorerModuleRow,
   },
+  User: {
+    ...usersResolvers.User,
+  }
 };
 
 applyDeploymentTargetGuards(typeDefs, baseResolvers);

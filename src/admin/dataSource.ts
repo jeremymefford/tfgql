@@ -20,10 +20,10 @@ export class AdminAPI {
     if (options.search) {
       params.q = options.search;
     }
-    if (typeof options.admin === "boolean") {
+    if (options.admin) {
       params["filter[admin]"] = options.admin;
     }
-    if (typeof options.suspended === "boolean") {
+    if (options.suspended) {
       params["filter[suspended]"] = options.suspended;
     }
 

@@ -1,7 +1,7 @@
 import { gql } from "graphql-tag";
 
 const explorerSchema = gql`
-  enum ExplorerFilterOperator  {
+  enum ExplorerFilterOperator {
     is
     is_not
     contains
@@ -16,7 +16,7 @@ const explorerSchema = gql`
     is_after
   }
 
-  enum ExplorerWorkspaceField  {
+  enum ExplorerWorkspaceField {
     all_checks_succeeded
     current_rum_count
     checks_errored
@@ -46,13 +46,13 @@ const explorerSchema = gql`
     workspace_updated_at
   }
 
-  enum ExplorerTerraformVersionField  {
+  enum ExplorerTerraformVersionField {
     version
     workspace_count
     workspaces
   }
 
-  enum ExplorerProviderField  {
+  enum ExplorerProviderField {
     name
     source
     version

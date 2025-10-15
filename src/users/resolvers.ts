@@ -11,7 +11,7 @@ export async function loadTeamsForUser(ctx: Context, userId: string, includeOrgs
     for await (const teamPage of ctx.dataSources.teamsAPI.listTeams(orgId, filter)) {
       for (const team of teamPage) {
         if (team.userIds && team.userIds.includes(userId)) {
-          teams.push(team)
+          teams.push(team);
         }
       }
     }

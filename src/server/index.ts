@@ -180,7 +180,7 @@ async function buildFastifyContext(
 
   updateLogContext({ tokenHash: verifiedClaims.tokenHash });
 
-  const requestLogger = logger.child({ token_hash: verifiedClaims.tokenHash });
+  const requestLogger = logger.child({});
 
   return buildContext(requestLogger, verifiedClaims.tfcToken);
 }

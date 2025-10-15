@@ -210,7 +210,10 @@ const baseResolvers = {
   },
   User: {
     ...usersResolvers.User,
-  }
+  },
+  AdminUser: {
+    ...adminResolvers.AdminUser,
+  },
 };
 
 applyDeploymentTargetGuards(typeDefs, baseResolvers);

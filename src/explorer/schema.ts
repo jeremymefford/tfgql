@@ -177,28 +177,28 @@ const explorerSchema = gql`
       excludeOrgs: [String!]
       sort: [ExplorerWorkspaceSortInput!]
       filters: [ExplorerWorkspaceFilterInput!]
-    ): [ExplorerWorkspaceRow!]!
+    ): [ExplorerWorkspaceRow!]! @tfcOnly
 
     explorerTerraformVersions(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerTerraformVersionSortInput!]
       filters: [ExplorerTerraformVersionFilterInput!]
-    ): [ExplorerTerraformVersionRow!]!
+    ): [ExplorerTerraformVersionRow!]! @tfcOnly
 
     explorerProviders(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerProviderSortInput!]
       filters: [ExplorerProviderFilterInput!]
-    ): [ExplorerProviderRow!]!
+    ): [ExplorerProviderRow!]! @tfcOnly
 
     explorerModules(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerModuleSortInput!]
       filters: [ExplorerModuleFilterInput!]
-    ): [ExplorerModuleRow!]!
+    ): [ExplorerModuleRow!]! @tfcOnly
   }
 `;
 

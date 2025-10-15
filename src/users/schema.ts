@@ -1,7 +1,16 @@
 import { gql } from "graphql-tag";
 
 const userSchema = gql`
-  type User {
+  interface UserAccount {
+    id: ID!
+    username: String!
+    email: String
+    avatarUrl: String
+    isServiceAccount: Boolean!
+    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
+  }
+
+  type User implements UserAccount {
     id: ID!
     username: String!
     email: String
@@ -10,6 +19,7 @@ const userSchema = gql`
     authMethod: String!
     v2Only: Boolean!
     permissions: UserPermissions!
+    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
   }
 
   type UserPermissions {
@@ -62,7 +72,7 @@ const userSchema = gql`
   }
 
   extend type Query {
-    user(id: ID!): User
+    user(id: ID!): User 
     me: User
   }
 `;

@@ -31,7 +31,7 @@ export interface TeamRelationships {
 }
 
 export type TeamResource = ResourceObject<TeamAttributes> & {
-  relationships: TeamRelationships;
+  relationships?: TeamRelationships;
 };
 
 export type TeamListResponse = ListResponse<TeamResource>;

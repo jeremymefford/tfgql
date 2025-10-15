@@ -32,6 +32,8 @@ import { TeamAccessAPI } from "../workspaceTeamAccess/dataSource";
 import { RunTriggersAPI } from "../runTriggers/dataSource";
 import { ExplorerAPI } from "../explorer/dataSource";
 import { createHttpClient } from "../common/httpClient";
+import { applicationConfiguration } from "../common/conf";
+import { AdminAPI } from "../admin/dataSource";
 
 /** GraphQL context type */
 export interface Context {
@@ -66,10 +68,12 @@ export interface Context {
     teamAccessAPI: TeamAccessAPI;
     runTriggersAPI: RunTriggersAPI;
     explorerAPI: ExplorerAPI;
+    adminAPI: AdminAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
   httpClient: AxiosInstance;
+  deploymentTarget: "tfc" | "tfe";
 }
 
 /**
@@ -117,9 +121,11 @@ export async function buildContext(
       teamAccessAPI: new TeamAccessAPI(httpClient),
       runTriggersAPI: new RunTriggersAPI(httpClient),
       explorerAPI: new ExplorerAPI(httpClient),
+      adminAPI: new AdminAPI(httpClient),
     },
     requestCache,
     logger: baseLogger,
     httpClient,
+    deploymentTarget: applicationConfiguration.deploymentTarget,
   };
 }

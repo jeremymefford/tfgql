@@ -30,6 +30,8 @@ import { resolvers as runTriggersResolvers } from "../runTriggers/resolvers";
 import { resolvers as teamTokensResolvers } from "../teamTokens/resolvers";
 import { resolvers as teamAccessResolvers } from "../workspaceTeamAccess/resolvers";
 import { resolvers as explorerResolvers } from "../explorer/resolvers";
+import { resolvers as adminResolvers } from "../admin/resolvers";
+import { applyDeploymentTargetGuards } from "./deploymentGuards";
 import configurationVersionSchema from "../configurationVersions/schema";
 import organizationSchema from "../organizations/schema";
 import workspaceSchema from "../workspaces/schema";
@@ -61,9 +63,13 @@ import teamTokensSchema from "../teamTokens/schema";
 import teamAccessSchema from "../workspaceTeamAccess/schema";
 import stateVersionsSchema from "../stateVersions/schema";
 import explorerSchema from "../explorer/schema";
+import adminSchema from "../admin/schema";
 
 // Base schema definitions for root types and custom scalar
 const baseSchema = gql`
+  directive @tfeOnly on FIELD_DEFINITION | OBJECT
+  directive @tfcOnly on FIELD_DEFINITION | OBJECT
+
   scalar DateTime
 
   type Query {
@@ -109,10 +115,11 @@ export const typeDefs = [
   teamTokensSchema,
   teamAccessSchema,
   explorerSchema,
+  adminSchema,
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
-export const resolvers = {
+const baseResolvers = {
   DateTime: DateTimeScalar,
   Query: {
     ...usersResolvers.Query,
@@ -145,6 +152,7 @@ export const resolvers = {
     ...teamTokensResolvers.Query,
     ...teamAccessResolvers.Query,
     ...explorerResolvers.Query,
+    ...adminResolvers.Query,
   },
   Organization: {
     ...organizationsResolvers.Organization,
@@ -200,4 +208,14 @@ export const resolvers = {
   ExplorerModuleRow: {
     ...explorerResolvers.ExplorerModuleRow,
   },
+  User: {
+    ...usersResolvers.User,
+  },
+  AdminUser: {
+    ...adminResolvers.AdminUser,
+  },
 };
+
+applyDeploymentTargetGuards(typeDefs, baseResolvers);
+
+export const resolvers = baseResolvers;

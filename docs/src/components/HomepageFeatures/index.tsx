@@ -20,6 +20,15 @@ const FeatureList = [
     ),
   },
   {
+    title: 'Multi-Org Querying',
+    emoji: '🌍',
+    description: (
+      <>
+        Fan out requests across many organizations in a single query using the <code>includeOrgs</code> / <code>excludeOrgs</code> helpers.
+      </>
+    ),
+  },
+  {
     title: 'HCP Terraform + TFE Support',
     emoji: '🧩',
     description: (
@@ -61,15 +70,6 @@ const FeatureList = [
     description: (
       <>
         Ships as a minimal Docker image with cross-architecture support — deployable anywhere in seconds.
-      </>
-    ),
-  },
-  {
-    title: 'Built on Apollo Server',
-    emoji: '🚀',
-    description: (
-      <>
-        Leverages the power of Apollo Server for robust GraphQL delivery
       </>
     ),
   },

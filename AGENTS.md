@@ -32,7 +32,6 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 ## Run & Build
 - Compile: `npm run compile`
 - Start: `npm start` (compiles then runs `dist/index.js`)
-- Tests: `npm test` (Vitest); `npm run coverage` for coverage
 - Docker build: `npm run docker:build`
 
 ## Logging & Tracing
@@ -73,6 +72,7 @@ This repository contains a TypeScript Apollo GraphQL server. These notes are for
 - Composition: `src/server/schema.ts` aggregates all typeDefs and resolvers.
 - Scalar: `DateTime` provided by `src/common/scalars/dateTime.ts` (ISO-8601 UTC).
 - Keep resolvers lean; put IO and pagination in data sources.
+- Only add `@tfeOnly` / `@tfcOnly` schema directives when the user explicitly requests it; never infer platform restrictions yourself. The guards emit 403 errors (and logs) when a directive is triggered on the wrong target.
 
 ## Entity Conventions
 - Files per entity

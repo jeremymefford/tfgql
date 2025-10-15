@@ -1,7 +1,7 @@
 import { gql } from "graphql-tag";
 
 const explorerSchema = gql`
-  enum ExplorerFilterOperator {
+  enum ExplorerFilterOperator  {
     is
     is_not
     contains
@@ -16,7 +16,7 @@ const explorerSchema = gql`
     is_after
   }
 
-  enum ExplorerWorkspaceField {
+  enum ExplorerWorkspaceField  {
     all_checks_succeeded
     current_rum_count
     checks_errored
@@ -46,13 +46,13 @@ const explorerSchema = gql`
     workspace_updated_at
   }
 
-  enum ExplorerTerraformVersionField {
+  enum ExplorerTerraformVersionField  {
     version
     workspace_count
     workspaces
   }
 
-  enum ExplorerProviderField {
+  enum ExplorerProviderField  {
     name
     source
     version
@@ -109,7 +109,7 @@ const explorerSchema = gql`
     ascending: Boolean!
   }
 
-  type ExplorerWorkspaceRow {
+  type ExplorerWorkspaceRow @tfcOnly {
     allChecksSucceeded: Boolean
     currentRumCount: Int
     checksErrored: Int
@@ -143,7 +143,7 @@ const explorerSchema = gql`
     organization: Organization
   }
 
-  type ExplorerTerraformVersionRow {
+  type ExplorerTerraformVersionRow @tfcOnly {
     version: String
     workspaceCount: Int
     workspaces: String
@@ -151,7 +151,7 @@ const explorerSchema = gql`
     workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
-  type ExplorerProviderRow {
+  type ExplorerProviderRow @tfcOnly {
     name: String
     source: String
     version: String
@@ -161,7 +161,7 @@ const explorerSchema = gql`
     workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
-  type ExplorerModuleRow {
+  type ExplorerModuleRow @tfcOnly {
     name: String
     source: String
     version: String
@@ -177,28 +177,28 @@ const explorerSchema = gql`
       excludeOrgs: [String!]
       sort: [ExplorerWorkspaceSortInput!]
       filters: [ExplorerWorkspaceFilterInput!]
-    ): [ExplorerWorkspaceRow!]!
+    ): [ExplorerWorkspaceRow!]! @tfcOnly
 
     explorerTerraformVersions(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerTerraformVersionSortInput!]
       filters: [ExplorerTerraformVersionFilterInput!]
-    ): [ExplorerTerraformVersionRow!]!
+    ): [ExplorerTerraformVersionRow!]! @tfcOnly
 
     explorerProviders(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerProviderSortInput!]
       filters: [ExplorerProviderFilterInput!]
-    ): [ExplorerProviderRow!]!
+    ): [ExplorerProviderRow!]! @tfcOnly
 
     explorerModules(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       sort: [ExplorerModuleSortInput!]
       filters: [ExplorerModuleFilterInput!]
-    ): [ExplorerModuleRow!]!
+    ): [ExplorerModuleRow!]! @tfcOnly
   }
 `;
 

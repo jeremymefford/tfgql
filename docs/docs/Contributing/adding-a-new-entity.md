@@ -162,19 +162,77 @@ export const resolvers = {
 File path: `src/server/context.ts`
 
 ```ts
-import { MyEntityAPI } from '../{domain}/dataSource';
+import { MyEntityAPI } from "../{domain}/dataSource";
+import { RequestCache } from "../common/requestCache";
+import { createHttpClient } from "../common/httpClient";
+import { applicationConfiguration } from "../common/conf";
+import type { AxiosInstance } from "axios";
+import type { Logger } from "pino";
 
 export interface Context {
   dataSources: {
     myEntityAPI: MyEntityAPI;
-    ...
+    // ...
+  };
+  deploymentTarget: "tfc" | "tfe";
+  requestCache: RequestCache;
+  logger: Logger;
+  httpClient: AxiosInstance;
+}
 ```
+
 ```ts
-export async function buildContext(): Promise<Context> {
+export async function buildContext(
+  baseLogger: Logger,
+  token: string,
+): Promise<Context> {
   const requestCache = new RequestCache();
-  
+  const httpClient = createHttpClient(token);
+
   return {
     dataSources: {
-      myEntityAPI: new MyEntityAPI(requestCache), // requestCache is optional, if needed
-      ...
+      myEntityAPI: new MyEntityAPI(httpClient, requestCache),
+      // ...
+    },
+    deploymentTarget: applicationConfiguration.deploymentTarget,
+    requestCache,
+    logger: baseLogger,
+    httpClient,
+  };
+}
 ```
+
+---
+
+## 8. Restrict Fields by Deployment Target
+
+File path: `src/{domain}/schema.ts`
+
+If your schema field should only be available for a specific deployment target, decorate it (or the enclosing type) with the matching directive:
+
+```graphql
+extend type Query {
+  tfeExclusiveThing: MyType @tfeOnly
+}
+```
+
+You can also protect an entire type:
+
+```graphql
+type TfeOnlyType @tfeOnly {
+  id: ID!
+  name: String!
+}
+```
+
+```graphql
+type TfcOnlyType @tfcOnly {
+  id: ID!
+  name: String!
+}
+```
+
+- Use `@tfeOnly` for Terraform Enterprise–specific behavior.
+- Use `@tfcOnly` for Terraform Cloud–only fields.
+
+When a client calls a restricted field while the server targets the opposite platform, the resolver returns a `403` GraphQL error (`TFE_ONLY_ENDPOINT` or `TFC_ONLY_ENDPOINT`).

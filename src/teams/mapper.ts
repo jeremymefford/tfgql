@@ -3,6 +3,9 @@ import { Team, TeamResource } from "./types";
 
 export const teamMapper: DomainMapper<TeamResource, Team> = {
   map(resource: TeamResource): Team {
+    const organizationRef = resource.relationships?.organization?.data;
+    const userRefs = resource.relationships?.users?.data ?? [];
+
     return {
       id: resource.id,
       name: resource.attributes.name,
@@ -81,10 +84,8 @@ export const teamMapper: DomainMapper<TeamResource, Team> = {
           resource.attributes["organization-access"]?.["manage-agent-pools"] ??
           false,
       },
-      organizationId: resource.relationships.organization.data.id,
-      userIds: resource.relationships.users.data.map(
-        (userMetadata) => userMetadata.id,
-      ),
+      organizationId: organizationRef?.id ?? "",
+      userIds: userRefs.map((userMetadata) => userMetadata.id),
     };
   },
 };

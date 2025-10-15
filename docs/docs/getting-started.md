@@ -30,6 +30,10 @@ This guide will walk you through installation, configuration, and basic usage of
 
 The **TFGQL** project provides a flexible GraphQL API for interacting with Terraform Cloud and Terraform Enterprise resources, including organizations, teams, workspaces, runs, and more. It wraps the underlying REST API, exposing a strongly typed schema with advanced filtering, rate-limit handling, and streaming pagination under the hood.
 
+:::tip
+Curious how this compares to a shell script that calls the REST API?  Check out the [comparison page](Concepts/direct-vs-graphql.md)
+:::
+
 ---
 # No Frills Starter
 

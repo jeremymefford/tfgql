@@ -9,6 +9,7 @@ export interface ServerTlsConfig {
 
 export class Config {
   readonly tfeBaseUrl: string;
+   readonly deploymentTarget: "tfc" | "tfe";
   readonly graphqlBatchSize: number;
   readonly tfcPageSize: number;
   readonly rateLimitMaxRetries: number = 20;
@@ -26,6 +27,7 @@ export class Config {
       baseUrl = `${baseUrl.replace(/\/?$/, "")}/api/v2`;
     }
     this.tfeBaseUrl = baseUrl;
+    this.deploymentTarget = this.determineDeploymentTarget(this.tfeBaseUrl);
 
     this.graphqlBatchSize = this.parsePositiveNumber(
       env.TFGQL_BATCH_SIZE,
@@ -113,6 +115,15 @@ export class Config {
       throw new Error(
         `Failed to read file for ${envVar} at path ${path}: ${(error as Error).message}`,
       );
+    }
+  }
+
+  private determineDeploymentTarget(baseUrl: string): "tfc" | "tfe" {
+    try {
+      const hostname = new URL(baseUrl).hostname;
+      return hostname.endsWith("terraform.io") ? "tfc" : "tfe";
+    } catch {
+      return "tfe";
     }
   }
 }

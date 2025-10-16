@@ -56,6 +56,7 @@ const workspaceSchema = gql`
     currentStateVersion: StateVersion
     providers: [WorkspaceProvider!]!
     modules: [WorkspaceModule!]!
+    project: Project
   }
 
   type WorkspaceActions {
@@ -177,7 +178,7 @@ const workspaceSchema = gql`
     """
     List all run-trigger edges (workspace dependency graph) across the selected organizations.
     """
-    stackGraph(
+    runTriggerGraph(
       includeOrgs: [String!]
       excludeOrgs: [String!]
     ): [WorkspaceRunTrigger!]!

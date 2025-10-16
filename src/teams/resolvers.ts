@@ -6,6 +6,7 @@ import { TeamToken, TeamTokenFilter } from "../teamTokens/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { coalesceOrgs } from "../common/orgHelper";
 import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
+import { AdminUser } from "../admin/types";
 
 export const resolvers = {
   Query: {
@@ -99,5 +100,14 @@ export const resolvers = {
       gatherAsyncGeneratorPromises(
         ctx.dataSources.teamTokensAPI.listTeamTokens(team.id, filter),
       ),
+    usersFromAdmin: async (
+      team: Team,
+      { filter }: { filter?: UserFilter },
+      ctx: Context,
+    ): Promise<AdminUser[]> =>
+      ctx.dataSources.adminAPI.listUsers({
+        filter: filter,
+        organizationId: team.organizationId,
+      })
   },
 };

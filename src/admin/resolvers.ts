@@ -17,16 +17,13 @@ export const resolvers = {
         suspended?: boolean;
       },
       ctx: Context,
-    ): Promise<AdminUser[]> => {
-      return gatherAsyncGeneratorPromises(
-        ctx.dataSources.adminAPI.listUsers({
-          filter: args.filter,
-          search: args.search,
-          admin: args.admin,
-          suspended: args.suspended,
-        }),
-      );
-    },
+    ): Promise<AdminUser[]> =>
+      ctx.dataSources.adminAPI.listUsers({
+        filter: args.filter,
+        search: args.search,
+        admin: args.admin,
+        suspended: args.suspended,
+      })
   },
   AdminUser: {
     organizations: async (

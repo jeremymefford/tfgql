@@ -92,13 +92,16 @@ export interface WorkspaceSettingOverwrites {
 }
 
 export interface WorkspaceRelationships {
-  organization?: {
+  organization: {
+    data: ResourceRef;
+  };
+  project: {
     data: ResourceRef;
   };
 }
 
 export type WorkspaceResource = ResourceObject<WorkspaceAttributes> & {
-  relationships?: WorkspaceRelationships;
+  relationships: WorkspaceRelationships;
 };
 export type WorkspaceListResponse = ListResponse<WorkspaceResource>;
 export type WorkspaceResponse = SingleResponse<WorkspaceResource>;
@@ -175,7 +178,8 @@ export interface Workspace {
     executionMode?: boolean;
     agentPool?: boolean;
   };
-  organizationName?: string;
+  organizationName: string;
+  projectId: string;
 }
 
 export interface WorkspaceProvider {

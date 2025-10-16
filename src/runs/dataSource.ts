@@ -37,7 +37,7 @@ export class RunsAPI {
       this.httpClient,
       `/workspaces/${workspaceId}/runs`,
       runMapper,
-      undefined,
+      {"filter[operation]": "plan_only,plan_and_apply,save_plan,refresh_only,destroy,empty_apply"},
       filter,
     );
   }

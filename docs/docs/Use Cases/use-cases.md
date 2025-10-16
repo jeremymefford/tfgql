@@ -19,35 +19,26 @@ Looking for aggregated Explorer data across organizations? See the dedicated [Ex
 TFC does not currently surface a global filter for run status.  Use the custom `workspacesWithOpenRuns` query to find all workspaces with at least one run matching a given status filter (e.g. planning/applying):
 
 ```graphql
-query WorkspacesWithOpenRuns(
-  $orgs: [String!]!
-  $runFilter: RunFilter!
-) {
-  workspacesWithOpenRuns(
-    includeOrgs: $orgs
-    runFilter: $runFilter
-  ) {
+query WorkspacesWithOpenRuns {
+  workspacesWithOpenRuns {
     id
     name
-    runs(filter: $runFilter) {
-      id
+    runs(filter:  {
+       status:  {
+          _nin: ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished"]
+       }
+    }) {
       status
-      message
-      createdAt
+      id
     }
   }
 }
 ```
 
-```json
-# Variables:
-{
-  "orgs": ["my-org"],
-  "runFilter": { "status": { "_in": ["planning", "applying"] } }
-}
-```
-
-The GraphQL layer pages through all workspaces and tests the first page of runs for each, so this remains efficient even at scale.
+The GraphQL layer pages through all workspace runs and looks for any that are not in a terminal state. To see which runs match, you can add the shown filter to that will narrow it down to just the open runs.  If no filter is presented, all runs for the resultant workspaces will be returned.
+:::warning
+Due to the heavy rate limiting imposed by HCP TF and TFE, this run can take a very long time to complete and there's a chance that the workspace is in the response but no runs if the run completed before the query returned.
+:::
 
 ---
 
@@ -56,10 +47,9 @@ The GraphQL layer pages through all workspaces and tests the first page of runs 
 Use the built‑in `resourceCount` field on `Workspace` to find workspaces whose current state contains more than *N* resources:
 
 ```graphql
-query HeavyWorkspaces($orgs: [String!]!, $min: Int!) {
+query ResourceHeavyWorkspaces {
   workspaces(
-    includeOrgs: $orgs
-    filter: { resourceCount: { _gt: $min } }
+    filter: { resourceCount: { _gt: 100 } }
   ) {
     id
     name
@@ -75,8 +65,8 @@ query HeavyWorkspaces($orgs: [String!]!, $min: Int!) {
 You can page through all workspaces and then retrieve variables per workspace.  For example, to dump every variable across every workspace:
 
 ```graphql
-query ExportAllVariables($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
+query ExportAllWorkspaceVariables {
+  workspaces {
     id
     name
     variables {
@@ -89,7 +79,7 @@ query ExportAllVariables($orgs: [String!]!) {
 }
 ```
 
-Our resolvers automatically page through large result sets (`variables` is fetched lazily under the hood).
+Resolvers automatically page through large result sets (`variables` is fetched lazily under the hood).
 
 ---
 
@@ -98,11 +88,18 @@ Our resolvers automatically page through large result sets (`variables` is fetch
 The GraphQL schema already supports bi‑directional mapping between policy sets and workspaces.  To see which workspaces each policy set applies to:
 
 ```graphql
-query PolicySetWorkspaces($org: String!) {
-  policySets(organization: $org) {
+query PolicySetWorkspaces {
+  policySets(filter:  { _or: [ 
+     { workspaceCount:  { _gt: 0 }},
+     { projectCount: { _gt: 0}}
+  ]}) {
     id
     name
     workspaces {
+      id
+      name
+    }
+    projects {
       id
       name
     }
@@ -110,17 +107,19 @@ query PolicySetWorkspaces($org: String!) {
 }
 ```
 
-If you prefer workspace‑centric output, you can also nest a policySets field under each `Workspace` (this will require adding a reverse lookup on Workspace, see note below).
-
 ---
 
 ## 5. Audit users across teams
 
 Use nested relationships to audit every team’s membership:
 
+:::info
+Due to privacy settings in HCP TF / TFE, you cannot get user emails outside of your own
+:::
+
 ```graphql
-query OrgTeamsUsers($org: String!) {
-  organization(name: $org) {
+query OrgTeamsUsers {
+  organization {
     teams {
       id
       name
@@ -134,37 +133,56 @@ query OrgTeamsUsers($org: String!) {
 }
 ```
 
-This leverages built‑in pagination and filtering on the `teams` and `users` connections.
-
-## 6. Detect drift from VCS
-
-To compare the last run’s commit SHA with your VCS HEAD, fetch the new `ingressAttributes.commitSha` (and related VCS metadata) on the `configurationVersion`:
-
+:::tip
+If you're querying TFE and have an admin token, you can use the following query to get email addresses
+:::
 ```graphql
-query WorkspaceDrift($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
-    id
-    name
-    runs(filter: { status: { _in: ["applied"] } }) {
-      configurationVersion {
-        ingressAttributes {
-          commitSha
-          commitUrl
-          branch
-        }
+query OrgTeamsUsers {
+  organizations {
+    teams {
+      id
+      name
+      usersFromAdmin {
+        id
+        username
+        email
       }
     }
   }
 }
 ```
 
-## 7. Generate Terraform “stack graph”
+This query can be especially useful for auditing requirements in regulated industries.
 
-Fetch the full workspace dependency graph in a single call using the new `stackGraph` query:
+## 6. Detect drift
+
+:::info
+This currently only works for HCP Terraform
+:::
 
 ```graphql
-query StackGraph($orgs: [String!]!) {
-  stackGraph(includeOrgs: $orgs) {
+query WorkspaceDrift {
+  explorerWorkspaces(filters: [ {
+     field: drifted, operator: is, value: "false"
+  }]) {
+    drifted
+    workspace {
+      id
+      name
+    }
+  }
+}
+```
+
+You can see how the nested workspace is retrieved.  This allows for querying of additional fields / relationships that aren't naturally available via explorer.
+
+## 7. Generate Terraform "run trigger graph”
+
+Fetch the full workspace dependency graph in a single call using the `runTriggerGraph` query:
+
+```graphql
+query RunTriggerGraph {
+  runTriggerGraph {
     id
     workspaceName
     sourceableName
@@ -173,56 +191,7 @@ query StackGraph($orgs: [String!]!) {
 }
 ```
 
-The `stackGraph` query returns a list of run-trigger edges (workspace dependencies) across all workspaces in the selected organizations.
-
-## 8. Export workspace inputs & outputs
-
-You can combine the variables (inputs) and state version outputs (outputs) per workspace:
-
-```graphql
-query WorkspaceIO($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
-    id
-    name
-    variables {
-      key
-      value
-      sensitive
-    }
-    # Assuming you know the last applied configuration version:
-    latestConfiguration: configurationVersions(filter: { status: { _eq: "applied" } }) {
-      id
-      downloadUrl
-    }
-    stateVersionOutputs(stateVersionId: "<LATEST_CONFIG_ID>") {
-      key
-      value
-    }
-  }
-}
-```
-
----
-
-## 9. Search across state versions
-
-Finding which state version contains a given resource requires downloading the JSON state for each version.  We now expose the hosted JSON download URL on `StateVersion`.
-
-```graphql
-query SearchStateVersions($org: String!, $workspace: String!) {
-  stateVersions(orgName: $org, workspaceName: $workspace) {
-    id
-    serial
-    hostedJsonStateDownloadUrl
-  }
-}
-```
-
-Download `hostedJsonStateDownloadUrl` and scan for your resource (e.g. `aws_s3_bucket.foo`).
-
----
-
-_For feedback or contributions on any of these use cases, please open an issue or PR!_
+The `runTriggerGraph` query returns a list of run-trigger edges (workspace dependencies) across all workspaces in the selected organizations.
 
 ---
 
@@ -519,14 +488,40 @@ query AutoApplySettings($orgs: [String!]!) {
 ## 15. User Membership and Activity Audit
 
 > **Persona:** Org Admin / Auditor  
-> **Goal:** List all users in the org, their team memberships, roles, and last activity.
+> **Goal:** List all users in the org along with the teams they belong to. (Last-activity timestamps are not exposed by the API.)
 
 > **Query:**
 ```graphql
-# TODO: extend `users` query to include nested `teams` and activity timestamps.
+query OrgUsersTeams(
+  $org: String!
+  $includeOrgs: [String!]
+  $excludeOrgs: [String!]
+) {
+  organization(name: $org) {
+    users {
+      id
+      username
+      email
+      teams(includeOrgs: $includeOrgs, excludeOrgs: $excludeOrgs) {
+        id
+        name
+        organization { name }
+      }
+    }
+  }
+}
 ```
 
-> **Note:** Confirm if last login or activity metadata is available via API.
+> **Variables:**
+```json
+{
+  "org": "my-org",
+  "includeOrgs": [],
+  "excludeOrgs": []
+}
+```
+
+Passing empty arrays uses the default multi-org expansion, mirroring how the resolver fans out across every organization the caller can access before applying exclusions.
 
 ---
 
@@ -570,10 +565,42 @@ query WorkspaceRunTriggers($workspaceId: ID!, $direction: String!) {
 
 > **Query:**
 ```graphql
-# TODO: list `variableSets` and their workspace attachments or add nested field.
+query VariableSetCoverage(
+  $includeOrgs: [String!]
+  $excludeOrgs: [String!]
+  $nameLike: String
+) {
+  variableSets(
+    includeOrgs: $includeOrgs
+    excludeOrgs: $excludeOrgs
+    filter: { name: { _ilike: $nameLike } }
+  ) {
+    id
+    name
+    organization { name }
+    workspaces {
+      id
+      name
+      projectName
+    }
+    workspaceExclusions {
+      id
+      name
+    }
+  }
+}
 ```
 
-> **Note:** Please provide the API endpoint for variable set attachments.
+> **Variables:**
+```json
+{
+  "includeOrgs": [],
+  "excludeOrgs": [],
+  "nameLike": "prod%"
+}
+```
+
+Use the returned `workspaces` list to verify coverage and the `workspaceExclusions` list to confirm intentional opt-outs.
 
 ---
 

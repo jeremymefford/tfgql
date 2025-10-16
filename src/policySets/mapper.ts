@@ -32,6 +32,7 @@ export const policySetMapper: DomainMapper<PolicySetResource, PolicySet> = {
       organizationId: resource.relationships!.organization.data.id,
       policyIds: resource.relationships?.policies?.data.map((r) => r.id) ?? [],
       projectIds: resource.relationships?.projects?.data.map((r) => r.id) ?? [],
+      projectCount: resource.relationships?.projects?.data?.length ?? 0,
       workspaceIds:
         resource.relationships?.workspaces?.data.map((r) => r.id) ?? [],
       workspaceExclusionIds:

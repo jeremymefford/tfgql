@@ -36,6 +36,8 @@ const organizationSchema = gql`
     ): [OrganizationMembership!]!
     tags(filter: OrganizationTagFilter): [OrganizationTag!]!
     policySets(filter: PolicySetFilter): [PolicySet!]
+    usersFromAdmin(filter: UserFilter): [AdminUser!] @tfeOnly
+    projects(filter: ProjectFilter): [Project!]
   }
 
   type OrganizationPermissions {

@@ -92,7 +92,8 @@ export const workspaceMapper: DomainMapper<WorkspaceResource, Workspace> = {
         executionMode: ws.attributes["setting-overwrites"]?.["execution-mode"],
         agentPool: ws.attributes["setting-overwrites"]?.["agent-pool"],
       },
-      organizationName: ws.relationships?.organization?.data?.id,
+      organizationName: ws.relationships.organization.data.id,
+      projectId: ws.relationships.project.data.id,
     };
   },
 };

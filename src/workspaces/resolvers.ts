@@ -28,6 +28,7 @@ import type {
   ExplorerQueryOptions,
 } from "../explorer/types";
 import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
+import { Project } from "../projects/types";
 
 export const resolvers = {
   Query: {
@@ -157,38 +158,35 @@ export const resolvers = {
         return [];
       }
 
+      const terminalStatuses = ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished"];
       const result: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
         ctx.logger.info(
           { orgName: orgId },
           "Finding workspaces with open runs",
         );
-        const localMatches: Workspace[] = [];
         for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
           orgId,
           filter,
         )) {
           await parallelizeBounded(page, async (workspace: Workspace) => {
-            const runsIterator = ctx.dataSources.runsAPI.listRuns(
+            for await (const runPage of ctx.dataSources.runsAPI.listRuns(
               workspace.id,
               runFilter,
-            );
-            const { value: runs } = await runsIterator.next();
-            if (runs && runs.length > 0) {
-              localMatches.push(workspace);
+            )) {
+              for (const run of runPage) {  
+                if (run.status && !terminalStatuses.includes(run.status)) {
+                  result.push(workspace);
+                  return; // No need to check further runs for this workspace
+                }
+              }
             }
-            runsIterator.return(undefined);
           });
         }
-        ctx.logger.info(
-          { orgName: orgId, count: localMatches.length },
-          "Found workspaces with open runs",
-        );
-        result.push(...localMatches);
       });
       return result;
     },
-    stackGraph: async (
+    runTriggerGraph: async (
       _: unknown,
       {
         includeOrgs,
@@ -349,6 +347,12 @@ export const resolvers = {
         }),
       );
     },
+    project: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<Project | null> =>
+      ctx.dataSources.projectsAPI.getProject(workspace.projectId),
     modules: async (
       workspace: Workspace,
       _: unknown,

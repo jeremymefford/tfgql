@@ -64,6 +64,7 @@ import teamAccessSchema from "../workspaceTeamAccess/schema";
 import stateVersionsSchema from "../stateVersions/schema";
 import explorerSchema from "../explorer/schema";
 import adminSchema from "../admin/schema";
+import logSchema from "../common/log/schema";
 
 // Base schema definitions for root types and custom scalar
 const baseSchema = gql`
@@ -116,6 +117,7 @@ export const typeDefs = [
   teamAccessSchema,
   explorerSchema,
   adminSchema,
+  logSchema,
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */

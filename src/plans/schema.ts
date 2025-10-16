@@ -16,7 +16,7 @@ const plansSchema = gql`
     resourceImports: Int!
     status: String!
     logReadUrl: String!
-    planLog: [JSON!]
+    planLog(minimumLevel: LogLevel = TRACE): [JSON!]
     planExportDownloadUrl: String
     structuredRunOutputEnabled: Boolean!
     jsonOutputUrl: String

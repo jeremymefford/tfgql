@@ -7,15 +7,55 @@ export function isNotFound(error: any): boolean {
 const DEFAULT_ARCHIVIST_CHUNK_SIZE = 512 * 1024; // 512 KiB
 const jsonLinePattern = /^\s*\{.+\}\s*$/;
 
+type FetchArchivistOptions = {
+  signal?: AbortSignal;
+  minimumLevel?: string;
+};
+
+const LOG_LEVEL_RANK: Record<string, number> = {
+  TRACE: 0,
+  JSON: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  WARNING: 3,
+  ERROR: 4,
+};
+
+const DEFAULT_MIN_LEVEL = "TRACE";
+
+function resolveLevelRank(level: string | undefined): number {
+  if (!level) return Number.POSITIVE_INFINITY;
+  const normalized = level.trim().toUpperCase();
+  if (normalized in LOG_LEVEL_RANK) {
+    return LOG_LEVEL_RANK[normalized];
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function shouldIncludeLog(
+  payload: Record<string, unknown>,
+  minimumRank: number,
+): boolean {
+  const levelValue =
+    typeof payload["@level"] === "string"
+      ? (payload["@level"] as string)
+      : undefined;
+  const levelRank = resolveLevelRank(levelValue);
+  if (levelRank === Number.POSITIVE_INFINITY && minimumRank === 0) {
+    // Unknown levels are only kept when the consumer is asking for everything.
+    return true;
+  }
+  return levelRank >= minimumRank;
+}
+
 export async function fetchArchivistJsonLines(
   httpClient: AxiosInstance,
   url: string,
-  options?: { chunkSize?: number; signal?: AbortSignal },
+  options?: FetchArchivistOptions,
 ): Promise<Record<string, unknown>[]> {
-  const chunkSize = Math.max(
-    options?.chunkSize ?? DEFAULT_ARCHIVIST_CHUNK_SIZE,
-    1,
-  );
+  const chunkSize = DEFAULT_ARCHIVIST_CHUNK_SIZE;
+  const minimumRank = resolveLevelRank(options?.minimumLevel ?? DEFAULT_MIN_LEVEL);
   const results: Record<string, unknown>[] = [];
   let nextStart = 0;
   let carryOver = "";
@@ -70,7 +110,9 @@ export async function fetchArchivistJsonLines(
       }
       try {
         const parsed = JSON.parse(candidate) as Record<string, unknown>;
-        results.push(parsed);
+        if (shouldIncludeLog(parsed, minimumRank)) {
+          results.push(parsed);
+        }
       } catch {
         // Ignore malformed JSON lines
       }
@@ -108,7 +150,9 @@ export async function fetchArchivistJsonLines(
   if (finalLine && jsonLinePattern.test(finalLine)) {
     try {
       const parsed = JSON.parse(finalLine) as Record<string, unknown>;
-      results.push(parsed);
+      if (shouldIncludeLog(parsed, minimumRank)) {
+        results.push(parsed);
+      }
     } catch {
       // Ignore malformed trailing line
     }

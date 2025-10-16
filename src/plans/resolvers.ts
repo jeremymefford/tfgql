@@ -20,14 +20,16 @@ export const resolvers = {
     },
     planLog: async (
       plan: Plan,
-      _: unknown,
+      { minimumLevel = "TRACE" }: { minimumLevel?: string },
       ctx: Context,
     ): Promise<Record<string, unknown>[] | null> => {
       const logReadUrl = plan.logReadUrl;
       if (!logReadUrl) {
         return null;
       }
-      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl);
+      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
+        minimumLevel,
+      });
     },
   },
 };

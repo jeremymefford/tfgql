@@ -9,7 +9,7 @@ const appliesSchema = gql`
     startedAt: DateTime
     finishedAt: DateTime
     logReadUrl: String!
-    applyLog: [JSON!]
+    applyLog(minimumLevel: LogLevel = TRACE): [JSON!]
     structuredRunOutputEnabled: Boolean!
     resourceAdditions: Int
     resourceChanges: Int

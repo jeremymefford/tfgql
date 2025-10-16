@@ -110,14 +110,16 @@ export const resolvers = {
     },
     applyLog: async (
       apply: Apply,
-      _: unknown,
+      { minimumLevel = "TRACE" }: { minimumLevel?: string },
       ctx: Context,
     ): Promise<Record<string, unknown>[] | null> => {
       const logReadUrl = apply.logReadUrl;
       if (!logReadUrl) {
         return null;
       }
-      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl);
+      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
+        minimumLevel,
+      });
     },
   },
 };

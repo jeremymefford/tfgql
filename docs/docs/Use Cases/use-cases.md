@@ -201,43 +201,6 @@ Below is a list of 25 high-value GraphQL query use cases for Terraform Cloud (TF
 
 ---
 
-## 1. Identify All Active Runs for Concurrency Management
-
-> **Persona:** Platform Engineer / SRE  
-> **Goal:** Get a unified view of all active runs (planning, applying, etc.) across every workspace to troubleshoot pipeline bottlenecks.
-
-> **Query:**
-```graphql
-query ActiveRuns(
-  $orgs: [String!]!
-  $runFilter: RunFilter!
-) {
-  workspacesWithOpenRuns(
-    includeOrgs: $orgs
-    runFilter: $runFilter
-  ) {
-    id
-    name
-    runs(filter: $runFilter) {
-      id
-      status
-      createdAt
-      triggerReason
-    }
-  }
-}
-```
-
-> **Variables:**
-```json
-{
-  "orgs": ["my-org"],
-  "runFilter": { "status": { "_in": ["pending", "planning", "applying"] } }
-}
-```
-
----
-
 ## 2. Find Stale Workspaces with No Recent Runs
 
 > **Persona:** Platform Admin  
@@ -245,13 +208,9 @@ query ActiveRuns(
 
 > **Query:**
 ```graphql
-query StaleWorkspaces(
-  $orgs: [String!]!
-  $threshold: DateTime!
-) {
+query StaleWorkspaces {
   workspaces(
-    includeOrgs: $orgs
-    filter: { latestChangeAt: { _lt: $threshold } }
+    filter: { latestChangeAt: { _lt: "2025-01-01T00:00:00Z" } }
   ) {
     id
     name
@@ -259,37 +218,6 @@ query StaleWorkspaces(
   }
 }
 ```
-
-> **Variables:**
-```json
-{
-  "orgs": ["my-org"],
-  "threshold": "2021-01-01T00:00:00Z"
-}
-```
-
----
-
-## 3. Detect Workspaces with Drift
-
-> **Persona:** SRE / Platform Engineer  
-> **Goal:** Find all workspaces where infrastructure drift has been detected (resources changed outside Terraform).
-
-> **Query (top-level):**
-```graphql
-query DriftedResults($workspaceId: ID!) {
-  assessmentResults(
-    workspaceId: $workspaceId
-    filter: { drifted: { _eq: true } }
-  ) {
-    id
-    drifted
-    createdAt
-  }
-}
-```
-
-> **Note:** To aggregate this across workspaces or to count drifted resources per workspace, we need a nested `assessmentResults` field on `Workspace` and/or an aggregated drift count. Please provide the corresponding API endpoint so we can extend the schema.
 
 ---
 

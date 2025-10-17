@@ -7,6 +7,10 @@ import { RunTrigger, RunTriggerFilter } from "../runTriggers/types";
 import { ConfigurationVersion } from "../configurationVersions/types";
 import { Apply } from "../applies/types";
 import { Plan } from "../plans/types";
+import {
+  PolicyEvaluation,
+  PolicyEvaluationFilter,
+} from "../policyEvaluations/types";
 
 export const resolvers = {
   Query: {
@@ -79,5 +83,43 @@ export const resolvers = {
       ctx.dataSources.appliesAPI.getRunApply(run.id),
     plan: async (run: Run, _: unknown, ctx: Context): Promise<Plan | null> =>
       ctx.dataSources.plansAPI.getPlanForRun(run.id),
+    policyEvaluations: async (
+      run: Run,
+      { filter }: { filter?: PolicyEvaluationFilter },
+      ctx: Context,
+    ): Promise<PolicyEvaluation[]> => {
+      const stageIds = run.taskStageIds ?? [];
+      if (stageIds.length === 0) {
+        return [];
+      }
+
+      const stages = await Promise.all(
+        stageIds.map((stageId) =>
+          ctx.dataSources.taskStagesAPI.getTaskStage(stageId),
+        ),
+      );
+
+      const policyStageIds = stages
+        .filter((stage): stage is NonNullable<typeof stage> => Boolean(stage))
+        .filter((stage) => stage.policyEvaluationIds.length > 0)
+        .map((stage) => stage.id);
+
+      if (policyStageIds.length === 0) {
+        return [];
+      }
+
+      const evaluations: PolicyEvaluation[] = [];
+      for (const stageId of policyStageIds) {
+        const results = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.policyEvaluationsAPI.listPolicyEvaluations(
+            stageId,
+            filter,
+          ),
+        );
+        evaluations.push(...results);
+      }
+
+      return evaluations;
+    },
   },
 };

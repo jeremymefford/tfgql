@@ -48,6 +48,10 @@ export const runMapper: DomainMapper<RunResource, Run> = {
       variables: run.attributes.variables,
       workspace: run.relationships?.workspace?.data,
       configurationVersion: run.relationships?.["configuration-version"]?.data,
+      taskStageIds:
+        run.relationships?.["task-stages"]?.data?.map(
+          (stage: { id: string }): string => stage.id,
+        ) ?? undefined,
     };
   },
 };

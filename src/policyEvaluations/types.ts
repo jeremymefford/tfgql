@@ -13,7 +13,6 @@ import {
 export interface PolicyEvaluationAttributes {
   status: string;
   "policy-kind": string;
-  "policy-tool-version": string;
   "result-count": {
     "advisory-failed": number;
     errored: number;
@@ -24,18 +23,20 @@ export interface PolicyEvaluationAttributes {
     "passed-at"?: string;
     "queued-at"?: string;
     "running-at"?: string;
+    "errored-at"?: string;
   };
   "created-at": string;
   "updated-at": string;
 }
 
 export interface PolicyEvaluationRelationships {
-  "policy-attachable": {
-    data: ResourceRef;
+  "policy-attachable"?: {
+    data?: ResourceRef;
   };
-  "policy-set-outcomes": {
-    links: {
-      related: string;
+  "policy-set-outcomes"?: {
+    data?: ResourceRef[];
+    links?: {
+      related?: string;
     };
   };
 }
@@ -53,7 +54,6 @@ export interface PolicyEvaluation {
   id: string;
   status: string;
   policyKind: string;
-  policyToolVersion: string;
   resultCount: {
     advisoryFailed: number;
     errored: number;
@@ -64,10 +64,12 @@ export interface PolicyEvaluation {
     passedAt?: string;
     queuedAt?: string;
     runningAt?: string;
+    erroredAt?: string;
   };
   createdAt: string;
   updatedAt: string;
-  policyAttachableId: string;
+  policyAttachableId?: string;
+  policySetOutcomeIds: string[];
 }
 
 export interface PolicyEvaluationFilter extends WhereClause<PolicyEvaluation> {
@@ -78,7 +80,6 @@ export interface PolicyEvaluationFilter extends WhereClause<PolicyEvaluation> {
   id?: StringComparisonExp;
   status?: StringComparisonExp;
   policyKind?: StringComparisonExp;
-  policyToolVersion?: StringComparisonExp;
   createdAt?: DateTimeComparisonExp;
   updatedAt?: DateTimeComparisonExp;
   policyAttachableId?: StringComparisonExp;

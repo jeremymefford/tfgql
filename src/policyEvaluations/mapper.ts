@@ -1,5 +1,8 @@
 import { DomainMapper } from "../common/middleware/domainMapper";
-import { PolicyEvaluationResource, PolicyEvaluation } from "./types";
+import {
+  PolicyEvaluationResource,
+  PolicyEvaluation,
+} from "./types";
 
 export const policyEvaluationMapper: DomainMapper<
   PolicyEvaluationResource,
@@ -8,12 +11,17 @@ export const policyEvaluationMapper: DomainMapper<
   map(resource: PolicyEvaluationResource): PolicyEvaluation {
     const attrs = resource.attributes;
     const rc = attrs["result-count"];
-    const ts = attrs["status-timestamps"];
+    const ts = attrs["status-timestamps"] ?? {};
+    const policyAttachableRef = resource.relationships?.["policy-attachable"]
+      ?.data;
+    const policyOutcomeIds =
+      resource.relationships?.["policy-set-outcomes"]?.data?.map(
+        (ref): string => ref.id,
+      ) ?? [];
     return {
       id: resource.id,
       status: attrs.status,
       policyKind: attrs["policy-kind"],
-      policyToolVersion: attrs["policy-tool-version"],
       resultCount: {
         advisoryFailed: rc["advisory-failed"],
         errored: rc.errored,
@@ -24,10 +32,12 @@ export const policyEvaluationMapper: DomainMapper<
         passedAt: ts["passed-at"],
         queuedAt: ts["queued-at"],
         runningAt: ts["running-at"],
+        erroredAt: ts["errored-at"],
       },
       createdAt: attrs["created-at"],
       updatedAt: attrs["updated-at"],
-      policyAttachableId: resource.relationships!["policy-attachable"].data.id,
+      policyAttachableId: policyAttachableRef?.id,
+      policySetOutcomeIds: policyOutcomeIds,
     };
   },
 };

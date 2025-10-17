@@ -31,6 +31,7 @@ const runSchema = gql`
     runEvents: [RunEvent!]!
     runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
     plan: Plan
+    policyEvaluations(filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
   }
 
   type RunPermissions {

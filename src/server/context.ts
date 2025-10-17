@@ -34,6 +34,8 @@ import { ExplorerAPI } from "../explorer/dataSource";
 import { createHttpClient } from "../common/httpClient";
 import { applicationConfiguration } from "../common/conf";
 import { AdminAPI } from "../admin/dataSource";
+import { TaskStagesAPI } from "../taskStages/dataSource";
+import { PolicySetOutcomesAPI } from "../policySetOutcomes/dataSource";
 
 /** GraphQL context type */
 export interface Context {
@@ -69,6 +71,8 @@ export interface Context {
     runTriggersAPI: RunTriggersAPI;
     explorerAPI: ExplorerAPI;
     adminAPI: AdminAPI;
+    taskStagesAPI: TaskStagesAPI;
+    policySetOutcomesAPI: PolicySetOutcomesAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
@@ -122,6 +126,8 @@ export async function buildContext(
       runTriggersAPI: new RunTriggersAPI(httpClient),
       explorerAPI: new ExplorerAPI(httpClient),
       adminAPI: new AdminAPI(httpClient),
+      taskStagesAPI: new TaskStagesAPI(httpClient, requestCache),
+      policySetOutcomesAPI: new PolicySetOutcomesAPI(httpClient),
     },
     requestCache,
     logger: baseLogger,

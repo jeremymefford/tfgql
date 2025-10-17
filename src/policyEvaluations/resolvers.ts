@@ -1,6 +1,7 @@
 import { Context } from "../server/context";
 import { PolicyEvaluation, PolicyEvaluationFilter } from "./types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
+import { PolicySetOutcome } from "../policySetOutcomes/types";
 
 export const resolvers = {
   Query: {
@@ -19,5 +20,17 @@ export const resolvers = {
         ),
       );
     },
+  },
+  PolicyEvaluation: {
+    policySetOutcomes: async (
+      evaluation: PolicyEvaluation,
+      _: unknown,
+      ctx: Context,
+    ): Promise<PolicySetOutcome[]> =>
+      gatherAsyncGeneratorPromises(
+        ctx.dataSources.policySetOutcomesAPI.listPolicySetOutcomes(
+          evaluation.id,
+        ),
+      ),
   },
 };

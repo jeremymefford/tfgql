@@ -216,6 +216,9 @@ const baseResolvers = {
   AdminUser: {
     ...adminResolvers.AdminUser,
   },
+  PolicyEvaluation: {
+    ...policyEvaluationsResolvers.PolicyEvaluation,
+  },
 };
 
 applyDeploymentTargetGuards(typeDefs, baseResolvers);

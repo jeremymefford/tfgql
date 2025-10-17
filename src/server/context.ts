@@ -115,7 +115,7 @@ export async function buildContext(
       organizationTagsAPI: new OrganizationTagsAPI(httpClient),
       plansAPI: new PlansAPI(httpClient, requestCache),
       policiesAPI: new PoliciesAPI(httpClient),
-      policySetsAPI: new PolicySetsAPI(httpClient),
+      policySetsAPI: new PolicySetsAPI(httpClient, requestCache),
       policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient),
       policySetParametersAPI: new PolicySetParametersAPI(httpClient),
       projectTeamAccessAPI: new ProjectTeamAccessAPI(httpClient),

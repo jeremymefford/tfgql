@@ -57,6 +57,7 @@ const workspaceSchema = gql`
     providers: [WorkspaceProvider!]!
     modules: [WorkspaceModule!]!
     project: Project
+    appliedPolicySets(filter: PolicySetFilter): [PolicySet!]!
   }
 
   type WorkspaceActions {

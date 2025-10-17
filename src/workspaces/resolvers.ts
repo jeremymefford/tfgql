@@ -29,6 +29,7 @@ import type {
 } from "../explorer/types";
 import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
 import { Project } from "../projects/types";
+import { PolicySet, PolicySetFilter } from "../policySets/types";
 
 export const resolvers = {
   Query: {
@@ -384,6 +385,31 @@ export const resolvers = {
           source: module.source ?? null,
         }),
       );
+    },
+    appliedPolicySets: async (
+      workspace: Workspace,
+      { filter }: { filter?: PolicySetFilter },
+      ctx: Context,
+    ): Promise<PolicySet[]> => {
+      if (!workspace.organizationName) {
+        return [];
+      }
+
+      const policySets = await ctx.dataSources.policySetsAPI.listPolicySets(
+        workspace.organizationName,
+        filter,
+      );
+
+      const filtered = policySets.filter((policySet) =>
+        // first check for "includes"
+        policySet.workspaceIds?.includes(workspace.id) ||
+        (workspace.projectId && policySet.projectIds?.includes(workspace.projectId)),
+      ).filter((policySet) =>
+        // then check for "excludes"
+        !(policySet.workspaceExclusionIds?.includes(workspace.id))
+      );
+
+      return Array.from(new Map(filtered.map((ps) => [ps.id, ps])).values());
     },
   },
 };

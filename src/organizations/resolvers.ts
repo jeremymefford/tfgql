@@ -53,9 +53,7 @@ export const resolvers = {
       { filter }: { filter?: PolicySetFilter },
       ctx: Context,
     ): Promise<PolicySet[]> => {
-      return gatherAsyncGeneratorPromises(
-        ctx.dataSources.policySetsAPI.listPolicySets(org.name, filter),
-      );
+      return ctx.dataSources.policySetsAPI.listPolicySets(org.name, filter);
     },
     teams: async (
       org: Organization,

@@ -141,18 +141,16 @@ export const resolvers = {
       });
       return matches;
     },
-    workspacesWithOpenRuns: async (
+    workspacesWithOpenCurrentRun: async (
       _: unknown,
       {
         includeOrgs,
         excludeOrgs,
         filter,
-        runFilter,
       }: {
         includeOrgs?: string[];
         excludeOrgs?: string[];
         filter?: WorkspaceFilter;
-        runFilter: RunFilter;
       },
       ctx: Context,
     ): Promise<Workspace[]> => {
@@ -161,27 +159,16 @@ export const resolvers = {
         return [];
       }
 
-      const terminalStatuses = ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished"];
+      const terminalStatuses = ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished", "planned_and_saved"];
       const result: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        ctx.logger.info(
-          { orgName: orgId },
-          "Finding workspaces with open runs",
-        );
-        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
-          orgId,
-          filter,
-        )) {
+        ctx.logger.debug({ orgName: orgId }, "Finding workspaces with open current runs");
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId,filter)) {
           await parallelizeBounded(page, async (workspace: Workspace) => {
-            for await (const runPage of ctx.dataSources.runsAPI.listRuns(
-              workspace.id,
-              runFilter,
-            )) {
-              for (const run of runPage) {
-                if (run.status && !terminalStatuses.includes(run.status)) {
+            const currentRun = workspace.currentRunId ? await ctx.dataSources.runsAPI.getRun(workspace.currentRunId) : null;
+            if (currentRun) {
+              if (currentRun.status && !terminalStatuses.includes(currentRun.status)) {
                   result.push(workspace);
-                  return; // No need to check further runs for this workspace
-                }
               }
             }
           });
@@ -263,10 +250,7 @@ export const resolvers = {
             }
           });
         }
-        ctx.logger.info(
-          { orgName: orgId, edgeCount: localEdges.length },
-          "Workspace stack graph complete",
-        );
+        ctx.logger.debug({ orgName: orgId, edgeCount: localEdges.length },"Workspace stack graph complete");
         edges.push(...localEdges);
       });
       return edges;

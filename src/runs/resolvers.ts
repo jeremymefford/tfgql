@@ -18,7 +18,7 @@ import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 
 export const resolvers = {
   Query: {
-    runs: async (
+    runsForWorkspace: async (
       _: unknown,
       { workspaceId }: { workspaceId: string },
       ctx: Context,
@@ -34,6 +34,28 @@ export const resolvers = {
     ): Promise<Run | null> => {
       return ctx.dataSources.runsAPI.getRun(id);
     },
+    runs: async (
+      _: unknown,
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: any },
+      ctx: Context,
+    ): Promise<Run[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      const runs: Run[] = [];
+      for (const orgId of orgs) {
+        for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+          for (const workspace of workspacePage) {
+            for await (const runPage of ctx.dataSources.runsAPI.listRuns(workspace.id, filter)) {
+              runs.push(...runPage);
+            }
+          }
+        }
+      }
+      return runs;
+    },
     runsWithOverriddenPolicy: async (
       _: unknown,
       {
@@ -45,7 +67,7 @@ export const resolvers = {
     ): Promise<Run[]> => {
       const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
       const runs: Run[] = [];
-      await parallelizeBounded(orgs, async (orgId) => {
+      for (const orgId of orgs) {
         for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
           for (const workspace of workspacePage) {
             for await (const runPage of ctx.dataSources.runsAPI.listRuns(workspace.id, filter)) {
@@ -60,7 +82,7 @@ export const resolvers = {
             }
           }
         }
-      });
+      }
       return runs;
     }
   },

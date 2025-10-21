@@ -176,11 +176,10 @@ const workspaceSchema = gql`
     """
     List all workspaces across the selected organizations that have at least one run matching the given runFilter (e.g. non-terminal states).
     """
-    workspacesWithOpenRuns(
+    workspacesWithOpenCurrentRun(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: WorkspaceFilter
-      runFilter: RunFilter
     ): [Workspace!]!
     """
     List all run-trigger edges (workspace dependency graph) across the selected organizations.

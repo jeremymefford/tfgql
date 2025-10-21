@@ -114,8 +114,12 @@ const runSchema = gql`
   }
 
   extend type Query {
-    runs(workspaceId: ID!, filter: RunFilter): [Run!]!
+    runsForWorkspace(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
+    runs(
+      includeOrgs: [String!],
+      excludeOrgs: [String!],
+      filter: RunFilter): [Run!]!
     runsWithOverriddenPolicy(
       includeOrgs: [String!],
       excludeOrgs: [String!],

@@ -228,10 +228,22 @@ query StaleWorkspaces {
 
 > **Query:**
 ```graphql
-# TODO: implement nested or top-level `policyEvaluations` query to list workspaces with failures.
+query {
+  workspacesWithFailedPolicyChecks {
+    id
+    name
+    currentRun {
+      status
+      policyChecks {
+        status
+      }
+      policyEvaluations {
+        status
+      }
+    }
+  }
+}
 ```
-
-> **Note:** The current schema exposes `policyEvaluations(taskStageId)`, but does not directly link it to `Run` or `Workspace` for filtering. Please provide the API endpoint for policy evaluations per run or workspace stage.
 
 ---
 
@@ -302,10 +314,21 @@ Due to the nature of dynamically resolving `appliedPolicySets`, you cannot filte
 
 > **Query:**
 ```graphql
-# TODO: implement `registryModules` or similar query for module usage counts.
-```
+query {
+  explorerModules {
+    name
+    source
+    version
+    workspaceEntities {
+      id      
+      name
+    }
+  } 
+}```
 
-> **Note:** Please provide the API endpoint for fetching module usage by workspace.
+:::warning
+This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE
+:::
 
 ---
 
@@ -316,10 +339,21 @@ Due to the nature of dynamically resolving `appliedPolicySets`, you cannot filte
 
 > **Query:**
 ```graphql
-# TODO: implement `providers` view query returning provider name, version, and workspace counts.
-```
+query {
+  explorerProviders {
+    name
+    source
+    version
+    workspaceEntities {
+      id      
+      name
+    }
+  } 
+}```
 
-> **Note:** Please provide the API endpoint for listing provider versions in use across workspaces.
+:::warning
+This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE
+:::
 
 ---
 
@@ -340,17 +374,16 @@ query TerraformVersions {
 
 ---
 
-## 10. Find Largest Workspaces by Resource Count
+## 10. Resource Heavy Workspaces
 
 > **Persona:** Platform Engineer  
 > **Goal:** Identify workspaces managing the most resources for performance tuning or splitting.
 
 > **Query:**
 ```graphql
-query LargestWorkspaces($orgs: [String!]!, $min: Int!) {
+query {
   workspaces(
-    includeOrgs: $orgs
-    filter: { resourceCount: { _gt: $min } }
+    filter: { resourceCount: { _gt: 80 } }
   ) {
     id
     name
@@ -368,10 +401,10 @@ query LargestWorkspaces($orgs: [String!]!, $min: Int!) {
 
 > **Query:**
 ```graphql
-query RecentFailures($orgs: [String!]!, $since: DateTime!) {
-  workspaces(includeOrgs: $orgs) {
+query {
+  workspacesWithOpenCurrentRun {
     name
-    runs(filter: { status: { _in: ["errored", "canceled"] }, createdAt: { _gt: $since } }) {
+    currentRun {
       id
       status
       message
@@ -386,19 +419,15 @@ query RecentFailures($orgs: [String!]!, $since: DateTime!) {
 ## 12. Spot Long-Pending or Stuck Runs
 
 > **Persona:** SRE  
-> **Goal:** Find runs that have been waiting for manual input or stuck in queue longer than expected.
+> **Goal:** Find runs in a non-terminal state and see the createdAt time to see if the run appears stuck
 
 > **Query:**
 ```graphql
-query StuckRuns($orgs: [String!]!, $statuses: [String!]!) {
-  workspacesWithOpenRuns(includeOrgs: $orgs, runFilter: { status: { _in: $statuses } }) {
+query PotentialStuckRuns($terminalStatuses: [String!]!) {
+  runs(filter: { status: { _nin: $terminalStatuses }}) {
     id
-    name
-    runs(filter: { status: { _in: $statuses } }) {
-      id
-      status
-      createdAt
-    }
+    status
+    createdAt
   }
 }
 ```
@@ -406,8 +435,14 @@ query StuckRuns($orgs: [String!]!, $statuses: [String!]!) {
 > **Variables:**
 ```json
 {
-  "orgs": ["my-org"],
-  "statuses": ["pending", "plan_queued", "policy_checking"]
+  "terminalStatuses": [
+    "planned_and_finished", 
+    "planned_and_saved",
+    "applied",
+    "discarded",
+    "errored",
+    "canceled",
+    "force_canceled"]
 }
 ```
 

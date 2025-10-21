@@ -219,11 +219,16 @@ export const resolvers = {
           if (!currentRun) {
             return;
           }
-          const failedPolicyEvals = await getPolicyEvaluationsForRun(currentRun, ctx)
+          const failStatuses = ["failed", "errored", "soft_failed"];
+          const failedPolicyEvals = getPolicyEvaluationsForRun(currentRun, ctx)
             .then((policyEvaluations) =>
               policyEvaluations.filter((policyEvaluation) =>
-                policyEvaluation.status === "failed" || policyEvaluation.status === "errored"));
-          if (failedPolicyEvals.length > 0) {
+                failStatuses.includes(policyEvaluation.status)));
+          const failedPolicyChecks = ctx.dataSources.policyChecksAPI.listPolicyChecks(currentRun.id)
+            .then((policyChecks) =>
+              policyChecks.filter((policyCheck) =>
+                failStatuses.includes(policyCheck.status)));
+          if ((await failedPolicyEvals).length > 0 || (await failedPolicyChecks).length > 0) {
             results.push(workspace);
           }
         });

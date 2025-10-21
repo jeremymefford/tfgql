@@ -41,6 +41,8 @@ export class WorkspaceTeamAccessAPI {
     //     ),
     // );
 
+    const all:WorkspaceTeamAccess[] = [];
+
     if (!filter) {
       return all;
     }

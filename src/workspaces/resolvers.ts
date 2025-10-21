@@ -30,6 +30,8 @@ import type {
 import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
 import { Project } from "../projects/types";
 import { PolicySet, PolicySetFilter } from "../policySets/types";
+import { getPolicyEvaluationsForRun } from "../policyEvaluations/resolvers";
+import { fail } from "assert";
 
 export const resolvers = {
   Query: {
@@ -175,7 +177,7 @@ export const resolvers = {
               workspace.id,
               runFilter,
             )) {
-              for (const run of runPage) {  
+              for (const run of runPage) {
                 if (run.status && !terminalStatuses.includes(run.status)) {
                   result.push(workspace);
                   return; // No need to check further runs for this workspace
@@ -186,6 +188,47 @@ export const resolvers = {
         }
       });
       return result;
+    },
+    workspacesWithFailedPolicyChecks: async (
+      _: unknown,
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: {
+        includeOrgs?: string[];
+        excludeOrgs?: string[];
+        filter?: WorkspaceFilter;
+      },
+      ctx: Context,
+    ): Promise<Workspace[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      if (orgs.length === 0) {
+        return [];
+      }
+      const results: Workspace[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        const workspaces = await gatherAsyncGeneratorPromises(
+          ctx.dataSources.workspacesAPI.listWorkspaces(orgId, filter),
+        );
+        await parallelizeBounded(workspaces, async (workspace: Workspace) => {
+          if (!workspace.currentRunId) {
+            return;
+          }
+          const currentRun = await ctx.dataSources.runsAPI.getRun(workspace.currentRunId);
+          if (!currentRun) {
+            return;
+          }
+          const failedPolicyEvals = await getPolicyEvaluationsForRun(currentRun, ctx)
+            .then((policyEvaluations) =>
+              policyEvaluations.filter((policyEvaluation) =>
+                policyEvaluation.status === "failed" || policyEvaluation.status === "errored"));
+          if (failedPolicyEvals.length > 0) {
+            results.push(workspace);
+          }
+        });
+      })
+      return results;
     },
     runTriggerGraph: async (
       _: unknown,
@@ -410,6 +453,16 @@ export const resolvers = {
       );
 
       return Array.from(new Map(filtered.map((ps) => [ps.id, ps])).values());
+    },
+    currentRun: async (
+      workspace: Workspace,
+      _: unknown,
+      ctx: Context,
+    ): Promise<Run | null> => {
+      if (!workspace.currentRunId) {
+        return null;
+      }
+      return ctx.dataSources.runsAPI.getRun(workspace.currentRunId);
     },
   },
 };

@@ -94,6 +94,7 @@ export const workspaceMapper: DomainMapper<WorkspaceResource, Workspace> = {
       },
       organizationName: ws.relationships.organization.data.id,
       projectId: ws.relationships.project.data.id,
+      currentRunId: ws.relationships["current-run"]?.data?.id,
     };
   },
 };

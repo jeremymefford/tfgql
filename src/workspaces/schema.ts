@@ -58,6 +58,7 @@ const workspaceSchema = gql`
     modules: [WorkspaceModule!]!
     project: Project
     appliedPolicySets(filter: PolicySetFilter): [PolicySet!]!
+    currentRun: Run
   }
 
   type WorkspaceActions {
@@ -163,6 +164,11 @@ const workspaceSchema = gql`
     workspace(id: ID!): Workspace
     workspaceByName(organization: String!, workspaceName: String!): Workspace
     workspacesWithNoResources(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: WorkspaceFilter
+    ): [Workspace!]!
+    workspacesWithFailedPolicyChecks(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: WorkspaceFilter

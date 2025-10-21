@@ -23,6 +23,7 @@ import { PlansAPI } from "../plans/dataSource";
 import { PoliciesAPI } from "../policies/dataSource";
 import { PolicySetsAPI } from "../policySets/dataSource";
 import { PolicyEvaluationsAPI } from "../policyEvaluations/dataSource";
+import { PolicyChecksAPI } from "../policyChecks/dataSource";
 import { PolicySetParametersAPI } from "../policySetParameters/dataSource";
 import { ProjectTeamAccessAPI } from "../projectTeamAccess/dataSource";
 import { StateVersionOutputsAPI } from "../stateVersionOutputs/dataSource";
@@ -73,6 +74,7 @@ export interface Context {
     adminAPI: AdminAPI;
     taskStagesAPI: TaskStagesAPI;
     policySetOutcomesAPI: PolicySetOutcomesAPI;
+    policyChecksAPI: PolicyChecksAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
@@ -116,7 +118,7 @@ export async function buildContext(
       plansAPI: new PlansAPI(httpClient, requestCache),
       policiesAPI: new PoliciesAPI(httpClient),
       policySetsAPI: new PolicySetsAPI(httpClient, requestCache),
-      policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient),
+      policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient, requestCache),
       policySetParametersAPI: new PolicySetParametersAPI(httpClient),
       projectTeamAccessAPI: new ProjectTeamAccessAPI(httpClient),
       stateVersionOutputsAPI: new StateVersionOutputsAPI(httpClient),
@@ -128,6 +130,7 @@ export async function buildContext(
       adminAPI: new AdminAPI(httpClient),
       taskStagesAPI: new TaskStagesAPI(httpClient, requestCache),
       policySetOutcomesAPI: new PolicySetOutcomesAPI(httpClient),
+      policyChecksAPI: new PolicyChecksAPI(httpClient, requestCache)
     },
     requestCache,
     logger: baseLogger,

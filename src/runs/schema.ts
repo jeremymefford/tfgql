@@ -32,6 +32,7 @@ const runSchema = gql`
     runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
     plan: Plan
     policyEvaluations(filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
+    policyChecks(filter: PolicyCheckFilter): [PolicyCheck!]!
   }
 
   type RunPermissions {
@@ -115,12 +116,18 @@ const runSchema = gql`
   extend type Query {
     runs(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
+    runsWithOverriddenPolicy(
+      includeOrgs: [String!],
+      excludeOrgs: [String!],
+      filter: RunFilter
+    ): [Run!]!
   }
 
-  type RunEvent {
-    id: ID!
-    body: JSON!
-  }
+type RunEvent {
+  id: ID!
+  body: JSON!
+}
+
 `;
 
 export default runSchema;

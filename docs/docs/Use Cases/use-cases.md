@@ -239,13 +239,35 @@ query StaleWorkspaces {
 
 > **Persona:** Security/Compliance Officer  
 > **Goal:** Identify runs where a policy was violated but overridden by an admin.
-
+:::warning
+Due to how rate limiting works for `runs` related APIs, this is a very slow query.  Optimize it as much as you can by providing a run filter, like the example, which shows "year-to-date" for 2025
+:::
 > **Query:**
 ```graphql
-# TODO: implement `runs` or `policyChecks` override detection query.
+query {
+  runsWithOverriddenPolicy(filter:  {
+     createdAt:  {
+        _gt: "2025-01-01"
+     }
+  }) {
+    id
+    policyEvaluations {
+      id
+      status
+    }
+    policyChecks {
+      id
+      statusTimestamps {
+        overriddenAt
+      }
+    }
+  }
+}
 ```
 
-> **Note:** Requires `overrideReason` and `approver` metadata from the policy checks API. Please provide the REST endpoint for fetching overridden policy check details.
+:::tip
+Policy checks are for Sentinel policy evaluations running in "legacy" mode.  Policy evaluations are for OPA and Sentinel policies running in "agent" mode.  Both can be present on a run.
+:::
 
 ---
 
@@ -256,10 +278,20 @@ query StaleWorkspaces {
 
 > **Query:**
 ```graphql
-# TODO: list all workspaces and attached `policySets`, then filter missing mandatory set.
-```
+query {
+  workspaces {
+    id
+    name
+    appliedPolicySets {
+      id
+      name
+    }
+  }
+}```
 
-> **Note:** Please provide the API endpoint for fetching workspace–policy set attachments (or confirm if `workspace.policySets` is available).
+:::info
+Due to the nature of dynamically resolving `appliedPolicySets`, you cannot filter them out, so this will return all workspaces, but those without policySets applied will have an empty array.  You can easily filter those out with `jq`
+:::
 
 ---
 
@@ -298,8 +330,8 @@ query StaleWorkspaces {
 
 > **Query:**
 ```graphql
-query TerraformVersions($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
+query TerraformVersions {
+  workspaces {
     name
     terraformVersion
   }

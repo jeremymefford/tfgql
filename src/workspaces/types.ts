@@ -98,6 +98,9 @@ export interface WorkspaceRelationships {
   project: {
     data: ResourceRef;
   };
+  "current-run"?: {
+    data: ResourceRef;
+  };
 }
 
 export type WorkspaceResource = ResourceObject<WorkspaceAttributes> & {
@@ -180,6 +183,7 @@ export interface Workspace {
   };
   organizationName: string;
   projectId: string;
+  currentRunId?: string;
 }
 
 export interface WorkspaceProvider {

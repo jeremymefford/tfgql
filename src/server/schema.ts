@@ -31,6 +31,8 @@ import { resolvers as teamTokensResolvers } from "../teamTokens/resolvers";
 import { resolvers as teamAccessResolvers } from "../workspaceTeamAccess/resolvers";
 import { resolvers as explorerResolvers } from "../explorer/resolvers";
 import { resolvers as adminResolvers } from "../admin/resolvers";
+import { resolvers as policyCheckResolvers } from "../policyChecks/resolvers";
+import { resolvers as policyChecksResolvers } from "../policyChecks/resolvers";
 import { applyDeploymentTargetGuards } from "./deploymentGuards";
 import configurationVersionSchema from "../configurationVersions/schema";
 import organizationSchema from "../organizations/schema";
@@ -64,6 +66,7 @@ import teamAccessSchema from "../workspaceTeamAccess/schema";
 import stateVersionsSchema from "../stateVersions/schema";
 import explorerSchema from "../explorer/schema";
 import adminSchema from "../admin/schema";
+import policyCheckSchema from "../policyChecks/schema";
 import logSchema from "../common/log/schema";
 
 // Base schema definitions for root types and custom scalar
@@ -117,6 +120,7 @@ export const typeDefs = [
   teamAccessSchema,
   explorerSchema,
   adminSchema,
+  policyCheckSchema,
   logSchema,
 ];
 
@@ -218,6 +222,9 @@ const baseResolvers = {
   },
   PolicyEvaluation: {
     ...policyEvaluationsResolvers.PolicyEvaluation,
+  },
+  PolicyCheck: {
+    ...policyChecksResolvers.PolicyCheck,
   },
 };
 

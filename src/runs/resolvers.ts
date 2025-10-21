@@ -11,6 +11,10 @@ import {
   PolicyEvaluation,
   PolicyEvaluationFilter,
 } from "../policyEvaluations/types";
+import { PolicyCheck, PolicyCheckFilter } from "../policyChecks/types";
+import { getPolicyEvaluationsForRun } from "../policyEvaluations/resolvers";
+import { coalesceOrgs } from "../common/orgHelper";
+import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 
 export const resolvers = {
   Query: {
@@ -30,6 +34,35 @@ export const resolvers = {
     ): Promise<Run | null> => {
       return ctx.dataSources.runsAPI.getRun(id);
     },
+    runsWithOverriddenPolicy: async (
+      _: unknown,
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: { includeOrgs?: string[]; excludeOrgs?: string[]; filter?: any },
+      ctx: Context,
+    ): Promise<Run[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      const runs: Run[] = [];
+      await parallelizeBounded(orgs, async (orgId) => {
+        for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+          for (const workspace of workspacePage) {
+            for await (const runPage of ctx.dataSources.runsAPI.listRuns(workspace.id, filter)) {
+              await parallelizeBounded(runPage, async (run) => {
+                const policyChecks = await ctx.dataSources.policyChecksAPI.listPolicyChecks(run.id);
+                const policyEvals = await getPolicyEvaluationsForRun(run, ctx, undefined);
+                if (policyChecks.some((check) => check.statusTimestamps.overriddenAt) ||
+                  policyEvals.some((policyEval) => policyEval.status === "overridden")) {
+                  runs.push(run);
+                }
+              });
+            }
+          }
+        }
+      });
+      return runs;
+    }
   },
   Run: {
     workspace: async (
@@ -83,43 +116,13 @@ export const resolvers = {
       ctx.dataSources.appliesAPI.getRunApply(run.id),
     plan: async (run: Run, _: unknown, ctx: Context): Promise<Plan | null> =>
       ctx.dataSources.plansAPI.getPlanForRun(run.id),
-    policyEvaluations: async (
+    policyEvaluations: (run: Run, args: { filter?: PolicyEvaluationFilter }, ctx: Context) =>
+      getPolicyEvaluationsForRun(run, ctx, args.filter),
+    policyChecks: async (
       run: Run,
-      { filter }: { filter?: PolicyEvaluationFilter },
+      { filter }: { filter?: PolicyCheckFilter },
       ctx: Context,
-    ): Promise<PolicyEvaluation[]> => {
-      const stageIds = run.taskStageIds ?? [];
-      if (stageIds.length === 0) {
-        return [];
-      }
-
-      const stages = await Promise.all(
-        stageIds.map((stageId) =>
-          ctx.dataSources.taskStagesAPI.getTaskStage(stageId),
-        ),
-      );
-
-      const policyStageIds = stages
-        .filter((stage): stage is NonNullable<typeof stage> => Boolean(stage))
-        .filter((stage) => stage.policyEvaluationIds.length > 0)
-        .map((stage) => stage.id);
-
-      if (policyStageIds.length === 0) {
-        return [];
-      }
-
-      const evaluations: PolicyEvaluation[] = [];
-      for (const stageId of policyStageIds) {
-        const results = await gatherAsyncGeneratorPromises(
-          ctx.dataSources.policyEvaluationsAPI.listPolicyEvaluations(
-            stageId,
-            filter,
-          ),
-        );
-        evaluations.push(...results);
-      }
-
-      return evaluations;
-    },
+    ): Promise<PolicyCheck[]> =>
+      ctx.dataSources.policyChecksAPI.listPolicyChecks(run.id, filter),
   },
 };

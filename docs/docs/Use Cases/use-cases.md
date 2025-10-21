@@ -451,15 +451,14 @@ query PotentialStuckRuns($terminalStatuses: [String!]!) {
 ## 13. Audit Auto-Apply vs. Manual Approval Settings
 
 > **Persona:** DevOps / Compliance Engineer  
-> **Goal:** Ensure critical environments require manual applies and lower environments use auto-apply for agility.
+> **Goal:** Ensure critical environments require manual applies
 
 > **Query:**
 ```graphql
-query AutoApplySettings($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
+query AutoApplySettings {
+  workspaces {
     name
     autoApply
-    environment
   }
 }
 ```

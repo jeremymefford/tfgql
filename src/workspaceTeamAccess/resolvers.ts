@@ -1,21 +1,42 @@
 import { Context } from "../server/context";
-import { Workspace, WorkspaceFilter } from "../workspaces/types";
+import {
+  WorkspaceTeamAccess,
+  WorkspaceTeamAccessFilter,
+} from "./types";
 
 export const resolvers = {
   Query: {
-    teamWorkspaces: async (
+    workspaceTeamAccessByWorkspace: async (
       _: unknown,
-      {
-        teamId: _teamId,
-        filter: _filter,
-      }: { teamId: string; filter?: WorkspaceFilter },
-      { dataSources: _dataSources }: Context,
-    ): Promise<Workspace[]> => {
-      return [];
-      // return gatherAsyncGeneratorPromises(
-      //   return []; // TODO fix later
-      //   // dataSources.teamAccessAPI.listWorkspacesForTeam(teamId, filter)
-      // );
-    },
+      { workspaceId, filter }: { workspaceId: string; filter?: WorkspaceTeamAccessFilter },
+      ctx: Context,
+    ): Promise<WorkspaceTeamAccess[]> =>
+      ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForWorkspace(workspaceId, filter),
+
+    workspaceTeamAccessByTeam: async (
+      _: unknown,
+      { teamId, filter }: { teamId: string; filter?: WorkspaceTeamAccessFilter },
+      ctx: Context,
+    ): Promise<WorkspaceTeamAccess[]> =>
+      ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForTeam(teamId, filter),
+
+    workspaceTeamAccessById: async (
+      _: unknown,
+      { id }: { id: string },
+      ctx: Context,
+    ): Promise<WorkspaceTeamAccess | null> =>
+      ctx.dataSources.workspaceTeamAccessAPI.getTeamWorkspaceAccess(id),
+  },
+  WorkspaceTeamAccess: {
+    team: async (
+      access: WorkspaceTeamAccess,
+      _: unknown,
+      ctx: Context,
+    ) => ctx.dataSources.teamsAPI.getTeam(access.teamId),
+    workspace: async (
+      access: WorkspaceTeamAccess,
+      _: unknown,
+      ctx: Context,
+    ) => ctx.dataSources.workspacesAPI.getWorkspace(access.workspaceId),
   },
 };

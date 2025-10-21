@@ -29,7 +29,7 @@ import { ProjectTeamAccessAPI } from "../projectTeamAccess/dataSource";
 import { StateVersionOutputsAPI } from "../stateVersionOutputs/dataSource";
 import { StateVersionsAPI } from "../stateVersions/dataSource";
 import { TeamTokensAPI } from "../teamTokens/dataSource";
-import { TeamAccessAPI } from "../workspaceTeamAccess/dataSource";
+import { WorkspaceTeamAccessAPI } from "../workspaceTeamAccess/dataSource";
 import { RunTriggersAPI } from "../runTriggers/dataSource";
 import { ExplorerAPI } from "../explorer/dataSource";
 import { createHttpClient } from "../common/httpClient";
@@ -68,7 +68,7 @@ export interface Context {
     stateVersionOutputsAPI: StateVersionOutputsAPI;
     stateVersionsAPI: StateVersionsAPI;
     teamTokensAPI: TeamTokensAPI;
-    teamAccessAPI: TeamAccessAPI;
+    workspaceTeamAccessAPI: WorkspaceTeamAccessAPI;
     runTriggersAPI: RunTriggersAPI;
     explorerAPI: ExplorerAPI;
     adminAPI: AdminAPI;
@@ -124,7 +124,10 @@ export async function buildContext(
       stateVersionOutputsAPI: new StateVersionOutputsAPI(httpClient),
       stateVersionsAPI: new StateVersionsAPI(httpClient, requestCache),
       teamTokensAPI: new TeamTokensAPI(httpClient),
-      teamAccessAPI: new TeamAccessAPI(httpClient),
+      workspaceTeamAccessAPI: new WorkspaceTeamAccessAPI(
+        httpClient,
+        requestCache,
+      ),
       runTriggersAPI: new RunTriggersAPI(httpClient),
       explorerAPI: new ExplorerAPI(httpClient),
       adminAPI: new AdminAPI(httpClient),

@@ -39,7 +39,7 @@ const projectTeamAccessSchema = gql`
   }
 
   extend type Query {
-    projectTeamAccess(
+    projectTeamAccessByProject(
       projectId: ID!
       filter: ProjectTeamAccessFilter
     ): [ProjectTeamAccess!]!

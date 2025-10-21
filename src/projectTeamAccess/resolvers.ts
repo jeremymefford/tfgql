@@ -4,7 +4,7 @@ import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 
 export const resolvers = {
   Query: {
-    projectTeamAccess: async (
+    projectTeamAccessByProject: async (
       _: unknown,
       {
         projectId,

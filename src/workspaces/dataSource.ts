@@ -18,13 +18,13 @@ export class WorkspacesAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) {}
+  ) { }
 
   async *listWorkspaces(
     orgName: string,
     filter?: WorkspaceFilter,
   ): AsyncGenerator<Workspace[], void, unknown> {
-    yield* streamPages<
+    const pageGenerator = streamPages<
       Workspace,
       {
         actions: WorkspaceActionsFilter;
@@ -38,17 +38,29 @@ export class WorkspacesAPI {
       {},
       filter,
     );
+    for await (const page of pageGenerator) {
+      for (const workspace of page) {
+        // workspaces are often queried as a nested entity, so cache them as we go
+        this.requestCache.set("WorkspaceGET", workspace.id, workspace);
+      }
+      yield page;
+    }
   }
 
   async getWorkspace(id: string): Promise<Workspace | null> {
-    return this.httpClient
-      .get<WorkspaceResponse>(`/workspaces/${id}`)
-      .then((res) => workspaceMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
+    return this.requestCache.getOrSet<Workspace | null>(
+      "WorkspaceGET",
+      id,
+      async () => {
+        return this.httpClient
+          .get<WorkspaceResponse>(`/workspaces/${id}`)
+          .then((res) => workspaceMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          });
       });
   }
 

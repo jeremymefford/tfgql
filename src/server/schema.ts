@@ -178,6 +178,9 @@ const baseResolvers = {
   PolicySet: {
     ...policySetsResolvers.PolicySet,
   },
+  WorkspaceTeamAccess: {
+    ...teamAccessResolvers.WorkspaceTeamAccess,
+  },
   VariableSet: {
     ...variableSetResolvers.VariableSet,
   },

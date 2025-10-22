@@ -36,7 +36,7 @@ export class AdminAPI {
       options.filter,
     ));
 
-    return params.organizationId
+    return options.organizationId
       ? users.filter((user) => user.organizationIds.includes(options.organizationId as string))
       : users;
   }

@@ -54,7 +54,7 @@ export const resolvers = {
       return results;
     }
   },
-  StateVersionOutputs: {
+  StateVersionOutput: {
     stateVersion: async (
       output: StateVersionOutput,
       _: unknown,

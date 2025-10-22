@@ -714,11 +714,19 @@ query StateVersionOutputSearch {
 > **Query:**
 ```graphql
 query ExecutionModes {
-  workspaces {
+  workspaces(filter:  {
+     executionMode:  {
+        _in: ["remote","local"]
+     }
+  }) {
     id
     name
-    executionMode
-    agentPool
+  }
+  agentPools {
+    workspaces {
+      id
+      name
+    }
   }
 }
 ```

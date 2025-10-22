@@ -207,19 +207,19 @@ export const resolvers = {
             return;
           }
           const failStatuses = ["failed", "errored", "soft_failed"];
-          const failedPolicyEvals = getPolicyEvaluationsForRun(currentRun, ctx)
-            .then((policyEvaluations) =>
+          const [failedPolicyEvals, failedPolicyChecks] = await Promise.all([
+            getPolicyEvaluationsForRun(currentRun, ctx).then((policyEvaluations) =>
               policyEvaluations.filter((policyEvaluation) =>
-                failStatuses.includes(policyEvaluation.status)));
-          const failedPolicyChecks = ctx.dataSources.policyChecksAPI.listPolicyChecks(currentRun.id)
-            .then((policyChecks) =>
+                failStatuses.includes(policyEvaluation.status))),
+            ctx.dataSources.policyChecksAPI.listPolicyChecks(currentRun.id).then((policyChecks) =>
               policyChecks.filter((policyCheck) =>
-                failStatuses.includes(policyCheck.status)));
-          if ((await failedPolicyEvals).length > 0 || (await failedPolicyChecks).length > 0) {
+                failStatuses.includes(policyCheck.status))),
+          ]);
+          if (failedPolicyEvals.length > 0 || failedPolicyChecks.length > 0) {
             results.push(workspace);
           }
         });
-      })
+      });
       return results;
     },
     runTriggerGraph: async (

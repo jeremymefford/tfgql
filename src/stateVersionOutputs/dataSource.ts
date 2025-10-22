@@ -7,7 +7,6 @@ import {
   StateVersionOutputResponse,
 } from "./types";
 import { stateVersionOutputMapper } from "./mapper";
-import { stat } from "fs";
 
 export class StateVersionOutputsAPI {
   constructor(private readonly httpClient: AxiosInstance) { }

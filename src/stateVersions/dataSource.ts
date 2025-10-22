@@ -46,7 +46,7 @@ export class StateVersionsAPI {
    * Fetch a single state version by ID.
    */
   async getStateVersion(id: string): Promise<StateVersion | null> {
-    if (id === "" || id === null || id === undefined) {
+    if (!id) {
       return null;
     }
     return await this.requestCache.getOrSet(`state-version`, id, async () =>

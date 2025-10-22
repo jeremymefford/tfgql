@@ -31,7 +31,6 @@ import { resolvers as teamTokensResolvers } from "../teamTokens/resolvers";
 import { resolvers as teamAccessResolvers } from "../workspaceTeamAccess/resolvers";
 import { resolvers as explorerResolvers } from "../explorer/resolvers";
 import { resolvers as adminResolvers } from "../admin/resolvers";
-import { resolvers as policyCheckResolvers } from "../policyChecks/resolvers";
 import { resolvers as policyChecksResolvers } from "../policyChecks/resolvers";
 import { applyDeploymentTargetGuards } from "./deploymentGuards";
 import configurationVersionSchema from "../configurationVersions/schema";
@@ -233,7 +232,7 @@ const baseResolvers = {
     ...projectTeamAccessResolvers.ProjectTeamAccess,
   },
   StateVersionOutput: {
-    ...stateVersionOutputsResolvers.StateVersionOutputs,
+    ...stateVersionOutputsResolvers.StateVersionOutput,
   },
 };
 

@@ -11,7 +11,7 @@ const workspaceResourcesSchema = gql`
     provider: String!
     providerType: String!
     modifiedByStateVersion: StateVersion!
-    nameIndex: Int
+    nameIndex: String
     workspace: Workspace!
   }
 

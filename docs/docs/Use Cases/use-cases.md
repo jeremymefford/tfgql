@@ -16,18 +16,14 @@ Looking for aggregated Explorer data across organizations? See the dedicated [Ex
 
 ## 1. View all workspaces with open runs
 
-TFC does not currently surface a global filter for run status.  Use the custom `workspacesWithOpenRuns` query to find all workspaces with at least one run matching a given status filter (e.g. planning/applying):
+TFC does not currently surface a global filter for run status.  Use the custom `workspacesWithOpenRuns` query to find all workspaces with the currentRun not in a terminal state.
 
 ```graphql
 query WorkspacesWithOpenRuns {
   workspacesWithOpenRuns {
     id
     name
-    runs(filter:  {
-       status:  {
-          _nin: ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished"]
-       }
-    }) {
+    currentRun {
       status
       id
     }
@@ -465,119 +461,118 @@ query AutoApplySettings {
 
 ---
 
-## 14. Workspace Team Access Matrix
+## 14. Team Access Audit
 
 > **Persona:** Org Admin  
-> **Goal:** Review which teams have access to which workspaces and at what level.
+> **Goal:** Review all team access across all orgs
 
 > **Query:**
 ```graphql
-# TODO: implement `teamAccess` query for workspace-team relationships.
-```
-
-> **Note:** Please provide the API endpoint for workspace–team access listings.
-
----
-
-## 15. User Membership and Activity Audit
-
-> **Persona:** Org Admin / Auditor  
-> **Goal:** List all users in the org along with the teams they belong to. (Last-activity timestamps are not exposed by the API.)
-
-> **Query:**
-```graphql
-query OrgUsersTeams(
-  $org: String!
-  $includeOrgs: [String!]
-  $excludeOrgs: [String!]
-) {
-  organization(name: $org) {
-    users {
+query TeamAccessAudit {
+ teams {
+  id
+  name
+  organization {
+    id
+  }
+  permissions {
+    canUpdateMembership
+    canDestroy
+    canUpdateOrganizationAccess
+    canUpdateApiToken
+    canUpdateVisibility
+    canUpdateName
+    canUpdateSsoTeamId
+    canUpdateMemberTokenManagement
+    canViewApiToken
+  }
+  organizationAccess {
+    managePolicies
+    manageWorkspaces
+    manageVcsSettings
+    managePolicyOverrides
+    manageModules
+    manageProviders
+    manageRunTasks
+    manageProjects
+    manageMembership
+    manageTeams
+    manageOrganizationAccess
+    accessSecretTeams
+    readProjects
+    readWorkspaces
+    manageAgentPools
+  }
+  projectAccess {
+    id
+    access
+    projectAccess {
+      settings
+      teams
+    }
+    workspaceAccess {
+      create
+      move
+      locking
+      delete
+      runs
+      variables
+      stateVersions
+      sentinelMocks
+      runTasks
+    }
+    project {
       id
-      username
-      email
-      teams(includeOrgs: $includeOrgs, excludeOrgs: $excludeOrgs) {
+      workspaces {
         id
         name
-        organization { name }
       }
     }
   }
-}
-```
-
-> **Variables:**
-```json
-{
-  "org": "my-org",
-  "includeOrgs": [],
-  "excludeOrgs": []
-}
-```
-
-Passing empty arrays uses the default multi-org expansion, mirroring how the resolver fans out across every organization the caller can access before applying exclusions.
-
----
-
-## 16. Identify Cost Estimation Outliers
-
-> **Persona:** FinOps / Cloud Cost Manager  
-> **Goal:** Find runs with cost estimates above a threshold or summarize cost estimates per workspace.
-
-> **Query:**
-```graphql
-# TODO: implement `costEstimates` fields on `Run` to filter by estimated cost.
-```
-
-> **Note:** Please provide the cost estimation API endpoint.
-
----
-
-## 17. Map Workspace Run Triggers (Dependency Graph)
-
-> **Persona:** Platform Engineer  
-> **Goal:** Map run triggers between workspaces to understand cross-workspace dependencies.
-
-> **Query:**
-```graphql
-query WorkspaceRunTriggers($workspaceId: ID!, $direction: String!) {
-  runTriggers(workspaceId: $workspaceId, filter: { type: { _eq: $direction } }) {
+  workspaceAccess {
     id
-    workspaceName
-    sourceableName
-    createdAt
+    access
+    runs
+    variables
+    stateVersions
+    sentinelMocks
+    workspaceLocking
+    runTasks
+    workspace {
+      id
+    }
   }
+ }
 }
 ```
+
+:::tip
+By projecting the workspaces from the project, you get a point-in-time view of the RBAC model.  This can be nice when auditors want to know everything as it stood on a certain day.  You can run this query daily and store off the results and then go back and audit it later.
+:::
 
 ---
 
 ## 18. Verify Variable Set Coverage
 
 > **Persona:** Platform Engineer  
-> **Goal:** Ensure global variable sets (e.g. credentials) are properly attached to all relevant workspaces.
+> **Goal:** Ensure variable sets are properly attached to all relevant workspaces / projects
 
 > **Query:**
 ```graphql
-query VariableSetCoverage(
-  $includeOrgs: [String!]
-  $excludeOrgs: [String!]
-  $nameLike: String
-) {
-  variableSets(
-    includeOrgs: $includeOrgs
-    excludeOrgs: $excludeOrgs
-    filter: { name: { _ilike: $nameLike } }
-  ) {
+query VariableSetAudit {
+  variableSets {
     id
     name
-    organization { name }
-    workspaces {
+    priority
+    projects {
       id
       name
-      projectName
+      workspaces {
+        id
+        name
+      }
     }
-    workspaceExclusions {
+    workspaces {
       id
       name
     }
@@ -585,47 +580,34 @@ query VariableSetCoverage(
 }
 ```
 
-> **Variables:**
-```json
-{
-  "includeOrgs": [],
-  "excludeOrgs": [],
-  "nameLike": "prod%"
-}
-```
-
-Use the returned `workspaces` list to verify coverage and the `workspaceExclusions` list to confirm intentional opt-outs.
-
----
-
-## 19. Search for a Specific Resource Across States
-
-> **Persona:** Cloud Engineer  
-> **Goal:** Quickly find if any workspace manages a given resource address or resource ID.
-
-> **Query:**
-```graphql
-# TODO: implement state resource search / index query across state versions.
-```
-
-> **Note:** Requires an API to search state JSON for resource addresses across all workspaces.
-
 ---
 
 ## 20. Ensure Sensitive Variables Are Properly Marked
 
 > **Persona:** Security Engineer  
-> **Goal:** Audit workspace variables to ensure secrets are not exposed in plaintext.
+> **Goal:** Audit workspace variables and varsets to ensure secrets are not exposed in plaintext.
 
 > **Query:**
 ```graphql
-query PlaintextSecrets($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
+query PlaintextSecrets {
+  workspaces {
     name
     variables(filter: { sensitive: { _eq: false } }) {
       key
       category
       value
+    }
+  }
+
+  variableSets {
+    vars(filter:  {
+       sensitive:  {
+          _eq: false
+       }
+    }) {
+      key
+      value
+      sensitive
     }
   }
 }
@@ -640,8 +622,39 @@ query PlaintextSecrets($orgs: [String!]!) {
 
 > **Query:**
 ```graphql
-# TODO: extend top-level `organizations` query with nested stats (requires multi-org support).
+query ResourceCounts {
+  organizations {
+    name
+    workspaces(filter:  {
+       resourceCount:  {
+          _gt: 0
+       }
+    }) {
+      resourceCount
+    }
+  }
+}
 ```
+
+:::tip
+If you want to get fancy with `jq` you could use this query to aggregate the output of TFGQL
+```bash
+jq '.data.organizations[] | {
+  name: .name,
+  workspace_count: (.workspaces | length),
+  total_resources: ([.workspaces[].resourceCount] | add)
+}'
+```
+This would give you output like this
+```json
+{
+  "name": "my-org",
+  "workspace_count": 31,
+  "total_resources": 1424
+}
+```
+:::
+
 
 ---
 

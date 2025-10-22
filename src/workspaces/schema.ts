@@ -59,6 +59,7 @@ const workspaceSchema = gql`
     project: Project
     appliedPolicySets(filter: PolicySetFilter): [PolicySet!]!
     currentRun: Run
+    teamAccess(filter: WorkspaceTeamAccessFilter): [WorkspaceTeamAccess!]!
   }
 
   type WorkspaceActions {

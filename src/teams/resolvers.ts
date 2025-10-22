@@ -7,6 +7,8 @@ import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { coalesceOrgs } from "../common/orgHelper";
 import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 import { AdminUser } from "../admin/types";
+import { resolvers as workspaceTeamAccessResolvers } from "../workspaceTeamAccess/resolvers";
+import { WorkspaceTeamAccess, WorkspaceTeamAccessFilter } from "../workspaceTeamAccess/types";
 
 export const resolvers = {
   Query: {
@@ -108,6 +110,17 @@ export const resolvers = {
       ctx.dataSources.adminAPI.listUsers({
         filter: filter,
         organizationId: team.organizationId,
-      })
+      }),
+    workspaceAccess: async (
+      team: Team,
+      { filter }: { filter?: WorkspaceTeamAccessFilter },
+      ctx: Context
+    ): Promise<WorkspaceTeamAccess[]> => {
+      return workspaceTeamAccessResolvers.Query.workspaceTeamAccessByTeam(
+        null,
+        { teamId: team.id, filter },
+        ctx,
+      );
+    }
   },
 };

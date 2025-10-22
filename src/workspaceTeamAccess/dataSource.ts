@@ -23,33 +23,6 @@ export class WorkspaceTeamAccessAPI {
     private readonly requestCache: RequestCache,
   ) {}
 
-  async listTeamAccessForTeam(
-    teamId: string,
-    filter?: WorkspaceTeamAccessFilter,
-  ): Promise<WorkspaceTeamAccess[]> {
-    // TODO : FiX THIS
-    // const all = await this.requestCache.getOrSet(
-    //   "WorkspaceTeamAccess:team",
-    //   teamId,
-    //   async () =>
-    //     collectStream(
-    //       streamPages<WorkspaceTeamAccess>(
-    //         this.httpClient,
-    //         `/teams/${teamId}/workspaces`,
-    //         workspaceTeamAccessMapper,
-    //       ),
-    //     ),
-    // );
-
-    const all:WorkspaceTeamAccess[] = [];
-
-    if (!filter) {
-      return all;
-    }
-
-    return all.filter((access) => evaluateWhereClause(filter, access));
-  }
-
   async listTeamAccessForWorkspace(
     workspaceId: string,
     filter?: WorkspaceTeamAccessFilter,

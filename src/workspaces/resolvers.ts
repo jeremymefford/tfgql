@@ -31,7 +31,7 @@ import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
 import { Project } from "../projects/types";
 import { PolicySet, PolicySetFilter } from "../policySets/types";
 import { getPolicyEvaluationsForRun } from "../policyEvaluations/resolvers";
-import { fail } from "assert";
+import { WorkspaceTeamAccess, WorkspaceTeamAccessFilter } from "../workspaceTeamAccess/types";
 
 export const resolvers = {
   Query: {
@@ -452,6 +452,13 @@ export const resolvers = {
         return null;
       }
       return ctx.dataSources.runsAPI.getRun(workspace.currentRunId);
+    },
+    teamAccess: async (
+      workspace: Workspace,
+      { filter }: { filter?: WorkspaceTeamAccessFilter },
+      ctx: Context,
+    ): Promise<WorkspaceTeamAccess[]> => {
+      return ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForWorkspace(workspace.id, filter);
     },
   },
 };

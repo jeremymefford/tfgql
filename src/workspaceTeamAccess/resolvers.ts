@@ -1,3 +1,4 @@
+import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 import { Context } from "../server/context";
 import {
   WorkspaceTeamAccess,
@@ -17,9 +18,24 @@ export const resolvers = {
       _: unknown,
       { teamId, filter }: { teamId: string; filter?: WorkspaceTeamAccessFilter },
       ctx: Context,
-    ): Promise<WorkspaceTeamAccess[]> =>
-      ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForTeam(teamId, filter),
-
+    ): Promise<WorkspaceTeamAccess[]> => {
+      const team = await ctx.dataSources.teamsAPI.getTeam(teamId);
+      if (!team) {
+        return [];
+      }
+      const org = team.organizationId;
+      const result: WorkspaceTeamAccess[] = [];
+      for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(org)) {
+        await parallelizeBounded(page, async (workspace) => {
+          const workspaceTeamAccess = await ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForWorkspace(workspace.id, filter);
+          const teamAccess = workspaceTeamAccess.filter((access) => access.teamId === teamId);
+          if (teamAccess.length > 0) {
+            result.push(...teamAccess);
+          }
+        });
+      }
+      return result;
+    },
     workspaceTeamAccessById: async (
       _: unknown,
       { id }: { id: string },

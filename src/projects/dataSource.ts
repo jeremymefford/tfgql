@@ -28,7 +28,7 @@ export class ProjectsAPI {
     );
   }
 
-  async *getProjects(
+  async *listProjects(
     orgName: string,
     filter?: ProjectFilter,
   ): AsyncGenerator<Project[], void, unknown> {
@@ -50,7 +50,7 @@ export class ProjectsAPI {
       "ProjectByNameGET",
       cacheKey,
       async () => {
-        for await (const page of this.getProjects(orgName, {
+        for await (const page of this.listProjects(orgName, {
           name: { _eq: projectName },
         })) {
           const match = page.find((project) => project.name === projectName);

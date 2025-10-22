@@ -15,6 +15,7 @@ const teamSchema = gql`
     usersFromAdmin(filter: UserFilter): [AdminUser!] @tfeOnly
     tokens(filter: TeamTokenFilter): [TeamToken!]!
     workspaceAccess(filter: WorkspaceTeamAccessFilter): [WorkspaceTeamAccess!]!
+    projectAccess(filter: ProjectTeamAccessFilter): [ProjectTeamAccess!]!
   }
 
   type TeamPermissions {

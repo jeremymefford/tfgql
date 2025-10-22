@@ -35,7 +35,7 @@ export const resolvers = {
       const results: Project[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
         const projects = await gatherAsyncGeneratorPromises(
-          ctx.dataSources.projectsAPI.getProjects(orgId, filter),
+          ctx.dataSources.projectsAPI.listProjects(orgId, filter),
         );
         results.push(...projects);
       });

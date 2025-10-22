@@ -229,6 +229,9 @@ const baseResolvers = {
   PolicyCheck: {
     ...policyChecksResolvers.PolicyCheck,
   },
+  ProjectTeamAccess: {
+    ...projectTeamAccessResolvers.ProjectTeamAccess,
+  },
 };
 
 applyDeploymentTargetGuards(typeDefs, baseResolvers);

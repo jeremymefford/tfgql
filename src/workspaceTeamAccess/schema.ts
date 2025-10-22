@@ -10,8 +10,6 @@ const workspaceTeamAccessSchema = gql`
     sentinelMocks: String!
     workspaceLocking: Boolean!
     runTasks: Boolean!
-    workspaceId: ID!
-    teamId: ID!
     team: Team!
     workspace: Workspace!
   }

@@ -128,7 +128,7 @@ export const resolvers = {
       ctx: Context,
     ): Promise<Project[]> => 
       gatherAsyncGeneratorPromises(
-        ctx.dataSources.projectsAPI.getProjects(org.name, filter),
+        ctx.dataSources.projectsAPI.listProjects(org.name, filter),
       ),
     usersFromAdmin: async (
       org: Organization,

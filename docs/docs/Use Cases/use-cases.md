@@ -4,17 +4,22 @@ title: Use Cases
 sidebar_label: Use Cases
 ---
 
-## Common Admin Workflows
+**Common Admin Workflows**
 
 This page walks through ten frequent Terraform Cloud/Enterprise (TFC/E) administration tasks and shows how to accomplish each using the TFGQL API.  When the built‑in GraphQL schema is sufficient, we provide example queries.  For more specialized needs, we highlight the custom queries you can add (and note where API support is missing).
 
 Looking for aggregated Explorer data across organizations? See the dedicated [Explorer Views](./explorer.md) guide for details on the `explorer*` queries and their nested workspace relationships.
 
-> **Multi-org selection:** Unless noted otherwise, workspace-centric queries accept optional `includeOrgs` and `excludeOrgs` arguments. Omitting `includeOrgs` (or passing an empty array) uses every organization you can access; any organization listed in both arrays is excluded.
+:::tip
+Unless noted otherwise, queries accept optional `includeOrgs` and `excludeOrgs` arguments. Omitting `includeOrgs` (or passing an empty array) uses every organization you can access; any organization listed in both arrays is excluded.
+:::
 
 ---
 
 ## 1. View all workspaces with open runs
+
+> **Persona:** Operations Engineer  
+> **Goal:** Quickly surface any workspace with a run still in progress or waiting on action.
 
 TFC does not currently surface a global filter for run status.  Use the custom `workspacesWithOpenRuns` query to find all workspaces with the currentRun not in a terminal state.
 
@@ -31,14 +36,14 @@ query WorkspacesWithOpenRuns {
 }
 ```
 
-The GraphQL layer pages through all workspace runs and looks for any that are not in a terminal state. To see which runs match, you can add the shown filter to that will narrow it down to just the open runs.  If no filter is presented, all runs for the resultant workspaces will be returned.
-:::warning
-Due to the heavy rate limiting imposed by HCP TF and TFE, this run can take a very long time to complete and there's a chance that the workspace is in the response but no runs if the run completed before the query returned.
-:::
+The GraphQL layer pages through all workspace runs and looks for any that are not in a terminal state. To see which runs match, you can add the shown filter that narrows it down to just the open runs.  If no filter is presented, all runs for the resultant workspaces will be returned.
 
 ---
 
 ## 2. Identify resource‑heavy states
+
+> **Persona:** Platform Engineer  
+> **Goal:** Flag workspaces whose state files exceed a safe resource-count threshold.
 
 Use the built‑in `resourceCount` field on `Workspace` to find workspaces whose current state contains more than *N* resources:
 
@@ -57,6 +62,9 @@ query ResourceHeavyWorkspaces {
 ---
 
 ## 3. Bulk export secrets or variables
+
+> **Persona:** Platform Administrator  
+> **Goal:** Export all workspace variables for auditing, migration, or backup.
 
 You can page through all workspaces and then retrieve variables per workspace.  For example, to dump every variable across every workspace:
 
@@ -81,11 +89,14 @@ Resolvers automatically page through large result sets (`variables` is fetched l
 
 ## 4. Map workspace → policy sets
 
+> **Persona:** Compliance Auditor  
+> **Goal:** Verify which workspaces and projects are governed by each policy set.
+
 The GraphQL schema already supports bi‑directional mapping between policy sets and workspaces.  To see which workspaces each policy set applies to:
 
 ```graphql
 query PolicySetWorkspaces {
-  policySets(filter:  { _or: [ 
+  policySets(filter:  { _or: [
      { workspaceCount:  { _gt: 0 }},
      { projectCount: { _gt: 0}}
   ]}) {
@@ -98,6 +109,10 @@ query PolicySetWorkspaces {
     projects {
       id
       name
+      workspaces {
+        id
+        name
+      }
     }
   }
 }
@@ -107,10 +122,13 @@ query PolicySetWorkspaces {
 
 ## 5. Audit users across teams
 
+> **Persona:** Organization Administrator  
+> **Goal:** Review team membership and available user identity data across the org.
+
 Use nested relationships to audit every team’s membership:
 
 :::info
-Due to privacy settings in HCP TF / TFE, you cannot get user emails outside of your own
+Due to privacy settings in HCP TF / TFE, you cannot get user emails outside of your own organization.
 :::
 
 ```graphql
@@ -130,7 +148,7 @@ query OrgTeamsUsers {
 ```
 
 :::tip
-If you're querying TFE and have an admin token, you can use the following query to get email addresses
+If you're querying TFE and have an admin token, you can use the following query to get email addresses.
 :::
 ```graphql
 query OrgTeamsUsers {
@@ -152,8 +170,11 @@ This query can be especially useful for auditing requirements in regulated indus
 
 ## 6. Detect drift
 
+> **Persona:** Platform Engineer  
+> **Goal:** Spot workspaces flagged as drifted in Explorer before issues escalate.
+
 :::info
-This currently only works for HCP Terraform
+This currently only works for HCP Terraform.
 :::
 
 ```graphql
@@ -174,6 +195,9 @@ You can see how the nested workspace is retrieved.  This allows for querying of 
 
 ## 7. Generate Terraform "run trigger graph”
 
+> **Persona:** Platform Engineer  
+> **Goal:** Visualize workspace dependencies formed by run triggers across organizations.
+
 Fetch the full workspace dependency graph in a single call using the `runTriggerGraph` query:
 
 ```graphql
@@ -191,13 +215,7 @@ The `runTriggerGraph` query returns a list of run-trigger edges (workspace depen
 
 ---
 
-## Top 25 GraphQL Queries for Terraform Cloud & Enterprise
-
-Below is a list of 25 high-value GraphQL query use cases for Terraform Cloud (TFC) and Terraform Enterprise (TFE). Each section includes the persona, their goal, and an example GraphQL query (with variables). Use cases that require additional API endpoints or schema extensions are marked accordingly.
-
----
-
-## 2. Find Stale Workspaces with No Recent Runs
+## 8. Find Stale Workspaces with No Recent Runs
 
 > **Persona:** Platform Admin  
 > **Goal:** List workspaces whose last apply or run occurred before a given threshold (e.g. 90 days ago).
@@ -217,7 +235,7 @@ query StaleWorkspaces {
 
 ---
 
-## 4. List Workspaces Failing Policy Checks
+## 9. List Workspaces Failing Policy Checks
 
 > **Persona:** Compliance Auditor  
 > **Goal:** See which workspaces currently have failing Sentinel/OPA policy checks.
@@ -243,12 +261,12 @@ query {
 
 ---
 
-## 5. Audit Overridden Policy Violations
+## 10. Audit Overridden Policy Violations
 
 > **Persona:** Security/Compliance Officer  
 > **Goal:** Identify runs where a policy was violated but overridden by an admin.
 :::warning
-Due to how rate limiting works for `runs` related APIs, this is a very slow query.  Optimize it as much as you can by providing a run filter, like the example, which shows "year-to-date" for 2025
+Due to how rate limiting works for `runs`-related APIs, this is a very slow query.  Optimize it as much as you can by providing a run filter, like the example, which shows "year-to-date" for 2025.
 :::
 > **Query:**
 ```graphql
@@ -279,7 +297,7 @@ Policy checks are for Sentinel policy evaluations running in "legacy" mode.  Pol
 
 ---
 
-## 6. Identify Workspaces Missing Mandatory Policy Sets
+## 11. Identify Workspaces Missing Mandatory Policy Sets
 
 > **Persona:** Compliance Auditor  
 > **Goal:** Ensure all workspaces have the required policy sets applied.
@@ -295,15 +313,16 @@ query {
       name
     }
   }
-}```
+}
+```
 
 :::info
-Due to the nature of dynamically resolving `appliedPolicySets`, you cannot filter them out, so this will return all workspaces, but those without policySets applied will have an empty array.  You can easily filter those out with `jq`
+Due to the nature of dynamically resolving `appliedPolicySets`, you cannot filter them out, so this will return all workspaces, but those without policySets applied will have an empty array.  You can easily filter those out with `jq`.
 :::
 
 ---
 
-## 7. Module Usage and Reuse Across Organization
+## 12. Module Usage and Reuse Across Organization
 
 > **Persona:** Platform Engineer / Module Author  
 > **Goal:** Get insight into how internal Terraform modules are used across workspaces.
@@ -316,19 +335,20 @@ query {
     source
     version
     workspaceEntities {
-      id      
+      id
       name
     }
-  } 
-}```
+  }
+}
+```
 
 :::warning
-This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE
+This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE.
 :::
 
 ---
 
-## 8. Track Provider Versions in Use (Provider Version Drift)
+## 13. Track Provider Versions in Use (Provider Version Drift)
 
 > **Persona:** Platform Engineer / Security  
 > **Goal:** See all Terraform providers (and versions) in use to detect outdated or unapproved versions.
@@ -341,19 +361,20 @@ query {
     source
     version
     workspaceEntities {
-      id      
+      id
       name
     }
-  } 
-}```
+  }
+}
+```
 
 :::warning
-This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE
+This only works for HCP Terraform at this point in time.  It requires explorer data, which is not available in TFE.
 :::
 
 ---
 
-## 9. Terraform Version Consistency Audit
+## 14. Terraform Version Consistency Audit
 
 > **Persona:** Platform Engineer  
 > **Goal:** Ensure all teams use approved Terraform CLI versions.
@@ -370,7 +391,7 @@ query TerraformVersions {
 
 ---
 
-## 10. Resource Heavy Workspaces
+## 15. Resource Heavy Workspaces
 
 > **Persona:** Platform Engineer  
 > **Goal:** Identify workspaces managing the most resources for performance tuning or splitting.
@@ -390,7 +411,7 @@ query {
 
 ---
 
-## 11. Aggregate Recent Run Failures
+## 16. Aggregate Recent Run Failures
 
 > **Persona:** SRE / DevOps Engineer  
 > **Goal:** List all failed runs (errored or canceled) in the last X days across the organization.
@@ -412,7 +433,7 @@ query {
 
 ---
 
-## 12. Spot Long-Pending or Stuck Runs
+## 17. Spot Long-Pending or Stuck Runs
 
 > **Persona:** SRE  
 > **Goal:** Find runs in a non-terminal state and see the createdAt time to see if the run appears stuck
@@ -432,7 +453,7 @@ query PotentialStuckRuns($terminalStatuses: [String!]!) {
 ```json
 {
   "terminalStatuses": [
-    "planned_and_finished", 
+    "planned_and_finished",
     "planned_and_saved",
     "applied",
     "discarded",
@@ -444,7 +465,7 @@ query PotentialStuckRuns($terminalStatuses: [String!]!) {
 
 ---
 
-## 13. Audit Auto-Apply vs. Manual Approval Settings
+## 18. Audit Auto-Apply vs. Manual Approval Settings
 
 > **Persona:** DevOps / Compliance Engineer  
 > **Goal:** Ensure critical environments require manual applies
@@ -461,7 +482,7 @@ query AutoApplySettings {
 
 ---
 
-## 14. Team Access Audit
+## 19. Team Access Audit
 
 > **Persona:** Org Admin  
 > **Goal:** Review all team access across all orgs
@@ -552,7 +573,7 @@ By projecting the workspaces from the project, you get a point-in-time view of t
 
 ---
 
-## 18. Verify Variable Set Coverage
+## 20. Verify Variable Set Coverage
 
 > **Persona:** Platform Engineer  
 > **Goal:** Ensure variable sets are properly attached to all relevant workspaces / projects
@@ -582,7 +603,7 @@ query VariableSetAudit {
 
 ---
 
-## 20. Ensure Sensitive Variables Are Properly Marked
+## 21. Ensure Sensitive Variables Are Properly Marked
 
 > **Persona:** Security Engineer  
 > **Goal:** Audit workspace variables and varsets to ensure secrets are not exposed in plaintext.
@@ -615,7 +636,7 @@ query PlaintextSecrets {
 
 ---
 
-## 21. Multi-Org Terraform Usage Summary
+## 22. Multi-Org Terraform Usage Summary
 
 > **Persona:** Enterprise Platform Owner  
 > **Goal:** Aggregate workspace counts, resource counts, etc. across multiple organizations.
@@ -637,7 +658,7 @@ query ResourceCounts {
 ```
 
 :::tip
-If you want to get fancy with `jq` you could use this query to aggregate the output of TFGQL
+If you want to get fancy with `jq`, you could use this query to aggregate the output of TFGQL
 ```bash
 jq '.data.organizations[] | {
   name: .name,
@@ -645,7 +666,7 @@ jq '.data.organizations[] | {
   total_resources: ([.workspaces[].resourceCount] | add)
 }'
 ```
-This would give you output like this
+This would give you output like this:
 ```json
 {
   "name": "my-org",
@@ -658,7 +679,7 @@ This would give you output like this
 
 ---
 
-## 22. Fetch Key Outputs from Multiple Workspaces
+## 23. Fetch Key Outputs from Multiple Workspaces
 
 > **Persona:** SRE / Integrator  
 > **Goal:** Retrieve specific output values (e.g. `service_endpoint`) from a set of workspaces.
@@ -711,9 +732,28 @@ query ExecutionModes {
 
 > **Query:**
 ```graphql
-# TODO: include plan summary fields (e.g. `resourceAddCount`, `resourceChangeCount`, `resourceDestroyCount`).
+query LargePlans {
+  runsWithPlanApplyFilter(
+    filter: {
+      status:  { _eq: "applied"  }
+    },
+    planFilter:  {
+     _or: [
+      { resourceChanges: { _gt: 10 }},
+      { resourceAdditions:  { _gt:10  }},
+      { resourceDestructions:  { _gt: 10 }}
+     ]
+  }) {
+    id
+    plan {
+      resourceChanges
+      resourceDestructions
+      resourceAdditions
+    }
+    workspace {
+      id
+      name
+    }
+  }
+}
 ```
-
----
-
-For any use case marked **TODO** above, please share the corresponding Terraform Cloud/Enterprise REST API endpoint so we can implement them in the GraphQL schema and resolvers.

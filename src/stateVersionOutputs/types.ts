@@ -32,6 +32,7 @@ export interface StateVersionOutput {
   type: string;
   value: any;
   detailedType: any;
+  stateVersionId?: string;
 }
 
 export interface StateVersionOutputFilter

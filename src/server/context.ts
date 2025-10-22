@@ -110,7 +110,7 @@ export async function buildContext(
       agentPoolsAPI: new AgentPoolsAPI(httpClient),
       agentTokensAPI: new AgentTokensAPI(httpClient),
       agentsAPI: new AgentsAPI(httpClient),
-      appliesAPI: new AppliesAPI(httpClient),
+      appliesAPI: new AppliesAPI(httpClient, requestCache),
       assessmentResultsAPI: new AssessmentResultsAPI(httpClient),
       commentsAPI: new CommentsAPI(httpClient),
       organizationMembershipsAPI: new OrganizationMembershipsAPI(httpClient),

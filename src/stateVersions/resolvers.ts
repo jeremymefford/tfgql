@@ -79,8 +79,6 @@ export const resolvers = {
       _: unknown,
       ctx: Context,
     ): Promise<StateVersionOutput[]> =>
-      gatherAsyncGeneratorPromises(
-        ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(sv.id),
-      ),
+      ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(sv.id),
   },
 };

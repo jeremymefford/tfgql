@@ -125,6 +125,13 @@ const runSchema = gql`
       excludeOrgs: [String!],
       filter: RunFilter
     ): [Run!]!
+    runsWithPlanApplyFilter(
+      includeOrgs: [String!],
+      excludeOrgs: [String!],
+      filter: RunFilter,
+      planFilter: PlanFilter,
+      applyFilter: ApplyFilter
+    ): [Run!]!
   }
 
 type RunEvent {

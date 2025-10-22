@@ -1,12 +1,12 @@
 import { Context } from "../server/context";
 import { Workspace } from "../workspaces/types";
-import { Run, RunEvent } from "./types";
+import { Run, RunEvent, RunFilter } from "./types";
 import { Comment, CommentFilter } from "../comments/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { RunTrigger, RunTriggerFilter } from "../runTriggers/types";
 import { ConfigurationVersion } from "../configurationVersions/types";
-import { Apply } from "../applies/types";
-import { Plan } from "../plans/types";
+import { Apply, ApplyFilter } from "../applies/types";
+import { Plan, PlanFilter } from "../plans/types";
 import {
   PolicyEvaluation,
   PolicyEvaluationFilter,
@@ -15,6 +15,7 @@ import { PolicyCheck, PolicyCheckFilter } from "../policyChecks/types";
 import { getPolicyEvaluationsForRun } from "../policyEvaluations/resolvers";
 import { coalesceOrgs } from "../common/orgHelper";
 import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
+import { evaluateWhereClause } from "../common/filtering/filtering";
 
 export const resolvers = {
   Query: {
@@ -55,6 +56,48 @@ export const resolvers = {
         }
       }
       return runs;
+    },
+    runsWithPlanApplyFilter: async (
+      _: unknown,
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+        planFilter,
+        applyFilter,
+      }: {
+        includeOrgs?: string[];
+        excludeOrgs?: string[];
+        filter?: RunFilter;
+        planFilter?: PlanFilter;
+        applyFilter?: ApplyFilter
+      },
+      ctx: Context,
+    ): Promise<Run[]> => {
+      const orgs = await coalesceOrgs(ctx, includeOrgs, excludeOrgs);
+      const result: Run[] = [];
+      for (const orgId of orgs) {
+        for await (const workspacePage of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+          await parallelizeBounded(workspacePage, async (workspace) => {
+            const workspaceRuns = await gatherAsyncGeneratorPromises(ctx.dataSources.runsAPI.listRuns(workspace.id, filter));
+            for (const run of workspaceRuns) {
+              let validRun = true;
+              if (planFilter) {
+                const plan = await ctx.dataSources.plansAPI.getPlanForRun(run.id);
+                validRun &&= plan ? evaluateWhereClause(planFilter, plan) : false;
+              }
+              if (applyFilter) {
+                const apply = await ctx.dataSources.appliesAPI.getRunApply(run.id);
+                validRun &&= apply ? evaluateWhereClause(applyFilter, apply) : false;
+              }
+              if (validRun) {
+                result.push(run);
+              }
+            }
+          });
+        }
+      }
+      return result;
     },
     runsWithOverriddenPolicy: async (
       _: unknown,

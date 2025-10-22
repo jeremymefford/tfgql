@@ -232,6 +232,9 @@ const baseResolvers = {
   ProjectTeamAccess: {
     ...projectTeamAccessResolvers.ProjectTeamAccess,
   },
+  StateVersionOutput: {
+    ...stateVersionOutputsResolvers.StateVersionOutputs,
+  },
 };
 
 applyDeploymentTargetGuards(typeDefs, baseResolvers);

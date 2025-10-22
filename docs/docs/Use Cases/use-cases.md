@@ -665,23 +665,20 @@ This would give you output like this
 
 > **Query:**
 ```graphql
-# TODO: use `stateVersionOutputs` across multiple workspaces with filtering.
-```
-
----
-
-## 23. Find Unassigned or Ungrouped Workspaces
-
-> **Persona:** Platform Admin  
-> **Goal:** Identify workspaces missing project assignments or required tags.
-
-> **Query:**
-```graphql
-query UngroupedWorkspaces($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs, filter: { projectName: { _eq: null } }) {
-    id
+query StateVersionOutputSearch {
+  searchStateVersionOutputs(filter:  {
+     name:  {
+        _ilike: "%fqdn%"
+     }
+  }) {
     name
-    tagNames
+    value
+    stateVersion {
+      workspace {
+        id
+        name
+      }
+    }
   }
 }
 ```
@@ -695,8 +692,8 @@ query UngroupedWorkspaces($orgs: [String!]!) {
 
 > **Query:**
 ```graphql
-query ExecutionModes($orgs: [String!]!) {
-  workspaces(includeOrgs: $orgs) {
+query ExecutionModes {
+  workspaces {
     id
     name
     executionMode

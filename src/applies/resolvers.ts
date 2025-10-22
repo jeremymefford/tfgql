@@ -4,6 +4,7 @@ import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 import { Run } from "../runs/types";
 import { evaluateWhereClause } from "../common/filtering/filtering";
 import { StateVersion, StateVersionFilter } from "../stateVersions/types";
+import { fetchArchivistJsonLines } from "../common/http";
 
 export const resolvers = {
   Query: {
@@ -106,6 +107,19 @@ export const resolvers = {
         }
       });
       return ret;
+    },
+    applyLog: async (
+      apply: Apply,
+      { minimumLevel = "TRACE" }: { minimumLevel?: string },
+      ctx: Context,
+    ): Promise<Record<string, unknown>[] | null> => {
+      const logReadUrl = apply.logReadUrl;
+      if (!logReadUrl) {
+        return null;
+      }
+      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
+        minimumLevel,
+      });
     },
   },
 };

@@ -12,12 +12,32 @@ export class RequestCache {
     this.inFlight = new Map();
   }
 
+  genKey(entityType: string, id: string): string {
+    return `${entityType}:${id}`;
+  }
+
+  async set<T>(entityType: string, id: string, value: T): Promise<T> {
+    if (value === null || value === undefined) {
+      return value;
+    }
+    const key = this.genKey(entityType, id);
+
+    if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) this.cache.delete(firstKey);
+    }
+
+    this.cache.set(key, value);
+
+    return value;
+  }
+
   async getOrSet<T>(
     entityType: string,
     id: string,
     valueFactory: () => Promise<T>,
   ): Promise<T> {
-    const key = `${entityType}:${id}`;
+    const key = this.genKey(entityType, id);
 
     if (this.cache.has(key)) {
       logger.debug({ key }, "Cache hit");
@@ -29,14 +49,9 @@ export class RequestCache {
       return this.inFlight.get(key) as Promise<T>;
     }
 
-    if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      if (firstKey) this.cache.delete(firstKey);
-    }
-
     const valuePromise: Promise<T> = valueFactory()
       .then((value) => {
-        this.cache.set(key, value);
+        this.set(entityType, id, value);
         return value;
       })
       .finally(() => this.inFlight.delete(key));

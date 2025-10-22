@@ -56,6 +56,10 @@ const workspaceSchema = gql`
     currentStateVersion: StateVersion
     providers: [WorkspaceProvider!]!
     modules: [WorkspaceModule!]!
+    project: Project
+    appliedPolicySets(filter: PolicySetFilter): [PolicySet!]!
+    currentRun: Run
+    teamAccess(filter: WorkspaceTeamAccessFilter): [WorkspaceTeamAccess!]!
   }
 
   type WorkspaceActions {
@@ -165,19 +169,23 @@ const workspaceSchema = gql`
       excludeOrgs: [String!]
       filter: WorkspaceFilter
     ): [Workspace!]!
-    """
-    List all workspaces across the selected organizations that have at least one run matching the given runFilter (e.g. non-terminal states).
-    """
-    workspacesWithOpenRuns(
+    workspacesWithFailedPolicyChecks(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: WorkspaceFilter
-      runFilter: RunFilter
+    ): [Workspace!]!
+    """
+    List all workspaces across the selected organizations that have at least one run matching the given runFilter (e.g. non-terminal states).
+    """
+    workspacesWithOpenCurrentRun(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: WorkspaceFilter
     ): [Workspace!]!
     """
     List all run-trigger edges (workspace dependency graph) across the selected organizations.
     """
-    stackGraph(
+    runTriggerGraph(
       includeOrgs: [String!]
       excludeOrgs: [String!]
     ): [WorkspaceRunTrigger!]!

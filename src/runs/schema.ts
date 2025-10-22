@@ -31,6 +31,8 @@ const runSchema = gql`
     runEvents: [RunEvent!]!
     runTriggers(filter: RunTriggerFilter): [RunTrigger!]!
     plan: Plan
+    policyEvaluations(filter: PolicyEvaluationFilter): [PolicyEvaluation!]!
+    policyChecks(filter: PolicyCheckFilter): [PolicyCheck!]!
   }
 
   type RunPermissions {
@@ -112,8 +114,25 @@ const runSchema = gql`
   }
 
   extend type Query {
-    runs(workspaceId: ID!, filter: RunFilter): [Run!]!
+    runsForWorkspace(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
+    runs(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: RunFilter
+    ): [Run!]!
+    runsWithOverriddenPolicy(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: RunFilter
+    ): [Run!]!
+    runsWithPlanApplyFilter(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: RunFilter
+      planFilter: PlanFilter
+      applyFilter: ApplyFilter
+    ): [Run!]!
   }
 
   type RunEvent {

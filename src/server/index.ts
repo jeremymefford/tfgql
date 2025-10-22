@@ -11,7 +11,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
 import fastifyApollo from "@as-integrations/fastify";
 import { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
 import { buildContext, Context } from "./context";
-import { typeDefs, resolvers } from "./schema";
+import { typeDefs, resolvers } from "./globalSchema";
 import { applicationConfiguration } from "../common/conf";
 import { createLoggingPlugin } from "../common/middleware/logging";
 import { enterLogContext, updateLogContext, logger } from "../common/logger";

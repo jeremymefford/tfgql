@@ -63,6 +63,7 @@ export interface PolicySet {
   overridable: boolean;
   workspaceCount: number;
   policyCount?: number;
+  projectCount?: number;
   policiesPath?: string | null;
   versioned: boolean;
   createdAt: string;
@@ -98,6 +99,7 @@ export interface PolicySetFilter extends WhereClause<PolicySet> {
   overridable?: BooleanComparisonExp;
   workspaceCount?: IntComparisonExp;
   policyCount?: IntComparisonExp;
+  projectCount?: IntComparisonExp;
   policiesPath?: StringComparisonExp;
   versioned?: BooleanComparisonExp;
   createdAt?: DateTimeComparisonExp;

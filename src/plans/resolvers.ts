@@ -1,3 +1,4 @@
+import { fetchArchivistJsonLines } from "../common/http";
 import { Context } from "../server/context";
 import { Plan } from "./types";
 
@@ -16,6 +17,19 @@ export const resolvers = {
       { dataSources }: Context,
     ): Promise<string | null> {
       return dataSources.plansAPI.getPlanExportDownloadUrl(plan.id);
+    },
+    planLog: async (
+      plan: Plan,
+      { minimumLevel = "TRACE" }: { minimumLevel?: string },
+      ctx: Context,
+    ): Promise<Record<string, unknown>[] | null> => {
+      const logReadUrl = plan.logReadUrl;
+      if (!logReadUrl) {
+        return null;
+      }
+      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
+        minimumLevel,
+      });
     },
   },
 };

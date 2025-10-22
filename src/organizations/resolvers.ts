@@ -15,6 +15,8 @@ import {
   OrganizationTagFilter,
 } from "../organizationTags/types";
 import { PolicySet, PolicySetFilter } from "../policySets/types";
+import { Project, ProjectFilter } from "../projects/types";
+import { AdminUser } from "../admin/types";
 
 export const resolvers = {
   Query: {
@@ -51,9 +53,7 @@ export const resolvers = {
       { filter }: { filter?: PolicySetFilter },
       ctx: Context,
     ): Promise<PolicySet[]> => {
-      return gatherAsyncGeneratorPromises(
-        ctx.dataSources.policySetsAPI.listPolicySets(org.name, filter),
-      );
+      return ctx.dataSources.policySetsAPI.listPolicySets(org.name, filter);
     },
     teams: async (
       org: Organization,
@@ -122,5 +122,22 @@ export const resolvers = {
           filter,
         ),
       ),
+    projects: async (
+      org: Organization,
+      { filter }: { filter?: ProjectFilter },
+      ctx: Context,
+    ): Promise<Project[]> =>
+      gatherAsyncGeneratorPromises(
+        ctx.dataSources.projectsAPI.listProjects(org.name, filter),
+      ),
+    usersFromAdmin: async (
+      org: Organization,
+      { filter }: { filter?: UserFilter },
+      ctx: Context,
+    ): Promise<AdminUser[]> =>
+      ctx.dataSources.adminAPI.listUsers({
+        filter: filter,
+        organizationId: org.id,
+      }),
   },
 };

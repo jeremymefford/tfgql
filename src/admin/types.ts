@@ -1,4 +1,8 @@
-import { ResourceObject, ListResponse, ResourceRef } from "../common/types/jsonApi";
+import {
+  ResourceObject,
+  ListResponse,
+  ResourceRef,
+} from "../common/types/jsonApi";
 
 export interface AdminUserAttributes {
   username: string;

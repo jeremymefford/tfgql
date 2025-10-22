@@ -7,7 +7,11 @@ const userSchema = gql`
     email: String
     avatarUrl: String
     isServiceAccount: Boolean!
-    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
+    teams(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: TeamFilter
+    ): [Team!]!
   }
 
   type User implements UserAccount {
@@ -19,7 +23,11 @@ const userSchema = gql`
     authMethod: String!
     v2Only: Boolean!
     permissions: UserPermissions!
-    teams(includeOrgs: [String!], excludeOrgs: [String!], filter: TeamFilter): [Team!]!
+    teams(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: TeamFilter
+    ): [Team!]!
   }
 
   type UserPermissions {

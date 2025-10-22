@@ -13,6 +13,7 @@ import { runMapper, runEventMapper } from "./mapper";
 import { logger } from "../common/logger";
 import { isNotFound } from "../common/http";
 import { RequestCache } from "../common/requestCache";
+import { StringComparisonExp } from "../common/filtering/types";
 
 export class RunsAPI {
   constructor(
@@ -20,11 +21,38 @@ export class RunsAPI {
     private readonly requestCache: RequestCache,
   ) {}
 
+  private extendParams(
+    paramObj: any,
+    paramName: string,
+    expression: StringComparisonExp,
+  ) {
+    if ("_eq" in expression && expression._eq) {
+      Object.assign(paramObj, { [`filter[${paramName}]`]: expression._eq });
+    } else if ("_in" in expression && expression._in) {
+      Object.assign(paramObj, {
+        [`filter[${paramName}]`]: expression._in.join(","),
+      });
+    }
+  }
+
   /** List all runs for a given workspace */
   async *listRuns(
     workspaceId: string,
     filter?: RunFilter,
   ): AsyncGenerator<Run[], void, unknown> {
+    // due to how limited the runs APIs are, we need to do some extra server side filtering if possible
+    const params = {
+      "filter[operation]":
+        "plan_only,plan_and_apply,save_plan,refresh_only,destroy,empty_apply",
+    };
+    if (filter) {
+      if ("status" in filter && filter.status) {
+        this.extendParams(params, "status", filter.status);
+      }
+      if ("source" in filter && filter.source) {
+        this.extendParams(params, "source", filter.source);
+      }
+    }
     logger.debug({ workspaceId }, "Fetching runs for workspace");
     yield* streamPages<
       Run,
@@ -37,7 +65,7 @@ export class RunsAPI {
       this.httpClient,
       `/workspaces/${workspaceId}/runs`,
       runMapper,
-      undefined,
+      params,
       filter,
     );
   }

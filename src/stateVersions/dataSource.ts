@@ -27,19 +27,28 @@ export class StateVersionsAPI {
       "filter[organization][name]": organizationName,
       "filter[workspace][name]": workspaceName,
     };
-    yield* streamPages<StateVersion, StateVersionFilter>(
+    const pageGenerator = streamPages<StateVersion, StateVersionFilter>(
       this.httpClient,
       `/state-versions`,
       stateVersionMapper,
       params,
       filter,
     );
+    for await (const page of pageGenerator) {
+      for (const stateVersion of page) {
+        this.requestCache.set("state-version", stateVersion.id, stateVersion);
+      }
+      yield page;
+    }
   }
 
   /**
    * Fetch a single state version by ID.
    */
   async getStateVersion(id: string): Promise<StateVersion | null> {
+    if (!id) {
+      return null;
+    }
     return await this.requestCache.getOrSet(`state-version`, id, async () =>
       this.httpClient
         .get<StateVersionResponse>(`/state-versions/${id}`)

@@ -8,6 +8,7 @@ const stateVersionOutputsSchema = gql`
     type: String!
     value: JSON!
     detailedType: JSON!
+    stateVersion: StateVersion
   }
 
   input StateVersionOutputFilter {
@@ -27,6 +28,11 @@ const stateVersionOutputsSchema = gql`
       filter: StateVersionOutputFilter
     ): [StateVersionOutput!]!
     stateVersionOutput(id: ID!): StateVersionOutput
+    searchStateVersionOutputs(
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: StateVersionOutputFilter!
+    ): [StateVersionOutput!]!
   }
 `;
 

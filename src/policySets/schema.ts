@@ -51,6 +51,7 @@ const policySetsSchema = gql`
     kind: StringComparisonExp
     global: BooleanComparisonExp
     agentEnabled: BooleanComparisonExp
+    projectCount: IntComparisonExp
     policyToolVersion: StringComparisonExp
     overridable: BooleanComparisonExp
     workspaceCount: IntComparisonExp

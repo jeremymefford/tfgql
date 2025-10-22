@@ -31,8 +31,9 @@ export const resolvers = {
 
       const results: PolicySet[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        const sets = await gatherAsyncGeneratorPromises(
-          ctx.dataSources.policySetsAPI.listPolicySets(orgId, filter),
+        const sets = await ctx.dataSources.policySetsAPI.listPolicySets(
+          orgId,
+          filter,
         );
         results.push(...sets);
       });

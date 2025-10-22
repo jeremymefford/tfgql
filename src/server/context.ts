@@ -23,17 +23,20 @@ import { PlansAPI } from "../plans/dataSource";
 import { PoliciesAPI } from "../policies/dataSource";
 import { PolicySetsAPI } from "../policySets/dataSource";
 import { PolicyEvaluationsAPI } from "../policyEvaluations/dataSource";
+import { PolicyChecksAPI } from "../policyChecks/dataSource";
 import { PolicySetParametersAPI } from "../policySetParameters/dataSource";
 import { ProjectTeamAccessAPI } from "../projectTeamAccess/dataSource";
 import { StateVersionOutputsAPI } from "../stateVersionOutputs/dataSource";
 import { StateVersionsAPI } from "../stateVersions/dataSource";
 import { TeamTokensAPI } from "../teamTokens/dataSource";
-import { TeamAccessAPI } from "../workspaceTeamAccess/dataSource";
+import { WorkspaceTeamAccessAPI } from "../workspaceTeamAccess/dataSource";
 import { RunTriggersAPI } from "../runTriggers/dataSource";
 import { ExplorerAPI } from "../explorer/dataSource";
 import { createHttpClient } from "../common/httpClient";
 import { applicationConfiguration } from "../common/conf";
 import { AdminAPI } from "../admin/dataSource";
+import { TaskStagesAPI } from "../taskStages/dataSource";
+import { PolicySetOutcomesAPI } from "../policySetOutcomes/dataSource";
 
 /** GraphQL context type */
 export interface Context {
@@ -65,10 +68,13 @@ export interface Context {
     stateVersionOutputsAPI: StateVersionOutputsAPI;
     stateVersionsAPI: StateVersionsAPI;
     teamTokensAPI: TeamTokensAPI;
-    teamAccessAPI: TeamAccessAPI;
+    workspaceTeamAccessAPI: WorkspaceTeamAccessAPI;
     runTriggersAPI: RunTriggersAPI;
     explorerAPI: ExplorerAPI;
     adminAPI: AdminAPI;
+    taskStagesAPI: TaskStagesAPI;
+    policySetOutcomesAPI: PolicySetOutcomesAPI;
+    policyChecksAPI: PolicyChecksAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
@@ -104,24 +110,30 @@ export async function buildContext(
       agentPoolsAPI: new AgentPoolsAPI(httpClient),
       agentTokensAPI: new AgentTokensAPI(httpClient),
       agentsAPI: new AgentsAPI(httpClient),
-      appliesAPI: new AppliesAPI(httpClient),
+      appliesAPI: new AppliesAPI(httpClient, requestCache),
       assessmentResultsAPI: new AssessmentResultsAPI(httpClient),
       commentsAPI: new CommentsAPI(httpClient),
       organizationMembershipsAPI: new OrganizationMembershipsAPI(httpClient),
       organizationTagsAPI: new OrganizationTagsAPI(httpClient),
       plansAPI: new PlansAPI(httpClient, requestCache),
       policiesAPI: new PoliciesAPI(httpClient),
-      policySetsAPI: new PolicySetsAPI(httpClient),
-      policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient),
+      policySetsAPI: new PolicySetsAPI(httpClient, requestCache),
+      policyEvaluationsAPI: new PolicyEvaluationsAPI(httpClient, requestCache),
       policySetParametersAPI: new PolicySetParametersAPI(httpClient),
       projectTeamAccessAPI: new ProjectTeamAccessAPI(httpClient),
       stateVersionOutputsAPI: new StateVersionOutputsAPI(httpClient),
       stateVersionsAPI: new StateVersionsAPI(httpClient, requestCache),
       teamTokensAPI: new TeamTokensAPI(httpClient),
-      teamAccessAPI: new TeamAccessAPI(httpClient),
+      workspaceTeamAccessAPI: new WorkspaceTeamAccessAPI(
+        httpClient,
+        requestCache,
+      ),
       runTriggersAPI: new RunTriggersAPI(httpClient),
       explorerAPI: new ExplorerAPI(httpClient),
       adminAPI: new AdminAPI(httpClient),
+      taskStagesAPI: new TaskStagesAPI(httpClient, requestCache),
+      policySetOutcomesAPI: new PolicySetOutcomesAPI(httpClient),
+      policyChecksAPI: new PolicyChecksAPI(httpClient, requestCache),
     },
     requestCache,
     logger: baseLogger,

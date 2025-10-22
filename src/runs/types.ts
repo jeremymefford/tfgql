@@ -151,6 +151,7 @@ export interface Run {
   };
   workspace?: ResourceRef;
   configurationVersion?: ResourceRef;
+  taskStageIds?: string[];
 }
 
 /**

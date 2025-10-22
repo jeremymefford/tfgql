@@ -6,8 +6,8 @@ const projectTeamAccessSchema = gql`
     access: String!
     projectAccess: ProjectAccess!
     workspaceAccess: WorkspaceAccess!
-    projectId: ID!
-    teamId: ID!
+    project: Project!
+    team: Team!
   }
 
   input ProjectTeamAccessFilter {
@@ -39,8 +39,12 @@ const projectTeamAccessSchema = gql`
   }
 
   extend type Query {
-    projectTeamAccess(
+    projectTeamAccessByProject(
       projectId: ID!
+      filter: ProjectTeamAccessFilter
+    ): [ProjectTeamAccess!]!
+    projectTeamAccessByTeam(
+      teamId: ID!
       filter: ProjectTeamAccessFilter
     ): [ProjectTeamAccess!]!
     projectTeamAccessById(id: ID!): ProjectTeamAccess

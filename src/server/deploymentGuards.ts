@@ -23,9 +23,8 @@ export function applyDeploymentTargetGuards(
       continue;
     }
 
-    const typeResolvers =
-      (targetResolvers[typeName] =
-        targetResolvers[typeName] ?? Object.create(null));
+    const typeResolvers = (targetResolvers[typeName] =
+      targetResolvers[typeName] ?? Object.create(null));
 
     for (const [fieldName, restriction] of fieldMap) {
       const existingResolver = typeResolvers[fieldName];
@@ -185,9 +184,7 @@ function createRestrictionGuard(
 
     if (disallowed) {
       const expected =
-        restriction === "tfeOnly"
-          ? "Terraform Enterprise"
-          : "Terraform Cloud";
+        restriction === "tfeOnly" ? "Terraform Enterprise" : "Terraform Cloud";
       const code =
         restriction === "tfeOnly" ? "TFE_ONLY_ENDPOINT" : "TFC_ONLY_ENDPOINT";
 

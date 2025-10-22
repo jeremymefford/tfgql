@@ -6,6 +6,17 @@ import { TeamToken, TeamTokenFilter } from "../teamTokens/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { coalesceOrgs } from "../common/orgHelper";
 import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
+import { AdminUser } from "../admin/types";
+import { resolvers as workspaceTeamAccessResolvers } from "../workspaceTeamAccess/resolvers";
+import {
+  WorkspaceTeamAccess,
+  WorkspaceTeamAccessFilter,
+} from "../workspaceTeamAccess/types";
+import { resolvers as projectTeamAccessResolvers } from "../projectTeamAccess/resolvers";
+import {
+  ProjectTeamAccess,
+  ProjectTeamAccessFilter,
+} from "../projectTeamAccess/types";
 
 export const resolvers = {
   Query: {
@@ -99,5 +110,36 @@ export const resolvers = {
       gatherAsyncGeneratorPromises(
         ctx.dataSources.teamTokensAPI.listTeamTokens(team.id, filter),
       ),
+    usersFromAdmin: async (
+      team: Team,
+      { filter }: { filter?: UserFilter },
+      ctx: Context,
+    ): Promise<AdminUser[]> =>
+      ctx.dataSources.adminAPI.listUsers({
+        filter: filter,
+        organizationId: team.organizationId,
+      }),
+    workspaceAccess: async (
+      team: Team,
+      { filter }: { filter?: WorkspaceTeamAccessFilter },
+      ctx: Context,
+    ): Promise<WorkspaceTeamAccess[]> => {
+      return workspaceTeamAccessResolvers.Query.workspaceTeamAccessByTeam(
+        null,
+        { teamId: team.id, filter },
+        ctx,
+      );
+    },
+    projectAccess: async (
+      team: Team,
+      { filter }: { filter?: ProjectTeamAccessFilter },
+      ctx: Context,
+    ): Promise<ProjectTeamAccess[]> => {
+      return projectTeamAccessResolvers.Query.projectTeamAccessByTeam(
+        null,
+        { teamId: team.id, filter },
+        ctx,
+      );
+    },
   },
 };

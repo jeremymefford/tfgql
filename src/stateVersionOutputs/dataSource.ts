@@ -1,6 +1,9 @@
 import type { AxiosInstance } from "axios";
 import { isNotFound } from "../common/http";
-import { streamPages } from "../common/streamPages";
+import {
+  gatherAsyncGeneratorPromises,
+  streamPages,
+} from "../common/streamPages";
 import {
   StateVersionOutput,
   StateVersionOutputFilter,
@@ -11,17 +14,23 @@ import { stateVersionOutputMapper } from "./mapper";
 export class StateVersionOutputsAPI {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  async *listStateVersionOutputs(
+  async listStateVersionOutputs(
     stateVersionId: string,
     filter?: StateVersionOutputFilter,
-  ): AsyncGenerator<StateVersionOutput[], void, unknown> {
-    yield* streamPages<StateVersionOutput, StateVersionOutputFilter>(
-      this.httpClient,
-      `/state-versions/${stateVersionId}/outputs`,
-      stateVersionOutputMapper,
-      undefined,
-      filter,
+  ): Promise<StateVersionOutput[]> {
+    const stateVersionOutputs = await gatherAsyncGeneratorPromises(
+      streamPages<StateVersionOutput, StateVersionOutputFilter>(
+        this.httpClient,
+        `/state-versions/${stateVersionId}/outputs`,
+        stateVersionOutputMapper,
+        undefined,
+        filter,
+      ),
     );
+    stateVersionOutputs.forEach((svo) => {
+      svo.stateVersionId = stateVersionId;
+    });
+    return stateVersionOutputs;
   }
 
   async getStateVersionOutput(id: string): Promise<StateVersionOutput | null> {

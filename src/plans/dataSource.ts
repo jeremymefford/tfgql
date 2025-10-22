@@ -25,27 +25,34 @@ export class PlansAPI {
   }
 
   async getPlan(id: string): Promise<Plan | null> {
-    return this.httpClient
-      .get<PlanResponse>(`/plans/${id}`)
-      .then((res) => planMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<Plan | null>("PlanGET", id, async () =>
+      this.httpClient
+        .get<PlanResponse>(`/plans/${id}`)
+        .then((res) => planMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 
   async getPlanForRun(runId: string): Promise<Plan | null> {
-    return this.httpClient
-      .get<PlanResponse>(`/runs/${runId}/plan`)
-      .then((res) => planMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<Plan | null>(
+      "PlanForRunGET",
+      runId,
+      async () =>
+        this.httpClient
+          .get<PlanResponse>(`/runs/${runId}/plan`)
+          .then((res) => planMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          }),
+    );
   }
 
   private async createPlanExport(

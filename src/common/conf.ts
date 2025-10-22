@@ -9,7 +9,7 @@ export interface ServerTlsConfig {
 
 export class Config {
   readonly tfeBaseUrl: string;
-   readonly deploymentTarget: "tfc" | "tfe";
+  readonly deploymentTarget: "tfc" | "tfe";
   readonly graphqlBatchSize: number;
   readonly tfcPageSize: number;
   readonly rateLimitMaxRetries: number = 20;
@@ -29,10 +29,7 @@ export class Config {
     this.tfeBaseUrl = baseUrl;
     this.deploymentTarget = this.determineDeploymentTarget(this.tfeBaseUrl);
 
-    this.graphqlBatchSize = this.parsePositiveNumber(
-      env.TFGQL_BATCH_SIZE,
-      10,
-    );
+    this.graphqlBatchSize = this.parsePositiveNumber(env.TFGQL_BATCH_SIZE, 10);
     const userGivenPageSize = this.parsePositiveNumber(
       env.TFGQL_PAGE_SIZE,
       100,

@@ -31,7 +31,8 @@ const stateVersionOutputsSchema = gql`
     searchStateVersionOutputs(
       includeOrgs: [String!]
       excludeOrgs: [String!]
-      filter: StateVersionOutputFilter!): [StateVersionOutput!]!
+      filter: StateVersionOutputFilter!
+    ): [StateVersionOutput!]!
   }
 `;
 

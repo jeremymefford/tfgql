@@ -14,7 +14,10 @@ export const resolvers = {
       }: { stateVersionId: string; filter?: StateVersionOutputFilter },
       { dataSources }: Context,
     ): Promise<StateVersionOutput[]> =>
-      dataSources.stateVersionOutputsAPI.listStateVersionOutputs(stateVersionId, filter),
+      dataSources.stateVersionOutputsAPI.listStateVersionOutputs(
+        stateVersionId,
+        filter,
+      ),
     stateVersionOutput: async (
       _: unknown,
       { id }: { id: string },
@@ -41,24 +44,36 @@ export const resolvers = {
         return results;
       }
       await parallelizeBounded(orgs, async (orgId) => {
-        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId)) {
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
+          orgId,
+        )) {
           await parallelizeBounded(page, async (workspace) => {
-            const stateVersions = await gatherAsyncGeneratorPromises(ctx.dataSources.stateVersionsAPI.listStateVersions(orgId, workspace.name));
+            const stateVersions = await gatherAsyncGeneratorPromises(
+              ctx.dataSources.stateVersionsAPI.listStateVersions(
+                orgId,
+                workspace.name,
+              ),
+            );
             for (const stateVersion of stateVersions) {
-              const stateVersionOutputs = await ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(stateVersion.id, filter);
+              const stateVersionOutputs =
+                await ctx.dataSources.stateVersionOutputsAPI.listStateVersionOutputs(
+                  stateVersion.id,
+                  filter,
+                );
               results.push(...stateVersionOutputs);
             }
           });
         }
       });
       return results;
-    }
+    },
   },
   StateVersionOutput: {
     stateVersion: async (
       output: StateVersionOutput,
       _: unknown,
       { dataSources }: Context,
-    ) => dataSources.stateVersionsAPI.getStateVersion(output.stateVersionId ?? ""),
+    ) =>
+      dataSources.stateVersionsAPI.getStateVersion(output.stateVersionId ?? ""),
   },
 };

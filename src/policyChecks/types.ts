@@ -1,8 +1,4 @@
-import {
-  BooleanComparisonExp,
-  StringComparisonExp,
-  WhereClause,
-} from "../common/filtering/types";
+import { StringComparisonExp, WhereClause } from "../common/filtering/types";
 import {
   ResourceObject,
   ListResponse,
@@ -31,9 +27,7 @@ export interface PolicyCheckRelationships {
   run?: { data?: ResourceRef };
 }
 
-export type PolicyCheckResource = ResourceObject<
-  PolicyCheckAttributes
-> & {
+export type PolicyCheckResource = ResourceObject<PolicyCheckAttributes> & {
   relationships?: PolicyCheckRelationships;
 };
 export type PolicyCheckListResponse = ListResponse<PolicyCheckResource>;

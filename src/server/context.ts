@@ -133,7 +133,7 @@ export async function buildContext(
       adminAPI: new AdminAPI(httpClient),
       taskStagesAPI: new TaskStagesAPI(httpClient, requestCache),
       policySetOutcomesAPI: new PolicySetOutcomesAPI(httpClient),
-      policyChecksAPI: new PolicyChecksAPI(httpClient, requestCache)
+      policyChecksAPI: new PolicyChecksAPI(httpClient, requestCache),
     },
     requestCache,
     logger: baseLogger,

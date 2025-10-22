@@ -1,8 +1,5 @@
 import { DomainMapper } from "../common/middleware/domainMapper";
-import {
-  PolicyEvaluationResource,
-  PolicyEvaluation,
-} from "./types";
+import { PolicyEvaluationResource, PolicyEvaluation } from "./types";
 
 export const policyEvaluationMapper: DomainMapper<
   PolicyEvaluationResource,
@@ -12,8 +9,8 @@ export const policyEvaluationMapper: DomainMapper<
     const attrs = resource.attributes;
     const rc = attrs["result-count"];
     const ts = attrs["status-timestamps"] ?? {};
-    const policyAttachableRef = resource.relationships?.["policy-attachable"]
-      ?.data;
+    const policyAttachableRef =
+      resource.relationships?.["policy-attachable"]?.data;
     const policyOutcomeIds =
       resource.relationships?.["policy-set-outcomes"]?.data?.map(
         (ref): string => ref.id,

@@ -55,7 +55,9 @@ export async function fetchArchivistJsonLines(
   options?: FetchArchivistOptions,
 ): Promise<Record<string, unknown>[]> {
   const chunkSize = DEFAULT_ARCHIVIST_CHUNK_SIZE;
-  const minimumRank = resolveLevelRank(options?.minimumLevel ?? DEFAULT_MIN_LEVEL);
+  const minimumRank = resolveLevelRank(
+    options?.minimumLevel ?? DEFAULT_MIN_LEVEL,
+  );
   const results: Record<string, unknown>[] = [];
   let nextStart = 0;
   let carryOver = "";

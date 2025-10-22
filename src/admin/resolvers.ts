@@ -1,5 +1,4 @@
 import { Context } from "../server/context";
-import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import type { Organization } from "../organizations/types";
 import type { AdminUser } from "./types";
 import type { UserFilter } from "../users/types";
@@ -23,7 +22,7 @@ export const resolvers = {
         search: args.search,
         admin: args.admin,
         suspended: args.suspended,
-      })
+      }),
   },
   AdminUser: {
     organizations: async (
@@ -38,14 +37,18 @@ export const resolvers = {
       const organizations = await Promise.all(
         user.organizationIds.map((id) =>
           ctx.dataSources.organizationsAPI.getOrganization(id),
-        )
+        ),
       ).then((results) => results.filter((res) => res !== null));
 
       return organizations;
     },
     teams: async (
       user: AdminUser,
-      { includeOrgs, excludeOrgs, filter }: { includeOrgs: string[]; excludeOrgs: string[]; filter?: TeamFilter },
+      {
+        includeOrgs,
+        excludeOrgs,
+        filter,
+      }: { includeOrgs: string[]; excludeOrgs: string[]; filter?: TeamFilter },
       ctx: Context,
     ): Promise<Team[]> => {
       return loadTeamsForUser(ctx, user.id, includeOrgs, excludeOrgs, filter);

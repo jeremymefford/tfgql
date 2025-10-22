@@ -1,5 +1,8 @@
 import type { AxiosInstance } from "axios";
-import { gatherAsyncGeneratorPromises, streamPages } from "../common/streamPages";
+import {
+  gatherAsyncGeneratorPromises,
+  streamPages,
+} from "../common/streamPages";
 import { adminUserMapper } from "./mapper";
 import type { AdminUser } from "./types";
 import type { UserFilter } from "../users/types";
@@ -13,7 +16,7 @@ interface ListUsersOptions {
 }
 
 export class AdminAPI {
-  constructor(private readonly httpClient: AxiosInstance) { }
+  constructor(private readonly httpClient: AxiosInstance) {}
 
   async listUsers(options: ListUsersOptions = {}): Promise<AdminUser[]> {
     const params: Record<string, unknown> = {};
@@ -28,16 +31,20 @@ export class AdminAPI {
       params["filter[suspended]"] = options.suspended;
     }
 
-    const users = await gatherAsyncGeneratorPromises(streamPages<AdminUser, UserFilter>(
-      this.httpClient,
-      "/admin/users",
-      adminUserMapper,
-      params,
-      options.filter,
-    ));
+    const users = await gatherAsyncGeneratorPromises(
+      streamPages<AdminUser, UserFilter>(
+        this.httpClient,
+        "/admin/users",
+        adminUserMapper,
+        params,
+        options.filter,
+      ),
+    );
 
     return options.organizationId
-      ? users.filter((user) => user.organizationIds.includes(options.organizationId as string))
+      ? users.filter((user) =>
+          user.organizationIds.includes(options.organizationId as string),
+        )
       : users;
   }
 }

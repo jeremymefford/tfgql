@@ -8,9 +8,15 @@ import { coalesceOrgs } from "../common/orgHelper";
 import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 import { AdminUser } from "../admin/types";
 import { resolvers as workspaceTeamAccessResolvers } from "../workspaceTeamAccess/resolvers";
-import { WorkspaceTeamAccess, WorkspaceTeamAccessFilter } from "../workspaceTeamAccess/types";
+import {
+  WorkspaceTeamAccess,
+  WorkspaceTeamAccessFilter,
+} from "../workspaceTeamAccess/types";
 import { resolvers as projectTeamAccessResolvers } from "../projectTeamAccess/resolvers";
-import { ProjectTeamAccess, ProjectTeamAccessFilter } from "../projectTeamAccess/types";
+import {
+  ProjectTeamAccess,
+  ProjectTeamAccessFilter,
+} from "../projectTeamAccess/types";
 
 export const resolvers = {
   Query: {
@@ -116,7 +122,7 @@ export const resolvers = {
     workspaceAccess: async (
       team: Team,
       { filter }: { filter?: WorkspaceTeamAccessFilter },
-      ctx: Context
+      ctx: Context,
     ): Promise<WorkspaceTeamAccess[]> => {
       return workspaceTeamAccessResolvers.Query.workspaceTeamAccessByTeam(
         null,
@@ -127,12 +133,12 @@ export const resolvers = {
     projectAccess: async (
       team: Team,
       { filter }: { filter?: ProjectTeamAccessFilter },
-      ctx: Context
+      ctx: Context,
     ): Promise<ProjectTeamAccess[]> => {
       return projectTeamAccessResolvers.Query.projectTeamAccessByTeam(
         null,
         { teamId: team.id, filter },
-        ctx,  
+        ctx,
       );
     },
   },

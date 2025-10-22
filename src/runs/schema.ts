@@ -117,28 +117,28 @@ const runSchema = gql`
     runsForWorkspace(workspaceId: ID!, filter: RunFilter): [Run!]!
     run(id: ID!): Run
     runs(
-      includeOrgs: [String!],
-      excludeOrgs: [String!],
-      filter: RunFilter): [Run!]!
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: RunFilter
+    ): [Run!]!
     runsWithOverriddenPolicy(
-      includeOrgs: [String!],
-      excludeOrgs: [String!],
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
       filter: RunFilter
     ): [Run!]!
     runsWithPlanApplyFilter(
-      includeOrgs: [String!],
-      excludeOrgs: [String!],
-      filter: RunFilter,
-      planFilter: PlanFilter,
+      includeOrgs: [String!]
+      excludeOrgs: [String!]
+      filter: RunFilter
+      planFilter: PlanFilter
       applyFilter: ApplyFilter
     ): [Run!]!
   }
 
-type RunEvent {
-  id: ID!
-  body: JSON!
-}
-
+  type RunEvent {
+    id: ID!
+    body: JSON!
+  }
 `;
 
 export default runSchema;

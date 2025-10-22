@@ -31,7 +31,10 @@ import type { ExplorerModuleField, ExplorerModuleRow } from "../explorer/types";
 import { Project } from "../projects/types";
 import { PolicySet, PolicySetFilter } from "../policySets/types";
 import { getPolicyEvaluationsForRun } from "../policyEvaluations/resolvers";
-import { WorkspaceTeamAccess, WorkspaceTeamAccessFilter } from "../workspaceTeamAccess/types";
+import {
+  WorkspaceTeamAccess,
+  WorkspaceTeamAccessFilter,
+} from "../workspaceTeamAccess/types";
 
 export const resolvers = {
   Query: {
@@ -159,16 +162,35 @@ export const resolvers = {
         return [];
       }
 
-      const terminalStatuses = ["applied", "discarded", "errored", "canceled", "force_canceled", "planned_and_finished", "planned_and_saved"];
+      const terminalStatuses = [
+        "applied",
+        "discarded",
+        "errored",
+        "canceled",
+        "force_canceled",
+        "planned_and_finished",
+        "planned_and_saved",
+      ];
       const result: Workspace[] = [];
       await parallelizeBounded(orgs, async (orgId) => {
-        ctx.logger.debug({ orgName: orgId }, "Finding workspaces with open current runs");
-        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(orgId,filter)) {
+        ctx.logger.debug(
+          { orgName: orgId },
+          "Finding workspaces with open current runs",
+        );
+        for await (const page of ctx.dataSources.workspacesAPI.listWorkspaces(
+          orgId,
+          filter,
+        )) {
           await parallelizeBounded(page, async (workspace: Workspace) => {
-            const currentRun = workspace.currentRunId ? await ctx.dataSources.runsAPI.getRun(workspace.currentRunId) : null;
+            const currentRun = workspace.currentRunId
+              ? await ctx.dataSources.runsAPI.getRun(workspace.currentRunId)
+              : null;
             if (currentRun) {
-              if (currentRun.status && !terminalStatuses.includes(currentRun.status)) {
-                  result.push(workspace);
+              if (
+                currentRun.status &&
+                !terminalStatuses.includes(currentRun.status)
+              ) {
+                result.push(workspace);
               }
             }
           });
@@ -202,18 +224,27 @@ export const resolvers = {
           if (!workspace.currentRunId) {
             return;
           }
-          const currentRun = await ctx.dataSources.runsAPI.getRun(workspace.currentRunId);
+          const currentRun = await ctx.dataSources.runsAPI.getRun(
+            workspace.currentRunId,
+          );
           if (!currentRun) {
             return;
           }
           const failStatuses = ["failed", "errored", "soft_failed"];
           const [failedPolicyEvals, failedPolicyChecks] = await Promise.all([
-            getPolicyEvaluationsForRun(currentRun, ctx).then((policyEvaluations) =>
-              policyEvaluations.filter((policyEvaluation) =>
-                failStatuses.includes(policyEvaluation.status))),
-            ctx.dataSources.policyChecksAPI.listPolicyChecks(currentRun.id).then((policyChecks) =>
-              policyChecks.filter((policyCheck) =>
-                failStatuses.includes(policyCheck.status))),
+            getPolicyEvaluationsForRun(currentRun, ctx).then(
+              (policyEvaluations) =>
+                policyEvaluations.filter((policyEvaluation) =>
+                  failStatuses.includes(policyEvaluation.status),
+                ),
+            ),
+            ctx.dataSources.policyChecksAPI
+              .listPolicyChecks(currentRun.id)
+              .then((policyChecks) =>
+                policyChecks.filter((policyCheck) =>
+                  failStatuses.includes(policyCheck.status),
+                ),
+              ),
           ]);
           if (failedPolicyEvals.length > 0 || failedPolicyChecks.length > 0) {
             results.push(workspace);
@@ -250,7 +281,10 @@ export const resolvers = {
             }
           });
         }
-        ctx.logger.debug({ orgName: orgId, edgeCount: localEdges.length },"Workspace stack graph complete");
+        ctx.logger.debug(
+          { orgName: orgId, edgeCount: localEdges.length },
+          "Workspace stack graph complete",
+        );
         edges.push(...localEdges);
       });
       return edges;
@@ -432,14 +466,19 @@ export const resolvers = {
         filter,
       );
 
-      const filtered = policySets.filter((policySet) =>
-        // first check for "includes"
-        policySet.workspaceIds?.includes(workspace.id) ||
-        (workspace.projectId && policySet.projectIds?.includes(workspace.projectId)),
-      ).filter((policySet) =>
-        // then check for "excludes"
-        !(policySet.workspaceExclusionIds?.includes(workspace.id))
-      );
+      const filtered = policySets
+        .filter(
+          (policySet) =>
+            // first check for "includes"
+            policySet.workspaceIds?.includes(workspace.id) ||
+            (workspace.projectId &&
+              policySet.projectIds?.includes(workspace.projectId)),
+        )
+        .filter(
+          (policySet) =>
+            // then check for "excludes"
+            !policySet.workspaceExclusionIds?.includes(workspace.id),
+        );
 
       return Array.from(new Map(filtered.map((ps) => [ps.id, ps])).values());
     },
@@ -458,7 +497,10 @@ export const resolvers = {
       { filter }: { filter?: WorkspaceTeamAccessFilter },
       ctx: Context,
     ): Promise<WorkspaceTeamAccess[]> => {
-      return ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForWorkspace(workspace.id, filter);
+      return ctx.dataSources.workspaceTeamAccessAPI.listTeamAccessForWorkspace(
+        workspace.id,
+        filter,
+      );
     },
   },
 };

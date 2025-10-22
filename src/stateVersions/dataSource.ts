@@ -13,7 +13,7 @@ export class StateVersionsAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
   /**
    * List all state versions for a given organization and workspace.

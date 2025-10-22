@@ -19,13 +19,19 @@ export class RunsAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
-  private extendParams(paramObj: any, paramName: string, expression: StringComparisonExp) {
+  private extendParams(
+    paramObj: any,
+    paramName: string,
+    expression: StringComparisonExp,
+  ) {
     if ("_eq" in expression && expression._eq) {
       Object.assign(paramObj, { [`filter[${paramName}]`]: expression._eq });
     } else if ("_in" in expression && expression._in) {
-      Object.assign(paramObj, { [`filter[${paramName}]`]: expression._in.join(",") });
+      Object.assign(paramObj, {
+        [`filter[${paramName}]`]: expression._in.join(","),
+      });
     }
   }
 
@@ -35,7 +41,10 @@ export class RunsAPI {
     filter?: RunFilter,
   ): AsyncGenerator<Run[], void, unknown> {
     // due to how limited the runs APIs are, we need to do some extra server side filtering if possible
-    const params = { "filter[operation]": "plan_only,plan_and_apply,save_plan,refresh_only,destroy,empty_apply" };
+    const params = {
+      "filter[operation]":
+        "plan_only,plan_and_apply,save_plan,refresh_only,destroy,empty_apply",
+    };
     if (filter) {
       if ("status" in filter && filter.status) {
         this.extendParams(params, "status", filter.status);

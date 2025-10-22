@@ -31,8 +31,12 @@ export const getPolicyEvaluationsForRun = async (
 
   const evaluations = await Promise.all(
     policyStageIds.map((stageId) =>
-      ctx.dataSources.policyEvaluationsAPI.listPolicyEvaluations(stageId, filter)
-    ));
+      ctx.dataSources.policyEvaluationsAPI.listPolicyEvaluations(
+        stageId,
+        filter,
+      ),
+    ),
+  );
 
   return evaluations.flat();
 };
@@ -47,7 +51,10 @@ export const resolvers = {
       }: { taskStageId: string; filter?: PolicyEvaluationFilter },
       { dataSources }: Context,
     ): Promise<PolicyEvaluation[]> =>
-      dataSources.policyEvaluationsAPI.listPolicyEvaluations(taskStageId, filter),
+      dataSources.policyEvaluationsAPI.listPolicyEvaluations(
+        taskStageId,
+        filter,
+      ),
   },
   PolicyEvaluation: {
     policySetOutcomes: async (

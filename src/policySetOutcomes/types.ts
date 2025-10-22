@@ -1,4 +1,8 @@
-import { ResourceObject, ListResponse, SingleResponse } from "../common/types/jsonApi";
+import {
+  ResourceObject,
+  ListResponse,
+  SingleResponse,
+} from "../common/types/jsonApi";
 
 export interface PolicySetOutcomeAttributes {
   outcomes: unknown;
@@ -22,12 +26,14 @@ export interface PolicySetOutcomeRelationships {
   };
 }
 
-export type PolicySetOutcomeResource = ResourceObject<PolicySetOutcomeAttributes> & {
-  relationships?: PolicySetOutcomeRelationships;
-};
+export type PolicySetOutcomeResource =
+  ResourceObject<PolicySetOutcomeAttributes> & {
+    relationships?: PolicySetOutcomeRelationships;
+  };
 
 export type PolicySetOutcomeResponse = SingleResponse<PolicySetOutcomeResource>;
-export type PolicySetOutcomeListResponse = ListResponse<PolicySetOutcomeResource>;
+export type PolicySetOutcomeListResponse =
+  ListResponse<PolicySetOutcomeResource>;
 
 export interface PolicySetOutcome {
   id: string;

@@ -18,7 +18,7 @@ export class WorkspacesAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
   async *listWorkspaces(
     orgName: string,
@@ -61,7 +61,8 @@ export class WorkspacesAPI {
             }
             throw err;
           });
-      });
+      },
+    );
   }
 
   async getWorkspaceByName(

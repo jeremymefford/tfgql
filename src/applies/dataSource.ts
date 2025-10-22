@@ -9,7 +9,7 @@ export class AppliesAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
   async getRunApply(runId: string): Promise<Apply | null> {
     return this.requestCache.getOrSet<Apply | null>(
@@ -25,22 +25,21 @@ export class AppliesAPI {
             }
             logger.error({ err: error, runId }, "Error fetching run apply");
             return null;
-          }));
+          }),
+    );
   }
 
   async getApply(id: string): Promise<Apply | null> {
-    return this.requestCache.getOrSet<Apply | null>(
-      "ApplyGET",
-      id,
-      async () =>
-        this.httpClient
-          .get<ApplyResponse>(`/applies/${id}`)
-          .then((res) => applyMapper.map(res.data.data))
-          .catch((err) => {
-            if (isNotFound(err)) {
-              return null;
-            }
-            throw err;
-          }));
+    return this.requestCache.getOrSet<Apply | null>("ApplyGET", id, async () =>
+      this.httpClient
+        .get<ApplyResponse>(`/applies/${id}`)
+        .then((res) => applyMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

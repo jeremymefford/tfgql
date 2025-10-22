@@ -1,8 +1,5 @@
 import { DomainMapper } from "../common/middleware/domainMapper";
-import {
-  WorkspaceTeamAccessResource,
-  WorkspaceTeamAccess,
-} from "./types";
+import { WorkspaceTeamAccessResource, WorkspaceTeamAccess } from "./types";
 
 export const workspaceTeamAccessMapper: DomainMapper<
   WorkspaceTeamAccessResource,

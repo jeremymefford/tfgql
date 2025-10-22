@@ -9,7 +9,7 @@ export class PlansAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
   async *listPlans(
     runId: string,
@@ -25,19 +25,17 @@ export class PlansAPI {
   }
 
   async getPlan(id: string): Promise<Plan | null> {
-    return this.requestCache.getOrSet<Plan | null>(
-      "PlanGET",
-      id,
-      async () =>
-        this.httpClient
-          .get<PlanResponse>(`/plans/${id}`)
-          .then((res) => planMapper.map(res.data.data))
-          .catch((err) => {
-            if (isNotFound(err)) {
-              return null;
-            }
-            throw err;
-          }));
+    return this.requestCache.getOrSet<Plan | null>("PlanGET", id, async () =>
+      this.httpClient
+        .get<PlanResponse>(`/plans/${id}`)
+        .then((res) => planMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 
   async getPlanForRun(runId: string): Promise<Plan | null> {
@@ -53,7 +51,8 @@ export class PlansAPI {
               return null;
             }
             throw err;
-          }));
+          }),
+    );
   }
 
   private async createPlanExport(
@@ -155,7 +154,7 @@ export class PlansAPI {
     timeoutMs = 5 * 60 * 1000,
   ) {
     const start = Date.now();
-    for (; ;) {
+    for (;;) {
       const exp = await this.getPlanExport(planExportId);
       const status = exp.attributes?.status;
       if (status === "finished") return exp;

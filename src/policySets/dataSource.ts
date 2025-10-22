@@ -9,7 +9,7 @@ export class PolicySetsAPI {
   constructor(
     private readonly httpClient: AxiosInstance,
     private readonly requestCache: RequestCache,
-  ) { }
+  ) {}
 
   async listPolicySets(
     organization: string,
@@ -29,7 +29,6 @@ export class PolicySetsAPI {
       return all;
     };
 
-
     if (!filter) {
       return this.requestCache.getOrSet(
         "PolicySets:list",
@@ -37,7 +36,7 @@ export class PolicySetsAPI {
         valueFactory,
       );
     }
-  
+
     return valueFactory();
   }
 

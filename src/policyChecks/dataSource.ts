@@ -1,5 +1,8 @@
 import type { AxiosInstance } from "axios";
-import { gatherAsyncGeneratorPromises, streamPages } from "../common/streamPages";
+import {
+  gatherAsyncGeneratorPromises,
+  streamPages,
+} from "../common/streamPages";
 import { RequestCache } from "../common/requestCache";
 import { PolicyCheck, PolicyCheckFilter } from "./types";
 import { evaluateWhereClause } from "../common/filtering/filtering";

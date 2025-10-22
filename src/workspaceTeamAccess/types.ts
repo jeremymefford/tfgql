@@ -25,14 +25,15 @@ export interface WorkspaceTeamAccessRelationships {
   workspace?: { data?: ResourceRef };
 }
 
-export type WorkspaceTeamAccessResource = ResourceObject<
-  WorkspaceTeamAccessAttributes
-> & {
-  relationships?: WorkspaceTeamAccessRelationships;
-};
+export type WorkspaceTeamAccessResource =
+  ResourceObject<WorkspaceTeamAccessAttributes> & {
+    relationships?: WorkspaceTeamAccessRelationships;
+  };
 
-export type WorkspaceTeamAccessListResponse = ListResponse<WorkspaceTeamAccessResource>;
-export type WorkspaceTeamAccessResponse = SingleResponse<WorkspaceTeamAccessResource>;
+export type WorkspaceTeamAccessListResponse =
+  ListResponse<WorkspaceTeamAccessResource>;
+export type WorkspaceTeamAccessResponse =
+  SingleResponse<WorkspaceTeamAccessResource>;
 
 export interface WorkspaceTeamAccess {
   id: string;

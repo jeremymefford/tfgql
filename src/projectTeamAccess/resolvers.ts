@@ -22,10 +22,7 @@ export const resolvers = {
     },
     projectTeamAccessByTeam: async (
       _: unknown,
-      {
-        teamId,
-        filter,
-      }: { teamId: string; filter?: ProjectTeamAccessFilter },
+      { teamId, filter }: { teamId: string; filter?: ProjectTeamAccessFilter },
       { dataSources }: Context,
     ): Promise<ProjectTeamAccess[]> => {
       const result: ProjectTeamAccess[] = [];
@@ -36,8 +33,15 @@ export const resolvers = {
       const orgId = team.organizationId;
       for await (const page of dataSources.projectsAPI.listProjects(orgId)) {
         await parallelizeBounded(page, async (project) => {
-          const projectTeamAccess = await gatherAsyncGeneratorPromises(dataSources.projectTeamAccessAPI.listProjectTeamAccess(project.id, filter));
-          const teamAccess = projectTeamAccess.filter((access) => access.teamId === teamId);
+          const projectTeamAccess = await gatherAsyncGeneratorPromises(
+            dataSources.projectTeamAccessAPI.listProjectTeamAccess(
+              project.id,
+              filter,
+            ),
+          );
+          const teamAccess = projectTeamAccess.filter(
+            (access) => access.teamId === teamId,
+          );
           if (teamAccess.length > 0) {
             result.push(...teamAccess);
           }

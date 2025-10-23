@@ -1,0 +1,30 @@
+class Tfgql < Formula
+  desc "GraphQL facade for Terraform Cloud / Enterprise"
+  homepage "https://github.com/jeremymefford/tfgql"
+  version "{{VERSION}}"
+  license "MIT"
+
+  on_macos do
+    on_arm do
+      url "{{ARM64_URL}}"
+      sha256 "{{ARM64_SHA}}"
+
+      def install
+        bin.install "{{ARM64_BINARY}}" => "tfgql"
+      end
+    end
+
+    on_intel do
+      url "{{X64_URL}}"
+      sha256 "{{X64_SHA}}"
+
+      def install
+        bin.install "{{X64_BINARY}}" => "tfgql"
+      end
+    end
+  end
+
+  test do
+    assert_match "GraphQL", shell_output("#{bin}/tfgql --help", 1)
+  end
+end

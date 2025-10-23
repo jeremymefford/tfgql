@@ -45,7 +45,7 @@ Do not forget to replace `token` in this script with your actual token!
 
 ```bash
 docker run -p 4000:4000 ghcr.io/jeremymefford/tfgql:latest
-export JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d '{"tfcToken":"<token>"}' | jq -r '.token')
+TFC_TOKEN=<token> JWT=$(curl -s -H "content-type: application/json" -X POST http://localhost:4000/auth/token -d "{\"tfcToken\":\"$TFC_TOKEN\"}" | jq -r '.token')
 curl -s -X POST -H "content-type: application/json" -H "Authorization: Bearer $JWT" http://localhost:4000/ \
   -d '{"query":"query { me { username } }"}'
 ```
@@ -115,12 +115,42 @@ Tokens for Terraform Cloud/Enterprise are now supplied per-request when you exch
 
 ## Running the Server
 
+### Option 1: Run the prebuilt binary (macOS, Linux, Windows)
+
+Download the archive that matches your platform from the latest
+[GitHub release](https://github.com/jeremymefford/tfgql/releases), extract it,
+and run the binary directly:
+
+```bash
+tar -xzf tfgql-linux-x64.tar.gz
+./tfgql-linux-x64
+```
+
+Set the same environment variables shown above before starting the process. The
+binary listens on `http://0.0.0.0:${PORT:-4000}`.
+
+> **macOS**: Apple requires binaries to be signed. Release artifacts are
+> shipped with an ad-hoc signature, so you can run them immediately. If you
+> modify the binary, re-sign it with:
+>
+> ```bash
+> codesign --sign - --force --deep ./tfgql-darwin-arm64
+> ```
+
+> **Windows**: Extract the `.tar.gz` with PowerShell (`tar -xf` is available by
+> default) and run `tfgql-win-x64.exe` from a Command Prompt or PowerShell. The
+> same environment variables apply.
+
+### Option 2: Run with Node.js
+
 Install dependencies and start:
 
 ```bash
 npm install
 npm start
 ```
+
+### Option 3: Run with Docker
 
 Alternatively, build and run with Docker:
 

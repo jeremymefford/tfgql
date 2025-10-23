@@ -1,6 +1,8 @@
 # Docker
 
-Build and run the TFGQL server in a Docker container.
+Build and run the TFGQL server in a Docker container. The published image uses
+the standard Node.js runtime (Alpine base) so that you can extend it with
+additional tooling if needed.
 
 ## Build the Docker image
 

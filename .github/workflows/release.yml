@@ -144,6 +144,8 @@ jobs:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
+    environment:
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -181,6 +183,8 @@ jobs:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: macos-latest
+    environment:
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,6 +218,8 @@ jobs:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: macos-latest-large
+    environment:
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -248,6 +254,8 @@ jobs:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: windows-latest
+    environment:
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -283,6 +291,8 @@ jobs:
     needs: [prepare-release, build-linux, build-macos-arm, build-macos-intel, build-windows]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
+    environment:
+      name: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -300,7 +310,6 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Import GPG key
-        if: secrets.ACTIONS_GPG_KEY != '' && secrets.ACTIONS_GPG_PASSPHRASE != ''
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
@@ -309,19 +318,24 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Disable commit signing when no GPG key
-        if: !(secrets.ACTIONS_GPG_KEY != '' && secrets.ACTIONS_GPG_PASSPHRASE != '')
         run: git config commit.gpgsign false
 
-      - name: Download Linux/Windows artifacts
+      - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sea-linux-win
+          name: sea-linux
           path: release-artifacts
 
-      - name: Download macOS artifacts
+      - name: Download macOS arm artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sea-macos
+          name: sea-macos-arm
+          path: release-artifacts
+
+      - name: Download macOS intel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sea-macos-intel
           path: release-artifacts
 
       - name: Download Windows artifacts

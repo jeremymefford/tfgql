@@ -145,6 +145,41 @@ jobs:
             sha256sum "$archive" > "${archive}.sha256"
           done
 
+      - name: Generate Homebrew formula
+        if: steps.bump.outputs.should_release == 'true'
+        run: |
+          mkdir -p release-artifacts/homebrew
+          ARM_SHA=$(cut -d ' ' -f1 release-artifacts/tfgql-darwin-arm64.tar.gz.sha256)
+          X64_SHA=$(cut -d ' ' -f1 release-artifacts/tfgql-darwin-x64.tar.gz.sha256)
+          VERSION=${{ steps.version.outputs.new_version }}
+          node scripts/update-homebrew-formula.mjs \
+            --version "$VERSION" \
+            --arm-url "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/tfgql-darwin-arm64.tar.gz" \
+            --arm-sha "$ARM_SHA" \
+            --arm-binary "tfgql-darwin-arm64" \
+            --x64-url "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/tfgql-darwin-x64.tar.gz" \
+            --x64-sha "$X64_SHA" \
+            --x64-binary "tfgql-darwin-x64" \
+            --output release-artifacts/homebrew/tfgql.rb
+
+      - name: Update Homebrew tap
+        if: steps.bump.outputs.should_release == 'true' && secrets.TAP_PUSH_TOKEN != ''
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_PUSH_TOKEN }}
+          VERSION: ${{ steps.version.outputs.new_version }}
+        run: |
+          git clone https://$TAP_TOKEN@github.com/jeremymefford/homebrew-tfgql.git tap
+          cp release-artifacts/homebrew/tfgql.rb tap/Formula/tfgql.rb
+          cd tap
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Homebrew tap already up to date."
+          else
+            git commit -am "tfgql ${VERSION}"
+            git push origin HEAD:main
+          fi
+
       - name: Upload SEA artifacts
         if: steps.bump.outputs.should_release == 'true'
         uses: actions/upload-artifact@v4

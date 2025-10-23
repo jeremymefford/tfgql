@@ -158,15 +158,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build SEA binaries (linux + windows)
+      - name: Build SEA binaries (linux)
         env:
-          SEA_TARGETS: linux-arm64,linux-x64,win-arm64,win-x64
+          SEA_TARGETS: linux-arm64,linux-x64
         run: npm run build:sea
 
       - name: Package binaries
         run: |
           mkdir -p release-artifacts
-          for name in tfgql-linux-arm64 tfgql-linux-x64 tfgql-win-arm64.exe tfgql-win-x64.exe; do
+          for name in tfgql-linux-arm64 tfgql-linux-x64; do
             tar -C build/sea/binaries -czf release-artifacts/${name}.tar.gz ${name}
             sha256sum release-artifacts/${name}.tar.gz > release-artifacts/${name}.tar.gz.sha256
           done
@@ -174,29 +174,25 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sea-linux-win
+          name: sea-linux
           path: release-artifacts
 
-  build-macos:
+  build-macos-arm:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Rosetta
-        run: sudo softwareupdate --install-rosetta --agree-to-license
-
-      - name: Set up Node.js (arm64)
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          architecture: 'arm64'
 
-      - name: Install dependencies (arm64)
+      - name: Install dependencies
         run: npm ci
 
       - name: Build SEA binary (darwin arm64)
@@ -208,34 +204,83 @@ jobs:
           tar -C build/sea/binaries -czf release-artifacts/tfgql-darwin-arm64.tar.gz tfgql-darwin-arm64
           shasum -a 256 release-artifacts/tfgql-darwin-arm64.tar.gz > release-artifacts/tfgql-darwin-arm64.tar.gz.sha256
 
-      - name: Clean workspace for x64 build
-        run: rm -rf node_modules build
+      - name: Upload macOS arm artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sea-macos-arm
+          path: release-artifacts
 
-      - name: Set up Node.js (x64)
+  build-macos-intel:
+    needs: prepare-release
+    if: needs.prepare-release.outputs.should_release == 'true'
+    runs-on: macos-latest-large
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           architecture: 'x64'
 
-      - name: Install dependencies (x64)
-        run: arch -x86_64 npm ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build SEA binary (darwin x64)
-        run: arch -x86_64 npm run build:sea -- --scope=current
+        run: npm run build:sea -- --scope=current
 
       - name: Package darwin x64 binary
         run: |
+          mkdir -p release-artifacts
           tar -C build/sea/binaries -czf release-artifacts/tfgql-darwin-x64.tar.gz tfgql-darwin-x64
           shasum -a 256 release-artifacts/tfgql-darwin-x64.tar.gz > release-artifacts/tfgql-darwin-x64.tar.gz.sha256
 
-      - name: Upload macOS artifacts
+      - name: Upload macOS intel artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: sea-macos
+          name: sea-macos-intel
+          path: release-artifacts
+
+  build-windows:
+    needs: prepare-release
+    if: needs.prepare-release.outputs.should_release == 'true'
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build SEA binary (windows x64)
+        run: npm run build:sea -- --scope=current
+
+      - name: Package windows binary
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release-artifacts | Out-Null
+          tar -C build/sea/binaries -czf release-artifacts/tfgql-win-x64.tar.gz tfgql-win-x64.exe
+          $hash = (Get-FileHash release-artifacts/tfgql-win-x64.tar.gz -Algorithm SHA256).Hash.ToLower()
+          "$hash  tfgql-win-x64.tar.gz" | Out-File release-artifacts/tfgql-win-x64.tar.gz.sha256 -Encoding ascii
+
+      - name: Upload windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sea-windows
           path: release-artifacts
 
   publish-release:
-    needs: [prepare-release, build-linux, build-macos]
+    needs: [prepare-release, build-linux, build-macos-arm, build-macos-intel, build-windows]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -255,12 +300,17 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Import GPG key
+        if: secrets.ACTIONS_GPG_KEY != '' && secrets.ACTIONS_GPG_PASSPHRASE != ''
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.ACTIONS_GPG_KEY }}
           passphrase: ${{ secrets.ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+
+      - name: Disable commit signing when no GPG key
+        if: !(secrets.ACTIONS_GPG_KEY != '' && secrets.ACTIONS_GPG_PASSPHRASE != '')
+        run: git config commit.gpgsign false
 
       - name: Download Linux/Windows artifacts
         uses: actions/download-artifact@v4
@@ -272,6 +322,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: sea-macos
+          path: release-artifacts
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sea-windows
           path: release-artifacts
 
       - name: Generate Homebrew formula
@@ -292,8 +348,13 @@ jobs:
 
       - name: Create tag
         run: |
-          git tag -s v${{ needs.prepare-release.outputs.version }} -m "Release v${{ needs.prepare-release.outputs.version }}"
-          git push origin v${{ needs.prepare-release.outputs.version }}
+          VERSION=${{ needs.prepare-release.outputs.version }}
+          if [[ -n "${{ secrets.ACTIONS_GPG_KEY }}" && -n "${{ secrets.ACTIONS_GPG_PASSPHRASE }}" ]]; then
+            git tag -s v${VERSION} -m "Release v${VERSION}"
+          else
+            git tag -a v${VERSION} -m "Release v${VERSION}"
+          fi
+          git push origin v${VERSION}
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2

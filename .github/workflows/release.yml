@@ -250,45 +250,8 @@ jobs:
           name: sea-macos-intel
           path: release-artifacts
 
-  build-windows:
-    needs: prepare-release
-    if: needs.prepare-release.outputs.should_release == 'true'
-    runs-on: windows-latest
-    environment:
-      name: prod
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build SEA binary (windows x64)
-        run: npm run build:sea -- --scope=current
-
-      - name: Package windows binary
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path release-artifacts | Out-Null
-          tar -C build/sea/binaries -czf release-artifacts/tfgql-win-x64.tar.gz tfgql-win-x64.exe
-          $hash = (Get-FileHash release-artifacts/tfgql-win-x64.tar.gz -Algorithm SHA256).Hash.ToLower()
-          "$hash  tfgql-win-x64.tar.gz" | Out-File release-artifacts/tfgql-win-x64.tar.gz.sha256 -Encoding ascii
-
-      - name: Upload windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: sea-windows
-          path: release-artifacts
-
   publish-release:
-    needs: [prepare-release, build-linux, build-macos-arm, build-macos-intel, build-windows]
+    needs: [prepare-release, build-linux, build-macos-arm, build-macos-intel]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     environment:
@@ -336,12 +299,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: sea-macos-intel
-          path: release-artifacts
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: sea-windows
           path: release-artifacts
 
       - name: Generate Homebrew formula

@@ -127,6 +127,30 @@ jobs:
           fi
           git commit -S -m "release: v${{ steps.version.outputs.new_version }}"
           git push origin HEAD:main
+
+      - name: Build SEA binaries (all platforms)
+        if: steps.bump.outputs.should_release == 'true'
+        run: npm run build:sea -- --scope=all
+
+      - name: Package SEA binaries
+        if: steps.bump.outputs.should_release == 'true'
+        run: |
+          mkdir -p release-artifacts
+          for file in build/sea/binaries/tfgql-*; do
+            name=$(basename "$file")
+            archive="release-artifacts/${name}.tar.gz"
+            tar -C build/sea/binaries -czf "$archive" "$name"
+          done
+          for archive in release-artifacts/*; do
+            sha256sum "$archive" > "${archive}.sha256"
+          done
+
+      - name: Upload SEA artifacts
+        if: steps.bump.outputs.should_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sea-binaries
+          path: release-artifacts
       
       - name: Upload docs artifact
         if: steps.bump.outputs.should_release == 'true' || steps.bump.outputs.docs_only == 'true'
@@ -152,6 +176,7 @@ jobs:
           tag_name: v${{ steps.version.outputs.new_version }}
           name: v${{ steps.version.outputs.new_version }}
           generate_release_notes: true
+          files: release-artifacts/*
 
   publish-image:
     needs: prepare-release

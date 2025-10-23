@@ -55,6 +55,7 @@ apollo-engine-report/
 
 node_modules/
 dist/
+build/
 certs/
 
 *.env

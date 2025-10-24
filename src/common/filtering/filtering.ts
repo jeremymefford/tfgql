@@ -6,7 +6,6 @@ import {
   TerraformVersionComparisonExp,
   WhereClause,
 } from "./types";
-import { logger } from "../logger";
 
 const TERRAFORM_VERSION_REGEX =
   /^(~>|>=|<=|>|<|!=|=)?\s*v?(\d+)\.(\d+)(?:\.(\d+))?.*$/;

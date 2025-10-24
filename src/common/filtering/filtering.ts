@@ -54,10 +54,6 @@ export function evaluateWhereClause<T, TFilter>(
         continue;
       }
 
-      if (key == "createdAt") {
-        logger.debug({ obj }, "Evaluating where clause for createdAt");
-      }
-
       if (filter) {
         if (filter._is_null !== undefined) {
           const isNull = value === null || value === undefined;

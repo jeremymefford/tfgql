@@ -18,11 +18,11 @@ export const resolvers = {
   Query: {
     runsForWorkspace: async (
       _: unknown,
-      { workspaceId }: { workspaceId: string },
+      { workspaceId, filter }: { workspaceId: string; filter?: RunFilter },
       ctx: Context,
     ): Promise<Run[]> => {
       return gatherAsyncGeneratorPromises(
-        ctx.dataSources.runsAPI.listRuns(workspaceId),
+        ctx.dataSources.runsAPI.listRuns(workspaceId, filter),
       );
     },
     run: async (

@@ -24,7 +24,7 @@ export const resolvers = {
     },
     appliesForWorkspace: async (
       _: unknown,
-      { workspaceId, filter }: { workspaceId: string; filter: ApplyFilter },
+      { workspaceId, filter }: { workspaceId: string; filter?: ApplyFilter },
       ctx: Context,
     ): Promise<Apply[]> => {
       const results: Apply[] = [];
@@ -45,7 +45,7 @@ export const resolvers = {
     },
     appliesForProject: async (
       _: unknown,
-      { projectId, filter }: { projectId: string; filter: ApplyFilter },
+      { projectId, filter }: { projectId: string; filter?: ApplyFilter },
       ctx: Context,
     ): Promise<Apply[]> => {
       const results: Apply[] = [];

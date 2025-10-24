@@ -6,14 +6,20 @@ Thank you for your interest in contributing to the TFGQL project! We welcome you
 
 ## Getting Started
 
-1. **Fork the repository** and clone it to your local machine.
-2. Run `npm install` to install dependencies.
-3. Create a `.env` file in the project root and configure environment variables (e.g., `TFGQL_JWT_ENCRYPTION_KEY`, `TFE_BASE_URL`, etc.).
-4. Build and start the project with:
+1. **Fork the repository** and clone it locally.
+2. Use **Node.js 24** (`nvm use 24` recommended) and install dependencies with `npm install`.
+3. Set the required environment variables (e.g., `TFGQL_JWT_ENCRYPTION_KEY`, `TFE_BASE_URL`, `PORT`) in your shell or a `.env.local` file.
+4. Start the API with:
 
    ```bash
-   npm install
    npm start
+   ```
+
+5. (Optional) Build a single executable for your architecture to sanity-check SEA output:
+
+   ```bash
+   npm run build:sea -- --scope=current
+   ./build/sea/binaries/tfgql-<platform>
    ```
 
 ---
@@ -52,9 +58,13 @@ Thank you for your interest in contributing to the TFGQL project! We welcome you
 
 ## Docker and Deployment
 
-- Build with `npm run docker:build`.
-- A lightweight, multi-arch Dockerfile is provided for secure production use.
-- Run the container locally using: `docker run -p 4000:4000 tfgql`.
+- Build the Linux image with `npm run docker:build`.
+- The published image targets Linux (`linux/amd64` and `linux/arm64`). On macOS/Windows use Docker Desktop in Linux mode.
+- Run the container locally using:
+
+  ```bash
+  docker run -p 4000:4000 ghcr.io/jeremymefford/tfgql:latest
+  ```
 
 ---
 
@@ -88,4 +98,4 @@ call many times when trying to resolve the same nested entity across multiple pa
 1. Ensure linter and formatter are clean.
 2. Push your branch and open a pull request, make sure the title of the pull request starts with `[MAJOR]` / `[MINOR]` / `[PATCH]` as this is used to determine how to bump the version.
 3. Clearly explain what the change does and why.
-
+4. If your change affects the Homebrew formula or release artifacts, note it in the PR description so the maintainers can verify the release workflow.

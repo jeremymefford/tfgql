@@ -9,7 +9,7 @@ There is no SaaS option for TFGQL, so you must host it yourself.
 
 ## TFGQL to Terraform Cloud (TFC)
 
-When calling TFC, you can host it in your on-premises datacenters or in a public cloud tenant.  The application only needs network access to TFC's APIs.
+When calling TFC, you can host it in your on-premises datacenters or in a public cloud tenant. The application only needs network access to TFC's APIs.
 
 ```mermaid
 flowchart LR

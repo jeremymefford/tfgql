@@ -34,6 +34,3 @@ with defaults and notes about when they are required.
   extension.
 - TLS configuration is optional unless you want the Node.js process to terminate
   HTTPS connections directly; see [`Deployment/tls`](./tls) for details.
-- When deploying in container environments, pass the variables via `--env-file`
-  (as shown in [`Deployment/docker`](./docker)) or your platform-specific secret
-  management solution.

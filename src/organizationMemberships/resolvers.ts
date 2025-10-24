@@ -47,7 +47,7 @@ export const resolvers = {
     },
     myOrganizationMemberships: async (
       _: unknown,
-      { filter }: { filter: OrganizationMembershipFilter },
+      { filter }: { filter?: OrganizationMembershipFilter },
       { dataSources }: Context,
     ): Promise<OrganizationMembership[]> => {
       return dataSources.organizationMembershipsAPI.myOrganizationMemberships(

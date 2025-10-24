@@ -3,30 +3,6 @@ import TabItem from '@theme/TabItem';
 
 # Getting Started with TFGQL
 
-Welcome to the comprehensive guide for getting started with the **TFGQL** project.
-
-This guide will walk you through installation, configuration, and basic usage of the TFGQL API.
-
----
-
-## Table of Contents
-
-1. [Project Overview](#project-overview)
-2. [Installation and Setup](#installation-and-setup)
-   - [Prerequisites](#prerequisites)
-   - [Clone the Repository](#clone-the-repository)
-   - [Environment Variables](#environment-variables)
-3. [Running the Server](#running-the-server)
-4. [Exploring the API](#exploring-the-api)
-5. [Basic Queries](#basic-queries)
-   - [List Organizations](#list-organizations)
-   - [List Teams](#list-teams)
-6. [Filtering Data](#filtering-data)
-7. [Nested Queries](#nested-queries)
-8. [Rate Limit Handling](#rate-limit-handling)
-9. [Sample Query: Workspace Runs](#sample-query-workspace-runs)
-10. [Resources](#resources)
-
 ---
 
 ## Project Overview
@@ -181,7 +157,7 @@ See [use cases](Use%20Cases/use-cases.md) for more real-world queries
       }
     ```
   </TabItem>
-  <TabItem value="orgs" label="Teams & Users" default>
+  <TabItem value="teams" label="Teams & Users" default>
     ```graphql
       query {
         teams(includeOrgs: ["<my-org>"]) {
@@ -195,7 +171,7 @@ See [use cases](Use%20Cases/use-cases.md) for more real-world queries
       }
     ```
   </TabItem>
-  <TabItem value="orgs" label="Workspaces" default>
+  <TabItem value="workspaces" label="Workspaces" default>
   ```graphql
     query {
       workspaces(includeOrgs: ["my-org"]) {
@@ -253,7 +229,7 @@ Each nested resolution is only aware of the parent context.  Therefore it is not
 
 If you filter on a nested relationship, it will filter only at the nested level.  Extending the previous example, if you fetched all teams with a user filter on the users, the result will be **ALL** teams and only filtering the users.  It will not be only teams that meet the user criteria.
 
-There are a couple custom queries that allow passing filters for different levels of resolution, but those are bespoke and cannot be broadly applied.  See this [ADR](Architecture%20Decision%20Records%20/filter-vs-where.md) if you want more info.
+There are a couple custom queries that allow passing filters for different levels of resolution, but those are bespoke and cannot be broadly applied.  See this [ADR](Architecture%20Decision%20Records/filter-vs-where.md) if you want more info.
 :::
 
 ## Resources

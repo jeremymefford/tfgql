@@ -22,7 +22,7 @@ export const resolvers = {
   Query: {
     organizations: async (
       _: unknown,
-      { filter }: { filter: OrganizationFilter },
+      { filter }: { filter?: OrganizationFilter },
       ctx: Context,
     ): Promise<Organization[]> => {
       return gatherAsyncGeneratorPromises(

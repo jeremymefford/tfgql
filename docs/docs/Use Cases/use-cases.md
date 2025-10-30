@@ -496,6 +496,9 @@ query TeamAccessAudit {
   organization {
     id
   }
+  users {
+    username
+  }
   permissions {
     canUpdateMembership
     canDestroy

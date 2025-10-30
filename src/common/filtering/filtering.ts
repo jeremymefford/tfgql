@@ -200,53 +200,61 @@ function evaluateBoolean(
   return true;
 }
 
+function coerceDate(input: unknown): Date | null {
+  if (input instanceof Date) return input;
+  if (typeof input === "string" || typeof input === "number") {
+    const parsed = new Date(input);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return null;
+}
+
 function evaluateDate(
   value: string | Date,
   filter: FieldComparisonExp,
 ): boolean {
   const dateValue = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(dateValue.getTime())) return false;
   if (
     "_eq" in filter &&
-    dateValue.getTime() !== new Date(filter._eq as string).getTime()
+    (coerceDate(filter._eq)?.getTime() ?? NaN) !== dateValue.getTime()
   )
     return false;
   if (
     "_neq" in filter &&
-    dateValue.getTime() === new Date(filter._neq as string).getTime()
+    (coerceDate(filter._neq)?.getTime() ?? NaN) === dateValue.getTime()
   )
     return false;
   if (
     "_in" in filter &&
-    !(filter._in as Date[]).some(
-      (d) => new Date(d).getTime() === dateValue.getTime(),
+    !((filter._in as unknown[]) ?? []).some(
+      (candidate) => coerceDate(candidate)?.getTime() === dateValue.getTime(),
     )
   )
     return false;
   if (
     "_nin" in filter &&
-    (filter._nin as Date[]).some(
-      (d) => new Date(d).getTime() === dateValue.getTime(),
+    ((filter._nin as unknown[]) ?? []).some(
+      (candidate) => coerceDate(candidate)?.getTime() === dateValue.getTime(),
     )
   )
     return false;
-  if (
-    "_gt" in filter &&
-    typeof filter._gt === "string" &&
-    dateValue <= new Date(filter._gt)
-  )
-    return false;
-  if (
-    "_gte" in filter &&
-    dateValue < new Date(filter._gte as unknown as string)
-  )
-    return false;
-  if ("_lt" in filter && dateValue >= new Date(filter._lt as unknown as string))
-    return false;
-  if (
-    "_lte" in filter &&
-    dateValue > new Date(filter._lte as unknown as string)
-  )
-    return false;
+  if ("_gt" in filter) {
+    const comparison = coerceDate(filter._gt);
+    if (!comparison || dateValue.getTime() <= comparison.getTime()) return false;
+  }
+  if ("_gte" in filter) {
+    const comparison = coerceDate(filter._gte);
+    if (!comparison || dateValue.getTime() < comparison.getTime()) return false;
+  }
+  if ("_lt" in filter) {
+    const comparison = coerceDate(filter._lt);
+    if (!comparison || dateValue.getTime() >= comparison.getTime()) return false;
+  }
+  if ("_lte" in filter) {
+    const comparison = coerceDate(filter._lte);
+    if (!comparison || dateValue.getTime() > comparison.getTime()) return false;
+  }
   return true;
 }
 
@@ -254,7 +262,6 @@ function evaluateSemver(
   value: string,
   filter: TerraformVersionComparisonExp,
 ): boolean {
-  // TODO: 1.5 is showing as _gte 1.12
   // string-based equality/membership
   if ("_eq" in filter && value !== filter._eq) return false;
   if ("_neq" in filter && value === filter._neq) return false;
@@ -272,21 +279,12 @@ function evaluateSemver(
     return false;
 
   // numeric comparison based on vMAJOR.MINOR.PATCH
-  const m = value.match(TERRAFORM_VERSION_REGEX);
-  if (!m) return false;
-  const [major, minor, patch] = m.slice(2, 5).map((n) => parseInt(n, 10)) as [
-    number,
-    number,
-    number,
-  ];
+  const parsedValue = parseSemverTuple(value);
+  if (!parsedValue) return false;
+  const [major, minor, patch] = parsedValue;
 
-  const parse = (v: unknown): [number, number, number] | null => {
-    if (typeof v !== "string") return null;
-    const mm = v.match(TERRAFORM_VERSION_REGEX);
-    return mm
-      ? (mm.slice(2, 5).map((n) => parseInt(n, 10)) as [number, number, number])
-      : null;
-  };
+  const parse = (v: unknown): [number, number, number] | null =>
+    typeof v === "string" ? parseSemverTuple(v) : null;
 
   const compare = (
     a: [number, number, number],
@@ -315,4 +313,14 @@ function evaluateSemver(
   }
 
   return true;
+}
+
+function parseSemverTuple(input: string): [number, number, number] | null {
+  const match = input.match(TERRAFORM_VERSION_REGEX);
+  if (!match) return null;
+  const major = parseInt(match[2], 10);
+  const minor = parseInt(match[3], 10);
+  const patch = match[4] ? parseInt(match[4], 10) : 0;
+  if ([major, minor, patch].some((part) => Number.isNaN(part))) return null;
+  return [major, minor, patch];
 }

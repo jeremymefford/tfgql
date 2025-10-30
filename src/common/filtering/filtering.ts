@@ -215,45 +215,47 @@ function evaluateDate(
 ): boolean {
   const dateValue = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(dateValue.getTime())) return false;
-  if (
-    "_eq" in filter &&
-    (coerceDate(filter._eq)?.getTime() ?? NaN) !== dateValue.getTime()
-  )
-    return false;
-  if (
-    "_neq" in filter &&
-    (coerceDate(filter._neq)?.getTime() ?? NaN) === dateValue.getTime()
-  )
-    return false;
-  if (
-    "_in" in filter &&
-    !((filter._in as unknown[]) ?? []).some(
-      (candidate) => coerceDate(candidate)?.getTime() === dateValue.getTime(),
-    )
-  )
-    return false;
-  if (
-    "_nin" in filter &&
-    ((filter._nin as unknown[]) ?? []).some(
-      (candidate) => coerceDate(candidate)?.getTime() === dateValue.getTime(),
-    )
-  )
-    return false;
+  const dateMillis = dateValue.getTime();
+  const toMillis = (input: unknown): number | null =>
+    coerceDate(input)?.getTime() ?? null;
+
+  if ("_eq" in filter) {
+    const comparison = toMillis(filter._eq);
+    if (comparison !== null && dateMillis !== comparison) return false;
+  }
+  if ("_neq" in filter) {
+    const comparison = toMillis(filter._neq);
+    if (comparison !== null && dateMillis === comparison) return false;
+  }
+  if ("_in" in filter) {
+    const comparisons = ((filter._in as unknown[]) ?? [])
+      .map(toMillis)
+      .filter((millis): millis is number => millis !== null);
+    if (comparisons.length > 0 && !comparisons.includes(dateMillis))
+      return false;
+  }
+  if ("_nin" in filter) {
+    const comparisons = ((filter._nin as unknown[]) ?? [])
+      .map(toMillis)
+      .filter((millis): millis is number => millis !== null);
+    if (comparisons.length > 0 && comparisons.includes(dateMillis))
+      return false;
+  }
   if ("_gt" in filter) {
     const comparison = coerceDate(filter._gt);
-    if (!comparison || dateValue.getTime() <= comparison.getTime()) return false;
+    if (comparison && dateMillis <= comparison.getTime()) return false;
   }
   if ("_gte" in filter) {
     const comparison = coerceDate(filter._gte);
-    if (!comparison || dateValue.getTime() < comparison.getTime()) return false;
+    if (comparison && dateMillis < comparison.getTime()) return false;
   }
   if ("_lt" in filter) {
     const comparison = coerceDate(filter._lt);
-    if (!comparison || dateValue.getTime() >= comparison.getTime()) return false;
+    if (comparison && dateMillis >= comparison.getTime()) return false;
   }
   if ("_lte" in filter) {
     const comparison = coerceDate(filter._lte);
-    if (!comparison || dateValue.getTime() > comparison.getTime()) return false;
+    if (comparison && dateMillis > comparison.getTime()) return false;
   }
   return true;
 }

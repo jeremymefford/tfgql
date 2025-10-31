@@ -322,7 +322,8 @@ function parseSemverTuple(input: string): [number, number, number] | null {
   if (!match) return null;
   const major = parseInt(match[2], 10);
   const minor = parseInt(match[3], 10);
-  const patch = match[4] ? parseInt(match[4], 10) : 0;
+  if (typeof match[4] === "undefined") return null;
+  const patch = parseInt(match[4], 10);
   if ([major, minor, patch].some((part) => Number.isNaN(part))) return null;
   return [major, minor, patch];
 }

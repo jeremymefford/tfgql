@@ -99,6 +99,10 @@ jobs:
         if: steps.bump.outputs.should_release == 'true'
         run: npm run compile
 
+      - name: Run unit tests
+        if: steps.bump.outputs.should_release == 'true'
+        run: npm test
+
       - name: Snapshot docs version
         if: steps.bump.outputs.should_release == 'true' && steps.bump.outputs.snapshot_docs == 'true'
         working-directory: docs

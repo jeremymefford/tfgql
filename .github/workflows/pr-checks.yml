@@ -3,8 +3,6 @@ name: PR Checks
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
-  push:
-    branches: [main]
 
 permissions:
   pull-requests: read
@@ -74,7 +72,6 @@ jobs:
         run: npm test
 
   enforce-title:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Check pull request title

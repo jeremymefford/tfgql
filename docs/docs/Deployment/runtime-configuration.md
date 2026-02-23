@@ -14,7 +14,7 @@ with defaults and notes about when they are required.
 | `TFGQL_PAGE_SIZE` | Maximum items requested per page from Terraform APIs. | `100` (max: 100) | ❌ |
 | `TFGQL_METRICS_ENABLED` | Enable or disable the Prometheus `/metrics` endpoint. | `true` | ❌ |
 | `TFGQL_METRICS_CONFIG` | Path to JSON metric definitions used by `/metrics`; built-in defaults are used when unset. | — | ❌ |
-| `TFGQL_METRICS_CACHE_TTL` | Cache TTL (seconds) for rendered Prometheus output per token. | `60` | ❌ |
+| `TFGQL_METRICS_CACHE_TTL` | Cache TTL (seconds) for rendered Prometheus output per token. Enforced minimum: `600` for TFC and `120` for TFE. | `600` on TFC, `120` on TFE | ❌ |
 | `TFGQL_RATE_LIMIT_MAX_RETRIES` | Retries after HTTP 429 responses. | `50` | ❌ |
 | `TFGQL_SERVER_ERROR_MAX_RETRIES` | Retries after upstream 5xx responses. | `20` | ❌ |
 | `TFGQL_SERVER_ERROR_RETRY_DELAY` | Delay (ms) between 5xx retries. | `60000` | ❌ |

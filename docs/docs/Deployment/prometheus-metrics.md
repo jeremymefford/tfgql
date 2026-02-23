@@ -5,6 +5,11 @@ TFGQL exposes Prometheus-compatible metrics at `GET /metrics`.
 The endpoint is authenticated and executes configured GraphQL queries, then converts
 the result rows into Prometheus metric families (`# HELP`, `# TYPE`, sample lines).
 
+Runnable example stack:
+
+- `examples/prometheus-grafana` includes Docker Compose, Prometheus config,
+  Grafana provisioning, and a starter dashboard for this endpoint.
+
 ## How It Works
 
 1. Your scraper calls `GET /metrics` with `Authorization: Bearer <encrypted-jwt>`.
@@ -19,6 +24,9 @@ Notes:
 - Non-numeric values for gauge/counter rows are skipped.
 - Metric names and label keys are sanitized to valid Prometheus names.
 - Results are cached per token hash for `TFGQL_METRICS_CACHE_TTL` seconds.
+- Cache floor is enforced by deployment target:
+  - TFC: minimum `600s` (10 minutes), always mandatory
+  - TFE: minimum `120s` (2 minutes), even if you set a lower env value
 
 ## Scrape Cadence (Important)
 
@@ -46,7 +54,7 @@ Practical guidance:
 |----------|-------------|---------|
 | `TFGQL_METRICS_ENABLED` | Enables the `/metrics` endpoint. Set to `false` to disable. | `true` |
 | `TFGQL_METRICS_CONFIG` | Optional path to a JSON metrics definition file. If unset, built-in defaults are used. | _(unset)_ |
-| `TFGQL_METRICS_CACHE_TTL` | Cache TTL in seconds for rendered `/metrics` output (per token). Set `0` to disable cache. | `60` |
+| `TFGQL_METRICS_CACHE_TTL` | Cache TTL in seconds for rendered `/metrics` output (per token). Enforced minimum: `600` (TFC) and `120` (TFE). | `600` on TFC, `120` on TFE |
 
 ## Authenticated Scrape Example
 

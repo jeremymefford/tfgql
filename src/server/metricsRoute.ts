@@ -18,6 +18,7 @@ import {
   generateSpanId,
   formatTraceparent,
 } from "../common/trace";
+import { applicationConfiguration } from "../common/conf";
 
 const PROMETHEUS_CONTENT_TYPE =
   "text/plain; version=0.0.4; charset=utf-8";
@@ -29,8 +30,7 @@ const metricsCache = new Map<
 >();
 
 function getCacheTtlMs(): number {
-  const ttl = Number(process.env.TFGQL_METRICS_CACHE_TTL);
-  return Number.isFinite(ttl) && ttl >= 0 ? ttl * 1000 : 60_000;
+  return applicationConfiguration.metricsCacheTtlSeconds * 1000;
 }
 
 export function registerMetricsRoute(

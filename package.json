@@ -8,7 +8,8 @@
     "docker:build": "docker buildx build --platform linux/amd64,linux/arm64 -t tfgql --load .",
     "lint": "eslint --max-warnings=0 \"src/**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "build:sea": "node scripts/build-sea.mjs"
+    "build:sea": "node scripts/build-sea.mjs",
+    "generate:api-docs": "node scripts/generate-api-docs.mjs"
   },
   "keywords": [],
   "author": "",

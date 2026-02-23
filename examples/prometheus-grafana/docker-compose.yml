@@ -1,0 +1,50 @@
+services:
+  tfgql:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      # Example-only default. Override via env for your own stack.
+      TFGQL_JWT_ENCRYPTION_KEY: ${TFGQL_JWT_ENCRYPTION_KEY:-example-insecure-change-me}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TFE_BASE_URL: ${TFE_BASE_URL:-https://app.terraform.io/api/v2}
+    ports:
+      - "4000:4000"
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    depends_on:
+      - tfgql
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/secrets:/etc/prometheus/secrets:ro
+      - prometheus-data:/prometheus
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  prometheus-data:
+  grafana-data:

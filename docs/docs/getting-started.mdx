@@ -51,7 +51,7 @@ native Windows binary is currently published).
 
 ## Exploring the API
 
-Open the GraphQL Explorer at:
+Open GraphiQL at:
 
 
 ### [http://127.0.0.1:4000/](http://127.0.0.1:4000/)
@@ -59,8 +59,8 @@ Open the GraphQL Explorer at:
 
 Check out the [use cases](Use%20Cases/use-cases.md)
 :::info
-Read [this](#exchange-a-tfc-token-for-a-jwt) to learn how to setup the authentication for the requests 
-in the explorer
+Read [this](#exchange-a-tfc-token-for-a-jwt) to learn how to set up authentication
+for requests in GraphiQL.
 :::
 
 ### Exchange a TFC Token for a JWT
@@ -82,62 +82,29 @@ The response contains an encrypted token and expiration timestamp:
 Include the token in the `Authorization` header for all GraphQL calls:
 
 ```bash
-curl http://<endpoint>/graphql \
+curl http://<endpoint>/ \
   -H 'content-type: application/json' \
   -H 'authorization: Bearer <jwe>' \
   --data '{"query":"{ __typename }"}'
 ```
 
-#### Apollo explorer authentication setup
+#### GraphiQL authentication setup
 
 ##### Step 1
-To use preflight scripts, you need to sign up for a free apollo dev account. Click your profile pic in the top right to start
-that flow or try to save the page and it should prompt you to create or log in.
+Open [http://127.0.0.1:4000/](http://127.0.0.1:4000/) in your browser. The GraphiQL auth prompt appears automatically.
 
 ##### Step 2
-Add your TFC/E token in your apollo environment
-
-![Apollo explorer env setup](./assets/envvar.png)
+Paste your Terraform Cloud / Terraform Enterprise token and click **Authenticate**.
 
 ##### Step 3
-Add a preflight script so the UI automatically exchanges the TFC/E token with a JWT:
-
-![Apollo Explorer Preflight Setup](./assets/preflight.png)
-
-:::warn
-Make sure to use a stable `TFGQL_JWT_ENCRYPTION_KEY` in your local environment if using this preflight script so that your tokens are valid across restarts of the application.
-:::
-
-```js
-const expiry = explorer.environment.get("jwtExpiry");
-
-if (!expiry || Date.now() > new Date(expiry).getTime()) {
-  console.log("JWT expired, fetching new one");
-
-  const tfcToken = explorer.environment.get("tfcToken");
-
-  const resp = await explorer.fetch('http://localhost:4000/auth/token', {
-    method: 'POST',
-    headers: {'content-type': 'application/json'},
-    body: JSON.stringify({tfcToken})
-  });
-
-
-  const authResponse = await resp.json();
-
-  explorer.environment.set("JWT", authResponse.token);
-  explorer.environment.set("jwtExpiry", authResponse.expiresAt);
-}
-```
+GraphiQL exchanges that token at `POST /auth/token`, then stores the encrypted JWT and expiry in browser session storage for subsequent requests.
 
 :::tip
-Something not working with your auth?  Just delete the `jwtExpiry` variable out of your explorer env and this script will automatically generate a new JWT for you.
+Something not working with your auth? Click **Logout** in the GraphiQL token bar, then authenticate again.
 :::
 
 ##### Step 4
-Add the `Authorization` header to each new tab
-
-![Apollo Explorer Preflight Setup](./assets/header.png)
+Run queries directly. GraphiQL automatically attaches `Authorization: Bearer <encrypted-jwt>` to GraphQL requests while you are authenticated.
 
 
 ---
@@ -236,4 +203,5 @@ There are a couple custom queries that allow passing filters for different level
 
 - [Terraform Cloud API Documentation](https://www.terraform.io/cloud-docs/api)
 - [TFGQL Concepts](Concepts/)
+- [Prometheus Metrics](Deployment/prometheus-metrics.md)
 - [Contributing Guide](Contributing/)

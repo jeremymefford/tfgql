@@ -5,9 +5,9 @@ import Fastify, {
   type FastifyReply,
   type FastifyRequest,
 } from "fastify";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import fastifyCors from "@fastify/cors";
-import { ApolloServerPluginLandingPageDisabled } from "@apollo/server/plugin/disabled";
-import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import fastifyApollo from "@as-integrations/fastify";
 import { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
 import { buildContext, Context } from "./context";
@@ -23,14 +23,14 @@ import {
 } from "../common/trace";
 import { verifyJwt } from "../common/auth/tokenService";
 import { registerAuthRoutes } from "./authRoutes";
+import { registerMetricsRoute } from "./metricsRoute";
+import { setApolloServer } from "../prometheus/resolvers";
+import { graphiqlLandingPagePlugin } from "./graphiqlPlugin";
 
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
  */
 export async function startServer(): Promise<void> {
-  const disableExplorer =
-    (process.env.TFGQL_DISABLE_EXPLORER ?? "").toLowerCase() === "true";
-
   const armor = new ApolloArmor({
     maxDepth: { n: 10 },
     maxAliases: { n: 20 },
@@ -41,20 +41,33 @@ export async function startServer(): Promise<void> {
 
   const fastify = createFastifyInstance();
 
+  // Chrome 130+ enforces Private Network Access (PNA) preflight checks.
+  // When a public origin (e.g. Apollo Explorer) requests a private/localhost
+  // target, Chrome sends Access-Control-Request-Private-Network: true and
+  // expects Access-Control-Allow-Private-Network: true in the response.
+  // @fastify/cors does not support this header natively.
+  fastify.addHook("onRequest", (request, reply, done) => {
+    if (
+      request.headers["access-control-request-private-network"] === "true"
+    ) {
+      reply.header("Access-Control-Allow-Private-Network", "true");
+    }
+    done();
+  });
+
   await fastify.register(fastifyCors, {
     origin: true,
     credentials: true,
   });
 
   registerAuthRoutes(fastify);
+  registerGraphiQLAssets(fastify);
 
   fastify.get("/health", async () => ({
     status: "ok",
   }));
 
-  const landingPagePlugin = disableExplorer
-    ? ApolloServerPluginLandingPageDisabled()
-    : ApolloServerPluginLandingPageLocalDefault({ embed: true });
+  const landingPagePlugin = graphiqlLandingPagePlugin();
 
   const server = new ApolloServer<Context>({
     typeDefs,
@@ -73,6 +86,12 @@ export async function startServer(): Promise<void> {
   });
 
   await server.start();
+
+  setApolloServer(server);
+
+  if (applicationConfiguration.metricsEnabled) {
+    registerMetricsRoute(fastify, server);
+  }
 
   await fastify.register(fastifyApollo(server), {
     path: "/",
@@ -94,6 +113,68 @@ export async function startServer(): Promise<void> {
   } else {
     logger.info({ url: address }, "GraphQL server ready");
   }
+}
+
+function registerGraphiQLAssets(
+  fastify: FastifyInstance<any, any, any, any, any>,
+): void {
+  const graphiqlAssetBase = path.join(process.cwd(), "node_modules");
+  const assets: Record<
+    string,
+    { filePath: string; contentType: string }
+  > = {
+    "react.production.min.js": {
+      filePath: path.join(
+        graphiqlAssetBase,
+        "react",
+        "umd",
+        "react.production.min.js",
+      ),
+      contentType: "application/javascript; charset=utf-8",
+    },
+    "react-dom.production.min.js": {
+      filePath: path.join(
+        graphiqlAssetBase,
+        "react-dom",
+        "umd",
+        "react-dom.production.min.js",
+      ),
+      contentType: "application/javascript; charset=utf-8",
+    },
+    "graphiql.min.css": {
+      filePath: path.join(graphiqlAssetBase, "graphiql", "graphiql.min.css"),
+      contentType: "text/css; charset=utf-8",
+    },
+    "graphiql.min.js": {
+      filePath: path.join(graphiqlAssetBase, "graphiql", "graphiql.min.js"),
+      contentType: "application/javascript; charset=utf-8",
+    },
+  };
+
+  fastify.get<{ Params: { asset: string } }>(
+    "/graphiql-assets/:asset",
+    async (request, reply) => {
+      const asset = assets[request.params.asset];
+      if (!asset) {
+        reply.code(404).send("Asset not found");
+        return;
+      }
+
+      try {
+        const data = await readFile(asset.filePath);
+        reply.type(asset.contentType);
+        reply.header("Cache-Control", "public, max-age=86400, immutable");
+        return data;
+      } catch (error) {
+        logger.warn(
+          { err: error },
+          `Unable to read GraphiQL asset ${request.params.asset}`,
+        );
+        reply.code(500).send("GraphiQL asset unavailable");
+        return;
+      }
+    },
+  );
 }
 
 function createFastifyInstance(): FastifyInstance<any> {

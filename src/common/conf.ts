@@ -19,6 +19,9 @@ export class Config {
   readonly serverTlsConfig?: ServerTlsConfig;
   readonly authTokenTtlSeconds: number;
   readonly jwtEncryptionKeyMaterial?: string;
+  readonly metricsEnabled: boolean;
+  readonly metricsConfigPath?: string;
+  readonly metricsCacheTtlSeconds: number;
 
   constructor(env = process.env) {
     let baseUrl = env.TFE_BASE_URL || "https://app.terraform.io/api/v2";
@@ -59,6 +62,15 @@ export class Config {
       2600000,
     ); // default 30 days
     this.jwtEncryptionKeyMaterial = env.TFGQL_JWT_ENCRYPTION_KEY;
+
+    this.metricsEnabled =
+      (env.TFGQL_METRICS_ENABLED ?? "true").toLowerCase() !== "false";
+    const metricsPath = env.TFGQL_METRICS_CONFIG?.trim();
+    this.metricsConfigPath = metricsPath || undefined;
+    this.metricsCacheTtlSeconds = this.parsePositiveNumber(
+      env.TFGQL_METRICS_CACHE_TTL,
+      60,
+    );
 
     const tlsCertPath = this.normalizePath(env.TFGQL_SERVER_TLS_CERT_FILE);
     const tlsKeyPath = this.normalizePath(env.TFGQL_SERVER_TLS_KEY_FILE);

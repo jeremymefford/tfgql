@@ -41,20 +41,6 @@ export async function startServer(): Promise<void> {
 
   const fastify = createFastifyInstance();
 
-  // Chrome 130+ enforces Private Network Access (PNA) preflight checks.
-  // When a public origin (e.g. Apollo Explorer) requests a private/localhost
-  // target, Chrome sends Access-Control-Request-Private-Network: true and
-  // expects Access-Control-Allow-Private-Network: true in the response.
-  // @fastify/cors does not support this header natively.
-  fastify.addHook("onRequest", (request, reply, done) => {
-    if (
-      request.headers["access-control-request-private-network"] === "true"
-    ) {
-      reply.header("Access-Control-Allow-Private-Network", "true");
-    }
-    done();
-  });
-
   await fastify.register(fastifyCors, {
     origin: true,
     credentials: true,

@@ -47,12 +47,13 @@ function resolveResultPath(
         ? resolvePath(item as Record<string, unknown>, segment)
         : item;
       if (Array.isArray(resolved)) {
-        // Attach __parent for label resolution from parent objects
+        // Wrap each child with a __parent reference without mutating the original
         for (const child of resolved) {
           if (child != null && typeof child === "object") {
-            (child as Record<string, unknown>).__parent = item;
+            next.push({ ...(child as Record<string, unknown>), __parent: item });
+          } else {
+            next.push(child);
           }
-          next.push(child);
         }
       } else if (resolved != null) {
         next.push(resolved);

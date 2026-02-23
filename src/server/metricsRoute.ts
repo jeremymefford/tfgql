@@ -29,8 +29,27 @@ const metricsCache = new Map<
   { text: string; expiresAt: number }
 >();
 
+const MAX_CACHE_ENTRIES = 100;
+
 function getCacheTtlMs(): number {
   return applicationConfiguration.metricsCacheTtlSeconds * 1000;
+}
+
+/** Remove expired entries and enforce size cap. */
+function evictStaleEntries(): void {
+  const now = Date.now();
+  for (const [key, entry] of metricsCache) {
+    if (entry.expiresAt <= now) metricsCache.delete(key);
+  }
+  // If still over the cap, drop oldest entries first
+  if (metricsCache.size > MAX_CACHE_ENTRIES) {
+    const excess = metricsCache.size - MAX_CACHE_ENTRIES;
+    const keys = metricsCache.keys();
+    for (let i = 0; i < excess; i++) {
+      const k = keys.next().value;
+      if (k !== undefined) metricsCache.delete(k);
+    }
+  }
 }
 
 export function registerMetricsRoute(
@@ -92,13 +111,16 @@ export function registerMetricsRoute(
       const cacheTtl = getCacheTtlMs();
       const cacheKey = verifiedClaims.tokenHash;
       const cached = metricsCache.get(cacheKey);
-      if (cached && cached.expiresAt > Date.now()) {
-        reply.type(PROMETHEUS_CONTENT_TYPE);
-        return cached.text;
+      if (cached) {
+        if (cached.expiresAt > Date.now()) {
+          reply.type(PROMETHEUS_CONTENT_TYPE);
+          return cached.text;
+        }
+        metricsCache.delete(cacheKey);
       }
 
       // --- build context and execute ---
-      const requestLogger = logger.child({});
+      const requestLogger = logger;
       const ctx = await buildContext(requestLogger, verifiedClaims.tfcToken);
 
       const config = loadMetricDefinitions();
@@ -149,6 +171,7 @@ export function registerMetricsRoute(
 
       // --- cache result ---
       if (cacheTtl > 0) {
+        evictStaleEntries();
         metricsCache.set(cacheKey, {
           text,
           expiresAt: Date.now() + cacheTtl,

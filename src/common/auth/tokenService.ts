@@ -117,30 +117,24 @@ export async function mintJwt(
   }
 
   const isInfinite = options?.infinite === true;
-  let expiresAt: Date | null;
-  if (isInfinite) {
-    expiresAt = null;
-  } else {
-    const ttlSeconds = Math.max(
-      1,
-      Math.floor(
-        options?.ttlSeconds ?? applicationConfiguration.authTokenTtlSeconds,
-      ),
-    );
-    expiresAt = new Date(Date.now() + ttlSeconds * 1000);
-  }
+  const ttlSeconds = isInfinite
+    ? null
+    : Math.max(
+        1,
+        Math.floor(
+          options?.ttlSeconds ?? applicationConfiguration.authTokenTtlSeconds,
+        ),
+      );
+
+  const expiresAt = ttlSeconds != null
+    ? new Date(Date.now() + ttlSeconds * 1000)
+    : null;
 
   let tokenBuilder = new EncryptJWT({ tfcToken })
     .setProtectedHeader({ alg: "dir", enc: "A256GCM", typ: "JWT" })
     .setIssuedAt();
 
-  if (!isInfinite) {
-    const ttlSeconds = Math.max(
-      1,
-      Math.floor(
-        options?.ttlSeconds ?? applicationConfiguration.authTokenTtlSeconds,
-      ),
-    );
+  if (ttlSeconds != null) {
     tokenBuilder = tokenBuilder.setExpirationTime(`+${ttlSeconds}s`);
   }
 

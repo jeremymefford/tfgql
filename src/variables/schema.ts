@@ -1,6 +1,9 @@
 import gql from "graphql-tag";
 
 const variableSchema = gql`
+  """
+  A key/value pair used to parameterize Terraform runs. Variables can be Terraform input variables or environment variables, and may be marked as sensitive.
+  """
   type Variable {
     id: ID!
     key: String!
@@ -39,11 +42,17 @@ const variableSchema = gql`
   }
 
   extend type Query {
+    """
+    List variables for a specific workspace.
+    """
     variables(
       organization: String!
       workspaceName: String!
       filter: VariableFilter
     ): [Variable!]!
+    """
+    List workspaces that have a TF_LOG environment variable set to one of the given log categories.
+    """
     workspacesWithTFLogCategory(
       includeOrgs: [String!]
       excludeOrgs: [String!]

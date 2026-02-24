@@ -9,9 +9,13 @@ import {
   TeamOrganizationAccessFilter,
 } from "./types";
 import { teamMapper } from "./mapper";
+import { RequestCache } from "../common/requestCache";
 
 export class TeamsAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   async *listTeams(
     organization: string,
@@ -75,14 +79,16 @@ export class TeamsAPI {
   }
 
   async getTeam(id: string): Promise<Team | null> {
-    return this.httpClient
-      .get<TeamResponse>(`/teams/${id}`)
-      .then((res) => teamMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<Team | null>("team", id, async () =>
+      this.httpClient
+        .get<TeamResponse>(`/teams/${id}`)
+        .then((res) => teamMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

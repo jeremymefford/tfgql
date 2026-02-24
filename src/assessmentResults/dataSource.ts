@@ -7,9 +7,13 @@ import {
   AssessmentResultResponse,
 } from "./types";
 import { assessmentResultMapper } from "./mapper";
+import { RequestCache } from "../common/requestCache";
 
 export class AssessmentResultsAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   async *listAssessmentResults(
     workspaceId: string,
@@ -25,14 +29,16 @@ export class AssessmentResultsAPI {
   }
 
   async getAssessmentResult(id: string): Promise<AssessmentResult | null> {
-    return this.httpClient
-      .get<AssessmentResultResponse>(`/assessment-results/${id}`)
-      .then((res) => assessmentResultMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<AssessmentResult | null>("assessmentResult", id, async () =>
+      this.httpClient
+        .get<AssessmentResultResponse>(`/assessment-results/${id}`)
+        .then((res) => assessmentResultMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

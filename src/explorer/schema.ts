@@ -109,6 +109,9 @@ const explorerSchema = gql`
     ascending: Boolean!
   }
 
+  """
+  A denormalized row from the HCP Terraform Explorer API representing a workspace with inline metadata about its current run, drift status, checks, providers, and modules.
+  """
   type ExplorerWorkspaceRow @tfcOnly {
     allChecksSucceeded: Boolean
     currentRumCount: Int
@@ -143,6 +146,9 @@ const explorerSchema = gql`
     organization: Organization
   }
 
+  """
+  A row from the Explorer API grouping workspaces by Terraform version.
+  """
   type ExplorerTerraformVersionRow @tfcOnly {
     version: String
     workspaceCount: Int
@@ -151,6 +157,9 @@ const explorerSchema = gql`
     workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
+  """
+  A row from the Explorer API grouping workspaces by Terraform provider.
+  """
   type ExplorerProviderRow @tfcOnly {
     name: String
     source: String
@@ -161,6 +170,9 @@ const explorerSchema = gql`
     workspaceEntities(filter: WorkspaceFilter): [Workspace!]!
   }
 
+  """
+  A row from the Explorer API grouping workspaces by Terraform module.
+  """
   type ExplorerModuleRow @tfcOnly {
     name: String
     source: String
@@ -172,6 +184,9 @@ const explorerSchema = gql`
   }
 
   extend type Query {
+    """
+    Query the HCP Terraform Explorer API for workspace data with server-side filtering and sorting. Only available on HCP Terraform (not Terraform Enterprise).
+    """
     explorerWorkspaces(
       includeOrgs: [String!]
       excludeOrgs: [String!]
@@ -179,6 +194,9 @@ const explorerSchema = gql`
       filters: [ExplorerWorkspaceFilterInput!]
     ): [ExplorerWorkspaceRow!]! @tfcOnly
 
+    """
+    Query the Explorer API for Terraform version usage across workspaces.
+    """
     explorerTerraformVersions(
       includeOrgs: [String!]
       excludeOrgs: [String!]
@@ -186,6 +204,9 @@ const explorerSchema = gql`
       filters: [ExplorerTerraformVersionFilterInput!]
     ): [ExplorerTerraformVersionRow!]! @tfcOnly
 
+    """
+    Query the Explorer API for provider usage across workspaces.
+    """
     explorerProviders(
       includeOrgs: [String!]
       excludeOrgs: [String!]
@@ -193,6 +214,9 @@ const explorerSchema = gql`
       filters: [ExplorerProviderFilterInput!]
     ): [ExplorerProviderRow!]! @tfcOnly
 
+    """
+    Query the Explorer API for module usage across workspaces.
+    """
     explorerModules(
       includeOrgs: [String!]
       excludeOrgs: [String!]

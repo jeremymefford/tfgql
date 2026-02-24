@@ -9,9 +9,13 @@ import {
 } from "./types";
 import { organizationMembershipMapper } from "./mapper";
 import { evaluateWhereClause } from "../common/filtering/filtering";
+import { RequestCache } from "../common/requestCache";
 
 export class OrganizationMembershipsAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   async *listOrganizationMemberships(
     orgName: string,
@@ -29,15 +33,20 @@ export class OrganizationMembershipsAPI {
   async getOrganizationMembership(
     id: string,
   ): Promise<OrganizationMembership | null> {
-    return this.httpClient
-      .get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
-      .then((res) => organizationMembershipMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<OrganizationMembership | null>(
+      "organizationMembership",
+      id,
+      async () =>
+        this.httpClient
+          .get<OrganizationMembershipResponse>(`/organization-memberships/${id}`)
+          .then((res) => organizationMembershipMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          }),
+    );
   }
 
   async myOrganizationMemberships(

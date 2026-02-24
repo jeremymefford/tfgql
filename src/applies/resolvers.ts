@@ -4,7 +4,6 @@ import { parallelizeBounded } from "../common/concurrency/parallelizeBounded";
 import { Run } from "../runs/types";
 import { evaluateWhereClause } from "../common/filtering/filtering";
 import { StateVersion, StateVersionFilter } from "../stateVersions/types";
-import { fetchArchivistJsonLines } from "../common/http";
 
 export const resolvers = {
   Query: {
@@ -117,9 +116,7 @@ export const resolvers = {
       if (!logReadUrl) {
         return null;
       }
-      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
-        minimumLevel,
-      });
+      return ctx.dataSources.logsAPI.fetchLog(logReadUrl, minimumLevel);
     },
   },
 };

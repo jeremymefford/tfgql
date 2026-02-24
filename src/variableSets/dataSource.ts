@@ -22,15 +22,17 @@ export class VariableSetsAPI {
   ) {}
 
   async getVariableSet(id: string): Promise<VariableSet | null> {
-    return this.httpClient
-      .get<VariableSetResponse>(`/varsets/${id}`)
-      .then((res) => variableSetMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<VariableSet | null>("variableSet", id, async () =>
+      this.httpClient
+        .get<VariableSetResponse>(`/varsets/${id}`)
+        .then((res) => variableSetMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 
   async *listVariableSetsForOrg(

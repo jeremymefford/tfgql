@@ -47,7 +47,9 @@ export function renderExposition(families: RenderedMetricFamily[]): string {
 
     const name = sanitizeName(family.name);
     lines.push(`# HELP ${name} ${family.help}`);
-    lines.push(`# TYPE ${name} ${family.type}`);
+    // "info" is an OpenMetrics type; Prometheus text format only supports gauge/counter/histogram/summary/untyped
+    const expositionType = family.type === "info" ? "gauge" : family.type;
+    lines.push(`# TYPE ${name} ${expositionType}`);
 
     for (const sample of family.samples) {
       lines.push(formatSample(sample));

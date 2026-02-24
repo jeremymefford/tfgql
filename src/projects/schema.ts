@@ -22,6 +22,9 @@ const projectsSchema = gql`
     defaultAgentPool: Boolean
   }
 
+  """
+  A container for organizing workspaces within an organization. Projects group related workspaces and control team access at a higher level.
+  """
   type Project {
     id: ID!
     name: String!
@@ -42,11 +45,17 @@ const projectsSchema = gql`
   }
 
   extend type Query {
+    """
+    List all projects across the selected organizations.
+    """
     projects(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: ProjectFilter
     ): [Project!]!
+    """
+    Look up a single project by ID.
+    """
     project(id: ID!): Project
   }
 

@@ -1,8 +1,8 @@
 global:
   # /metrics executes live GraphQL queries and can be slow.
-  scrape_interval: 30m
-  scrape_timeout: 120s
-  evaluation_interval: 30m
+  scrape_interval: 30s
+  scrape_timeout: 29s
+  evaluation_interval: 30s
 
 scrape_configs:
   - job_name: tfgql
@@ -10,7 +10,7 @@ scrape_configs:
     scheme: http
     authorization:
       type: Bearer
-      credentials_file: /etc/prometheus/secrets/tfgql.token
+      credentials_file: /etc/prometheus/secrets/.env
     static_configs:
       - targets:
           - tfgql:4000

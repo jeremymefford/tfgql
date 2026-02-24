@@ -114,6 +114,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### Agent
 
+A Terraform Cloud agent that executes runs on isolated, private, or on-premises infrastructure. Agents connect to HCP Terraform and are organized into agent pools.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -126,6 +128,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### AgentPool
 
+A group of agents, often sharing a common network segment or purpose. Workspaces can be configured to use an agent pool for remote operations with isolated infrastructure.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -133,6 +137,7 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 | `name` | `String!` |  |
 | `createdAt` | `DateTime!` |  |
 | `organizationScoped` | `Boolean!` |  |
+| `organizationName` | `String` | The name of the organization this agent pool belongs to. |
 | `agentCount` | `Int!` |  |
 | `workspaces(filter: WorkspaceFilter)` | `[Workspace!]!` |  |
 | `allowedWorkspaces(filter: WorkspaceFilter)` | `[Workspace!]!` |  |
@@ -142,6 +147,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 ---
 
 ### AgentToken
+
+An authentication token used by agents to register with an agent pool.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -155,6 +162,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 ---
 
 ### Apply
+
+Represents the results of applying a Terraform run's execution plan. Contains resource change counts, status, and log output.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -177,6 +186,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### AssessmentResult
 
+The result of a health assessment for a workspace, including drift detection and continuous validation status.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -189,6 +200,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### Comment
 
+A comment left on a Terraform run. Comments appear in the run timeline and can be used for review discussions.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -198,6 +211,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 ---
 
 ### ConfigurationVersion
+
+A snapshot of Terraform configuration files uploaded to a workspace. Each run is associated with a configuration version that provides the code to plan and apply.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -229,6 +244,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### ExplorerModuleRow
 
+A row from the Explorer API grouping workspaces by Terraform module.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `name` | `String` |  |
@@ -242,6 +259,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 ---
 
 ### ExplorerProviderRow
+
+A row from the Explorer API grouping workspaces by Terraform provider.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -257,6 +276,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 
 ### ExplorerTerraformVersionRow
 
+A row from the Explorer API grouping workspaces by Terraform version.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `version` | `String` |  |
@@ -268,6 +289,8 @@ Represents a user managed through the Terraform Enterprise admin APIs.
 ---
 
 ### ExplorerWorkspaceRow
+
+A denormalized row from the HCP Terraform Explorer API representing a workspace with inline metadata about its current run, drift status, checks, providers, and modules.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -335,6 +358,8 @@ Commit metadata for VCS-based configuration versions.
 
 ### Organization
 
+A shared space for teams to collaborate on workspaces in HCP Terraform. Organizations manage access, settings, and billing.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -375,6 +400,8 @@ Commit metadata for VCS-based configuration versions.
 ---
 
 ### OrganizationMembership
+
+Represents a user's membership in an organization. Users are added by invitation and become members once accepted.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -421,6 +448,8 @@ Commit metadata for VCS-based configuration versions.
 
 ### OrganizationTag
 
+A tag used to classify and organize workspaces within an organization. Tags can be applied to multiple workspaces and used for filtering.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -431,6 +460,8 @@ Commit metadata for VCS-based configuration versions.
 ---
 
 ### Plan
+
+Represents the execution plan of a run in a Terraform workspace. Contains resource change counts, status, and optional structured JSON output.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -463,6 +494,8 @@ Commit metadata for VCS-based configuration versions.
 
 ### Policy
 
+A Sentinel or OPA policy that enforces rules during Terraform runs. Policies are organized into policy sets and have configurable enforcement levels.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -477,6 +510,8 @@ Commit metadata for VCS-based configuration versions.
 ---
 
 ### PolicyCheck
+
+The result of a Sentinel policy check performed during a run. Contains the overall status, scope, and detailed result data including pass/fail outcomes.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -497,6 +532,8 @@ Commit metadata for VCS-based configuration versions.
 
 ### PolicyCheckActions
 
+Available actions for a policy check based on its current state.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `isOverridable` | `Boolean!` |  |
@@ -505,6 +542,8 @@ Commit metadata for VCS-based configuration versions.
 
 ### PolicyCheckPermissions
 
+Permissions the current user has on a policy check.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `canOverride` | `Boolean!` |  |
@@ -512,6 +551,8 @@ Commit metadata for VCS-based configuration versions.
 ---
 
 ### PolicyCheckStatusTimestamps
+
+Timestamps for each policy check status transition.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -525,6 +566,8 @@ Commit metadata for VCS-based configuration versions.
 ---
 
 ### PolicyEvaluation
+
+An OPA or Sentinel policy evaluation performed during a run's task stage. Contains aggregated result counts and individual policy set outcomes.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -599,6 +642,8 @@ A collection of policies that can be applied to Terraform Cloud workspaces.
 
 ### PolicySetOutcome
 
+The evaluation result of a single policy set, including individual policy outcomes and override status.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -614,6 +659,8 @@ A collection of policies that can be applied to Terraform Cloud workspaces.
 
 ### PolicySetOutcomeResultCount
 
+Counts of policy outcomes within a single policy set evaluation.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `advisoryFailed` | `Int!` |  |
@@ -624,6 +671,8 @@ A collection of policies that can be applied to Terraform Cloud workspaces.
 ---
 
 ### PolicySetParameter
+
+A key/value pair sent to the Sentinel runtime during policy checks. Parameters help avoid hardcoding sensitive values into policies.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -651,6 +700,8 @@ VCS repository configuration for a policy set.
 
 ### Project
 
+A container for organizing workspaces within an organization. Projects group related workspaces and control team access at a higher level.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -673,6 +724,8 @@ VCS repository configuration for a policy set.
 ---
 
 ### ProjectAccess
+
+Project-level permission settings for a team.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -702,6 +755,8 @@ VCS repository configuration for a policy set.
 ---
 
 ### ProjectTeamAccess
+
+Associates a team with a project and defines the team's permission level for project settings, teams, and workspace operations within the project.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -736,6 +791,8 @@ VCS repository configuration for a policy set.
 ---
 
 ### Run
+
+Represents a Terraform execution within a workspace. A run performs a plan and optionally an apply to create, update, or destroy infrastructure.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -839,7 +896,7 @@ VCS repository configuration for a policy set.
 
 ### StateVersion
 
-Remote Terraform state version data and metadata.
+An instance of Terraform state data for a workspace. State versions contain metadata about the state, its properties, and download URLs. They do not directly contain the stored state itself.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -871,6 +928,8 @@ Remote Terraform state version data and metadata.
 
 ### StateVersionOutput
 
+An output value from a Terraform state version. Contains the output name, type, value, and sensitivity flag.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -884,6 +943,8 @@ Remote Terraform state version data and metadata.
 ---
 
 ### Team
+
+A group of HCP Terraform users with shared permissions. Teams can be granted access to workspaces and projects within an organization.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -944,6 +1005,8 @@ Remote Terraform state version data and metadata.
 
 ### TeamToken
 
+An API token associated with a team. Team tokens can be used to authenticate API requests on behalf of the team.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -958,6 +1021,8 @@ Remote Terraform state version data and metadata.
 ---
 
 ### User
+
+An HCP Terraform user account. User objects contain username, avatar, and permission information but not other personal identifying details.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -994,6 +1059,8 @@ Remote Terraform state version data and metadata.
 
 ### Variable
 
+A key/value pair used to parameterize Terraform runs. Variables can be Terraform input variables or environment variables, and may be marked as sensitive.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -1010,6 +1077,8 @@ Remote Terraform state version data and metadata.
 ---
 
 ### VariableSet
+
+A reusable collection of variables that can be applied to multiple workspaces and projects across an organization. Global variable sets apply to all workspaces automatically.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -1039,6 +1108,8 @@ Remote Terraform state version data and metadata.
 ---
 
 ### Workspace
+
+Represents running infrastructure managed by Terraform. Each workspace is associated with a Terraform configuration and maintains state, variables, and run history.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -1103,6 +1174,8 @@ Remote Terraform state version data and metadata.
 ---
 
 ### WorkspaceAccess
+
+Workspace-level permission settings granted through project team access.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
@@ -1176,6 +1249,8 @@ Remote Terraform state version data and metadata.
 
 ### WorkspaceResource
 
+A Terraform-managed resource tracked in a workspace's state. Includes the resource address, provider, module path, and the state version that last modified it.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -1217,6 +1292,8 @@ Remote Terraform state version data and metadata.
 
 ### WorkspaceTeamAccess
 
+Associates a team with a workspace and defines the team's permission level for runs, variables, state, and other workspace operations.
+
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | `ID!` |  |
@@ -1248,6 +1325,8 @@ Inbound or outbound run-trigger connections between workspaces.
 ---
 
 ### UserAccount
+
+Common fields shared by regular users and admin-managed users.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |

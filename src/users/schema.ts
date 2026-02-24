@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const userSchema = gql`
+  """
+  Common fields shared by regular users and admin-managed users.
+  """
   interface UserAccount {
     id: ID!
     username: String!
@@ -14,6 +17,9 @@ const userSchema = gql`
     ): [Team!]!
   }
 
+  """
+  An HCP Terraform user account. User objects contain username, avatar, and permission information but not other personal identifying details.
+  """
   type User implements UserAccount {
     id: ID!
     username: String!
@@ -80,7 +86,13 @@ const userSchema = gql`
   }
 
   extend type Query {
+    """
+    Look up a single user by ID.
+    """
     user(id: ID!): User
+    """
+    Get the currently authenticated user's account details.
+    """
     me: User
   }
 `;

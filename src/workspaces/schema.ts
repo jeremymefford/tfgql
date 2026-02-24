@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const workspaceSchema = gql`
+  """
+  Represents running infrastructure managed by Terraform. Each workspace is associated with a Terraform configuration and maintains state, variables, and run history.
+  """
   type Workspace {
     id: ID!
     name: String!
@@ -157,18 +160,33 @@ const workspaceSchema = gql`
   }
 
   extend type Query {
+    """
+    List all workspaces across the selected organizations.
+    """
     workspaces(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: WorkspaceFilter
     ): [Workspace!]!
+    """
+    Look up a single workspace by ID.
+    """
     workspace(id: ID!): Workspace
+    """
+    Look up a single workspace by organization name and workspace name.
+    """
     workspaceByName(organization: String!, workspaceName: String!): Workspace
+    """
+    List workspaces that have zero managed resources (empty state).
+    """
     workspacesWithNoResources(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: WorkspaceFilter
     ): [Workspace!]!
+    """
+    List workspaces where the current run has failed policy checks.
+    """
     workspacesWithFailedPolicyChecks(
       includeOrgs: [String!]
       excludeOrgs: [String!]

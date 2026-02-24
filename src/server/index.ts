@@ -35,23 +35,49 @@ export async function startServer(): Promise<void> {
     maxDepth: { n: 10 },
     maxAliases: { n: 20 },
     maxDirectives: { n: 50 },
-    costLimit: { maxCost: 20000 },
+    costLimit: {
+      maxCost: 5000,
+      objectCost: 3,
+      scalarCost: 1,
+      depthCostFactor: 1.5,
+      ignoreIntrospection: true,
+    },
   });
   const protection = armor.protect();
 
   const fastify = createFastifyInstance();
 
   await fastify.register(fastifyCors, {
-    origin: true,
-    credentials: true,
+    origin: applicationConfiguration.corsOrigin,
   });
 
-  registerAuthRoutes(fastify);
+  if (applicationConfiguration.serverTlsConfig) {
+    fastify.addHook("onSend", async (_request, reply) => {
+      reply.header(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains",
+      );
+    });
+  }
+
+  await registerAuthRoutes(fastify);
   registerGraphiQLAssets(fastify);
 
   fastify.get("/health", async () => ({
     status: "ok",
   }));
+
+  fastify.get("/favicon.svg", async (_request, reply) => {
+    const svgPath = path.join(process.cwd(), "docs", "static", "img", "logo.svg");
+    try {
+      const data = await readFile(svgPath);
+      reply.type("image/svg+xml");
+      reply.header("Cache-Control", "public, max-age=86400, immutable");
+      return data;
+    } catch {
+      reply.code(404).send("Favicon not found");
+    }
+  });
 
   const landingPagePlugin = graphiqlLandingPagePlugin();
 

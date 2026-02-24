@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const teamSchema = gql`
+  """
+  A group of HCP Terraform users with shared permissions. Teams can be granted access to workspaces and projects within an organization.
+  """
   type Team {
     id: ID!
     name: String!
@@ -102,22 +105,33 @@ const teamSchema = gql`
   }
 
   extend type Query {
+    """
+    List all teams across the selected organizations.
+    """
     teams(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: TeamFilter
     ): [Team!]!
-    # teams(organization: String!, filter: TeamFilter): [Team!]!
+    """
+    Search teams within an organization by name query string.
+    """
     teamsByQuery(
       organization: String!
       query: String!
       filter: TeamFilter
     ): [Team!]!
+    """
+    Look up specific teams within an organization by exact name.
+    """
     teamsByName(
       organization: String!
       names: [String!]!
       filter: TeamFilter
     ): [Team!]!
+    """
+    Look up a single team by ID.
+    """
     team(id: ID!): Team
   }
 `;

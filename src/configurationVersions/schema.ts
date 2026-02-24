@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const configurationVersionSchema = gql`
+  """
+  A snapshot of Terraform configuration files uploaded to a workspace. Each run is associated with a configuration version that provides the code to plan and apply.
+  """
   type ConfigurationVersion {
     id: ID!
     autoQueueRuns: Boolean!
@@ -77,11 +80,20 @@ const configurationVersionSchema = gql`
   }
 
   extend type Query {
+    """
+    Look up a single configuration version by ID.
+    """
     configurationVersion(id: ID!): ConfigurationVersion
+    """
+    List configuration versions for a workspace.
+    """
     configurationVersions(
       workspaceId: ID!
       filter: ConfigurationVersionFilter
     ): [ConfigurationVersion]!
+    """
+    List workspaces that have at least one configuration version larger than the specified byte threshold.
+    """
     workspacesWithConfigurationVersionsLargerThan(
       includeOrgs: [String!]
       excludeOrgs: [String!]

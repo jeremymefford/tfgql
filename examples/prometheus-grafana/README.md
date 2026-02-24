@@ -31,7 +31,7 @@ TFGQL_TOKEN=$(
     -d "{\"tfcToken\":\"${TFC_TOKEN}\",\"infinite\":true}" \
   | jq -r '.token'
 )
-printf '%s' "$TFGQL_TOKEN" > prometheus/secrets/tfgql.token
+printf '%s' "$TFGQL_TOKEN" > prometheus/secrets/.env
 ```
 
 ## 3) Start Prometheus + Grafana
@@ -50,8 +50,7 @@ docker compose up -d
 
 ## Notes
 
-- Scrape cadence is intentionally slow (`30m`) because `/metrics` executes live GraphQL queries.
 - Prometheus scrapes the `tfgql` Compose service directly at `tfgql:4000`.
 - The example uses a default `TFGQL_JWT_ENCRYPTION_KEY`; override it for non-demo usage.
-- To rotate token auth after expiry/revocation, rewrite `prometheus/secrets/tfgql.token` and restart Prometheus:
+- To rotate token auth after expiry/revocation, rewrite `prometheus/secrets/.env` and restart Prometheus:
   `docker compose restart prometheus`

@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const runSchema = gql`
+  """
+  Represents a Terraform execution within a workspace. A run performs a plan and optionally an apply to create, update, or destroy infrastructure.
+  """
   type Run {
     id: ID!
     status: String!
@@ -114,18 +117,33 @@ const runSchema = gql`
   }
 
   extend type Query {
+    """
+    List all runs for a specific workspace.
+    """
     runsForWorkspace(workspaceId: ID!, filter: RunFilter): [Run!]!
+    """
+    Look up a single run by ID.
+    """
     run(id: ID!): Run
+    """
+    List all runs across the selected organizations.
+    """
     runs(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: RunFilter
     ): [Run!]!
+    """
+    List runs where a policy check was soft-mandatory failed and then overridden.
+    """
     runsWithOverriddenPolicy(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: RunFilter
     ): [Run!]!
+    """
+    List runs with additional filtering on plan and apply attributes. Each run's plan and apply are fetched individually to evaluate the filters.
+    """
     runsWithPlanApplyFilter(
       includeOrgs: [String!]
       excludeOrgs: [String!]

@@ -71,11 +71,11 @@ export async function* streamPages<T, TFilter = Record<string, never>>(
       remainingPages.length > 0
     ) {
       const page = remainingPages.shift()!;
-      const p = loadPage(page).then((items) => {
-        inflight.delete(p);
-        return items;
+      const p = loadPage(page);
+      const tracked = p.finally(() => {
+        inflight.delete(tracked);
       });
-      inflight.add(p);
+      inflight.add(tracked);
     }
 
     const completed = await Promise.race(inflight);

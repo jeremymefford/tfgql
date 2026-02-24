@@ -21,6 +21,9 @@ const policyEvaluationsSchema = gql`
     erroredAt: DateTime
   }
 
+  """
+  Counts of policy outcomes within a single policy set evaluation.
+  """
   type PolicySetOutcomeResultCount {
     advisoryFailed: Int!
     mandatoryFailed: Int!
@@ -28,6 +31,9 @@ const policyEvaluationsSchema = gql`
     errored: Int!
   }
 
+  """
+  The evaluation result of a single policy set, including individual policy outcomes and override status.
+  """
   type PolicySetOutcome {
     id: ID!
     outcomes: JSON
@@ -39,6 +45,9 @@ const policyEvaluationsSchema = gql`
     resultCount: PolicySetOutcomeResultCount!
   }
 
+  """
+  An OPA or Sentinel policy evaluation performed during a run's task stage. Contains aggregated result counts and individual policy set outcomes.
+  """
   type PolicyEvaluation {
     id: ID!
     status: String!
@@ -65,6 +74,9 @@ const policyEvaluationsSchema = gql`
   }
 
   extend type Query {
+    """
+    List all policy evaluations for a specific task stage.
+    """
     policyEvaluations(
       taskStageId: ID!
       filter: PolicyEvaluationFilter

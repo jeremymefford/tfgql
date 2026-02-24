@@ -133,7 +133,7 @@ Set `TFGQL_METRICS_CONFIG` to a JSON file with a `metrics` array:
 
 Field behavior:
 
-- `type`: `gauge`, `counter`, or `info`
+- `type`: `gauge`, `counter`
 - `resultPath`: dot path to an array in the GraphQL result
 - `valueField`: required for `gauge`/`counter`, ignored for `info`
 - `labels`: map of `label_name -> dot.path`

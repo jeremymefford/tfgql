@@ -5,9 +5,13 @@ import { AgentPool, AgentPoolFilter, AgentPoolResponse } from "./types";
 import { agentPoolMapper } from "./mapper";
 import { Agent, AgentFilter } from "../agents/types";
 import { agentMapper } from "../agents/mapper";
+import { RequestCache } from "../common/requestCache";
 
 export class AgentPoolsAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   async *listAgentPools(
     orgName: string,
@@ -36,14 +40,16 @@ export class AgentPoolsAPI {
   }
 
   async getAgentPool(id: string): Promise<AgentPool | null> {
-    return this.httpClient
-      .get<AgentPoolResponse>(`/agent-pools/${id}`)
-      .then((res) => agentPoolMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<AgentPool | null>("agentPool", id, async () =>
+      this.httpClient
+        .get<AgentPoolResponse>(`/agent-pools/${id}`)
+        .then((res) => agentPoolMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

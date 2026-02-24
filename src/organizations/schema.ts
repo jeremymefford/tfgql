@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const organizationSchema = gql`
+  """
+  A shared space for teams to collaborate on workspaces in HCP Terraform. Organizations manage access, settings, and billing.
+  """
   type Organization {
     id: ID!
     name: String!
@@ -136,7 +139,13 @@ const organizationSchema = gql`
   }
 
   extend type Query {
+    """
+    List all organizations accessible to the authenticated user.
+    """
     organizations(filter: OrganizationFilter): [Organization!]!
+    """
+    Look up a single organization by name.
+    """
     organization(name: String!): Organization
   }
 `;

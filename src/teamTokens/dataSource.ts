@@ -2,9 +2,13 @@ import type { AxiosInstance } from "axios";
 import { streamPages } from "../common/streamPages";
 import { TeamToken, TeamTokenFilter, TeamTokenResponse } from "./types";
 import { teamTokenMapper } from "./mapper";
+import { RequestCache } from "../common/requestCache";
 
 export class TeamTokensAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   async *listTeamTokens(
     teamId: string,
@@ -20,14 +24,16 @@ export class TeamTokensAPI {
   }
 
   async getTeamToken(id: string): Promise<TeamToken | null> {
-    return this.httpClient
-      .get<TeamTokenResponse>(`/authentication-tokens/${id}`)
-      .then((res) => teamTokenMapper.map(res.data.data))
-      .catch((err) => {
-        if (err.status === 404) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<TeamToken | null>("teamToken", id, async () =>
+      this.httpClient
+        .get<TeamTokenResponse>(`/authentication-tokens/${id}`)
+        .then((res) => teamTokenMapper.map(res.data.data))
+        .catch((err) => {
+          if (err.status === 404) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

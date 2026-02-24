@@ -68,16 +68,21 @@ export class StateVersionsAPI {
   async getCurrentStateVersion(
     workspaceId: string,
   ): Promise<StateVersion | null> {
-    return this.httpClient
-      .get<StateVersionResponse>(
-        `/workspaces/${workspaceId}/current-state-version`,
-      )
-      .then((res) => stateVersionMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<StateVersion | null>(
+      "currentStateVersion",
+      workspaceId,
+      async () =>
+        this.httpClient
+          .get<StateVersionResponse>(
+            `/workspaces/${workspaceId}/current-state-version`,
+          )
+          .then((res) => stateVersionMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          }),
+    );
   }
 }

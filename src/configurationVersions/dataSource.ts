@@ -164,29 +164,35 @@ export class ConfigurationVersionsAPI {
   async getIngressAttributes(
     configurationVersionId: string,
   ): Promise<IngressAttributes> {
-    const res = await this.httpClient.get<{ data: any }>(
-      `/configuration-versions/${configurationVersionId}/ingress-attributes`,
+    return this.requestCache.getOrSet<IngressAttributes>(
+      "IngressAttributes",
+      configurationVersionId,
+      async () => {
+        const res = await this.httpClient.get<{ data: any }>(
+          `/configuration-versions/${configurationVersionId}/ingress-attributes`,
+        );
+        return {
+          id: res.data.data.id,
+          branch: res.data.data.attributes.branch,
+          cloneUrl: res.data.data.attributes["clone-url"],
+          commitMessage: res.data.data.attributes["commit-message"],
+          commitSha: res.data.data.attributes["commit-sha"],
+          commitUrl: res.data.data.attributes["commit-url"],
+          compareUrl: res.data.data.attributes["compare-url"],
+          identifier: res.data.data.attributes.identifier,
+          isPullRequest: res.data.data.attributes["is-pull-request"],
+          onDefaultBranch: res.data.data.attributes["on-default-branch"],
+          pullRequestNumber: res.data.data.attributes["pull-request-number"],
+          pullRequestUrl: res.data.data.attributes["pull-request-url"],
+          pullRequestTitle: res.data.data.attributes["pull-request-title"],
+          pullRequestBody: res.data.data.attributes["pull-request-body"],
+          tag: res.data.data.attributes.tag,
+          senderUsername: res.data.data.attributes["sender-username"],
+          senderAvatarUrl: res.data.data.attributes["sender-avatar-url"],
+          senderHtmlUrl: res.data.data.attributes["sender-html-url"],
+          createdBy: res.data.data.relationships?.["created-by"]?.data?.id,
+        };
+      },
     );
-    return {
-      id: res.data.data.id,
-      branch: res.data.data.attributes.branch,
-      cloneUrl: res.data.data.attributes["clone-url"],
-      commitMessage: res.data.data.attributes["commit-message"],
-      commitSha: res.data.data.attributes["commit-sha"],
-      commitUrl: res.data.data.attributes["commit-url"],
-      compareUrl: res.data.data.attributes["compare-url"],
-      identifier: res.data.data.attributes.identifier,
-      isPullRequest: res.data.data.attributes["is-pull-request"],
-      onDefaultBranch: res.data.data.attributes["on-default-branch"],
-      pullRequestNumber: res.data.data.attributes["pull-request-number"],
-      pullRequestUrl: res.data.data.attributes["pull-request-url"],
-      pullRequestTitle: res.data.data.attributes["pull-request-title"],
-      pullRequestBody: res.data.data.attributes["pull-request-body"],
-      tag: res.data.data.attributes.tag,
-      senderUsername: res.data.data.attributes["sender-username"],
-      senderAvatarUrl: res.data.data.attributes["sender-avatar-url"],
-      senderHtmlUrl: res.data.data.attributes["sender-html-url"],
-      createdBy: res.data.data.relationships?.["created-by"]?.data?.id,
-    };
   }
 }

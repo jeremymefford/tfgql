@@ -1,4 +1,3 @@
-import { fetchArchivistJsonLines } from "../common/http";
 import { Context } from "../server/context";
 import { Plan } from "./types";
 
@@ -27,9 +26,7 @@ export const resolvers = {
       if (!logReadUrl) {
         return null;
       }
-      return fetchArchivistJsonLines(ctx.httpClient, logReadUrl, {
-        minimumLevel,
-      });
+      return ctx.dataSources.logsAPI.fetchLog(logReadUrl, minimumLevel);
     },
   },
 };

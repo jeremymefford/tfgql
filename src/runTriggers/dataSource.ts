@@ -12,9 +12,13 @@ import {
   RunTriggerResponse,
   WorkspaceRunTrigger,
 } from "./types";
+import { RequestCache } from "../common/requestCache";
 
 export class RunTriggersAPI {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(
+    private readonly httpClient: AxiosInstance,
+    private readonly requestCache: RequestCache,
+  ) {}
 
   /**
    * List run triggers for a workspace (inbound or outbound).
@@ -43,14 +47,16 @@ export class RunTriggersAPI {
    * Get a single run trigger by ID.
    */
   async getRunTrigger(id: string): Promise<RunTrigger | null> {
-    return this.httpClient
-      .get<RunTriggerResponse>(`/run-triggers/${id}`)
-      .then((res) => runTriggerMapper.map(res.data.data))
-      .catch((err) => {
-        if (isNotFound(err)) {
-          return null;
-        }
-        throw err;
-      });
+    return this.requestCache.getOrSet<RunTrigger | null>("runTrigger", id, async () =>
+      this.httpClient
+        .get<RunTriggerResponse>(`/run-triggers/${id}`)
+        .then((res) => runTriggerMapper.map(res.data.data))
+        .catch((err) => {
+          if (isNotFound(err)) {
+            return null;
+          }
+          throw err;
+        }),
+    );
   }
 }

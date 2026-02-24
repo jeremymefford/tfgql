@@ -10,6 +10,10 @@ const agentPoolsSchema = gql`
     name: String!
     createdAt: DateTime!
     organizationScoped: Boolean!
+    """
+    The name of the organization this agent pool belongs to.
+    """
+    organizationName: String
     agentCount: Int!
     workspaces(filter: WorkspaceFilter): [Workspace!]!
     allowedWorkspaces(filter: WorkspaceFilter): [Workspace!]!

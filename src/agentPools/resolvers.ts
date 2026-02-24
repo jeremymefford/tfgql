@@ -33,6 +33,9 @@ export const resolvers = {
         const pools = await gatherAsyncGeneratorPromises(
           ctx.dataSources.agentPoolsAPI.listAgentPools(orgId, filter),
         );
+        for (const pool of pools) {
+          pool.organizationName = orgId;
+        }
         results.push(...pools);
       });
       return results;

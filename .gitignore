@@ -58,4 +58,6 @@ build/
 certs/
 
 *.env
+**/*.env
+**/*.swp
 .claude

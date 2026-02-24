@@ -51,6 +51,7 @@ export interface AgentPool {
   name: string;
   createdAt: string;
   organizationScoped: boolean;
+  organizationName?: string;
   agentCount: number;
   workspaceIds: string[];
   allowedWorkspaceIds: string[];

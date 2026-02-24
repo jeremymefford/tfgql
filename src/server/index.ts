@@ -5,8 +5,8 @@ import Fastify, {
   type FastifyReply,
   type FastifyRequest,
 } from "fastify";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { loadBundledAsset } from "./assetLoader";
 import fastifyCors from "@fastify/cors";
 import fastifyApollo from "@as-integrations/fastify";
 import { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
@@ -30,6 +30,9 @@ import { graphiqlLandingPagePlugin } from "./graphiqlPlugin";
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
  */
+/** Project root — two levels up from src/server/ (or dist/server/). */
+const projectRoot = path.resolve(__dirname, "..", "..");
+
 export async function startServer(): Promise<void> {
   const armor = new ApolloArmor({
     maxDepth: { n: 10 },
@@ -68,9 +71,11 @@ export async function startServer(): Promise<void> {
   }));
 
   fastify.get("/favicon.svg", async (_request, reply) => {
-    const svgPath = path.join(process.cwd(), "docs", "static", "img", "logo.svg");
     try {
-      const data = await readFile(svgPath);
+      const data = await loadBundledAsset(
+        "graphiql-assets/favicon.svg",
+        path.join(projectRoot, "docs", "static", "img", "logo.svg"),
+      );
       reply.type("image/svg+xml");
       reply.header("Cache-Control", "public, max-age=86400, immutable");
       return data;
@@ -130,35 +135,29 @@ export async function startServer(): Promise<void> {
 function registerGraphiQLAssets(
   fastify: FastifyInstance<any, any, any, any, any>,
 ): void {
-  const graphiqlAssetBase = path.join(process.cwd(), "node_modules");
+  const nodeModules = path.join(projectRoot, "node_modules");
   const assets: Record<
     string,
-    { filePath: string; contentType: string }
+    { bundleRelPath: string; devAbsPath: string; contentType: string }
   > = {
     "react.production.min.js": {
-      filePath: path.join(
-        graphiqlAssetBase,
-        "react",
-        "umd",
-        "react.production.min.js",
-      ),
+      bundleRelPath: "graphiql-assets/react.production.min.js",
+      devAbsPath: path.join(nodeModules, "react", "umd", "react.production.min.js"),
       contentType: "application/javascript; charset=utf-8",
     },
     "react-dom.production.min.js": {
-      filePath: path.join(
-        graphiqlAssetBase,
-        "react-dom",
-        "umd",
-        "react-dom.production.min.js",
-      ),
+      bundleRelPath: "graphiql-assets/react-dom.production.min.js",
+      devAbsPath: path.join(nodeModules, "react-dom", "umd", "react-dom.production.min.js"),
       contentType: "application/javascript; charset=utf-8",
     },
     "graphiql.min.css": {
-      filePath: path.join(graphiqlAssetBase, "graphiql", "graphiql.min.css"),
+      bundleRelPath: "graphiql-assets/graphiql.min.css",
+      devAbsPath: path.join(nodeModules, "graphiql", "graphiql.min.css"),
       contentType: "text/css; charset=utf-8",
     },
     "graphiql.min.js": {
-      filePath: path.join(graphiqlAssetBase, "graphiql", "graphiql.min.js"),
+      bundleRelPath: "graphiql-assets/graphiql.min.js",
+      devAbsPath: path.join(nodeModules, "graphiql", "graphiql.min.js"),
       contentType: "application/javascript; charset=utf-8",
     },
   };
@@ -173,7 +172,7 @@ function registerGraphiQLAssets(
       }
 
       try {
-        const data = await readFile(asset.filePath);
+        const data = await loadBundledAsset(asset.bundleRelPath, asset.devAbsPath);
         reply.type(asset.contentType);
         reply.header("Cache-Control", "public, max-age=86400, immutable");
         return data;

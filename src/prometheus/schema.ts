@@ -1,17 +1,26 @@
 import { gql } from "graphql-tag";
 
 const prometheusSchema = gql`
+  """
+  The output format for rendered metrics.
+  """
   enum MetricFormat {
     PROMETHEUS
     OPENMETRICS
   }
 
+  """
+  A single metric data point with its name, label set, and numeric value.
+  """
   type PrometheusMetricSample {
     name: String!
     labels: JSON!
     value: Float
   }
 
+  """
+  The result of a Prometheus metrics query, containing both raw exposition text and structured samples.
+  """
   type PrometheusResult {
     """
     Raw Prometheus exposition text, ready for ingestion

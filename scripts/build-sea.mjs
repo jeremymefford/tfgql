@@ -229,11 +229,31 @@ async function buildBundle() {
   return bundleDir;
 }
 
+async function copyGraphiQLAssets(bundleDir) {
+  const assetsDir = path.join(bundleDir, "graphiql-assets");
+  await mkdir(assetsDir, { recursive: true });
+
+  const assets = [
+    { src: path.join(rootDir, "node_modules", "react", "umd", "react.production.min.js"), dest: "react.production.min.js" },
+    { src: path.join(rootDir, "node_modules", "react-dom", "umd", "react-dom.production.min.js"), dest: "react-dom.production.min.js" },
+    { src: path.join(rootDir, "node_modules", "graphiql", "graphiql.min.css"), dest: "graphiql.min.css" },
+    { src: path.join(rootDir, "node_modules", "graphiql", "graphiql.min.js"), dest: "graphiql.min.js" },
+    { src: path.join(rootDir, "docs", "static", "img", "logo.svg"), dest: "favicon.svg" },
+  ];
+
+  for (const asset of assets) {
+    await cp(asset.src, path.join(assetsDir, asset.dest));
+  }
+
+  log(`Copied ${assets.length} GraphiQL static assets to bundle`);
+}
+
 async function prepareRuntime() {
   log("Compiling TypeScript sources");
   run("npm run compile", { cwd: rootDir });
 
   const bundleDir = await buildBundle();
+  await copyGraphiQLAssets(bundleDir);
 
   log("Preparing SEA runtime directory");
   await copyFile(path.join(rootDir, "package.json"), path.join(runtimeDir, "package.json"));

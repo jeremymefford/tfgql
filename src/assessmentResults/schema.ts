@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const assessmentResultsSchema = gql`
+  """
+  The result of a health assessment for a workspace, including drift detection and continuous validation status.
+  """
   type AssessmentResult {
     id: ID!
     drifted: Boolean!
@@ -22,10 +25,16 @@ const assessmentResultsSchema = gql`
   }
 
   extend type Query {
+    """
+    List all health assessment results for a specific workspace.
+    """
     assessmentResults(
       workspaceId: ID!
       filter: AssessmentResultFilter
     ): [AssessmentResult!]!
+    """
+    Look up a single assessment result by ID.
+    """
     assessmentResult(id: ID!): AssessmentResult
   }
 `;

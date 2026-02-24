@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const policyCheckSchema = gql`
+  """
+  Timestamps for each policy check status transition.
+  """
   type PolicyCheckStatusTimestamps {
     queuedAt: DateTime
     passedAt: DateTime
@@ -10,14 +13,23 @@ const policyCheckSchema = gql`
     overriddenAt: DateTime
   }
 
+  """
+  Permissions the current user has on a policy check.
+  """
   type PolicyCheckPermissions {
     canOverride: Boolean!
   }
 
+  """
+  Available actions for a policy check based on its current state.
+  """
   type PolicyCheckActions {
     isOverridable: Boolean!
   }
 
+  """
+  The result of a Sentinel policy check performed during a run. Contains the overall status, scope, and detailed result data including pass/fail outcomes.
+  """
   type PolicyCheck {
     id: ID!
     status: String!

@@ -22,6 +22,9 @@ export class Config {
   readonly serverTlsConfig?: ServerTlsConfig;
   readonly authTokenTtlSeconds: number;
   readonly jwtEncryptionKeyMaterial?: string;
+  readonly corsOrigin: string | (string | RegExp)[] | boolean;
+  readonly authRateLimitMax: number;
+  readonly authRateLimitWindowMs: number;
   readonly metricsEnabled: boolean;
   readonly metricsConfigPath?: string;
   readonly metricsCacheTtlSeconds: number;
@@ -65,6 +68,39 @@ export class Config {
       2600000,
     ); // default 30 days
     this.jwtEncryptionKeyMaterial = env.TFGQL_JWT_ENCRYPTION_KEY;
+
+    this.authRateLimitMax = this.parsePositiveNumber(
+      env.TFGQL_AUTH_RATE_LIMIT_MAX,
+      10,
+    );
+    this.authRateLimitWindowMs = this.parsePositiveNumber(
+      env.TFGQL_AUTH_RATE_LIMIT_WINDOW,
+      60000,
+    );
+
+    const localhostOrigins: RegExp[] = [
+      /^http?:\/\/localhost(:\d+)?$/,
+      /^http?:\/\/127\.0\.0\.1(:\d+)?$/,
+    ];
+    const domainEnv = env.TFGQL_DOMAIN?.trim();
+    if (!domainEnv) {
+      this.corsOrigin = localhostOrigins;
+    } else if (domainEnv === "*") {
+      this.corsOrigin = "*";
+    } else {
+      const extra: (string | RegExp)[] = domainEnv
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => {
+          if (s.startsWith("http://") || s.startsWith("https://")) {
+            return s;
+          }
+          const escaped = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          return new RegExp(`^https?:\\/\\/${escaped}(:\\d+)?$`);
+        });
+      this.corsOrigin = [...localhostOrigins, ...extra];
+    }
 
     this.metricsEnabled =
       (env.TFGQL_METRICS_ENABLED ?? "true").toLowerCase() !== "false";

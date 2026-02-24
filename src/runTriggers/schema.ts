@@ -44,10 +44,16 @@ const runTriggersSchema = gql`
   }
 
   extend type Query {
+    """
+    List all inbound and outbound run triggers for a specific workspace.
+    """
     runTriggers(
       workspaceId: ID!
       filter: RunTriggerFilter
     ): [WorkspaceRunTrigger!]!
+    """
+    Look up a single run trigger by ID.
+    """
     runTrigger(id: ID!): RunTrigger
   }
 `;

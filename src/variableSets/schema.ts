@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const variableSetSchema = gql`
+  """
+  A reusable collection of variables that can be applied to multiple workspaces and projects across an organization. Global variable sets apply to all workspaces automatically.
+  """
   type VariableSet {
     id: ID!
     name: String!
@@ -24,11 +27,17 @@ const variableSetSchema = gql`
   }
 
   extend type Query {
+    """
+    List all variable sets across the selected organizations.
+    """
     variableSets(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: VariableSetFilter
     ): [VariableSet!]!
+    """
+    Look up a single variable set by ID.
+    """
     variableSet(id: ID!): VariableSet
   }
 

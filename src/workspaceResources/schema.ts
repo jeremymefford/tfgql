@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const workspaceResourcesSchema = gql`
+  """
+  A Terraform-managed resource tracked in a workspace's state. Includes the resource address, provider, module path, and the state version that last modified it.
+  """
   type WorkspaceResource {
     id: ID!
     address: String!
@@ -36,6 +39,9 @@ const workspaceResourcesSchema = gql`
   }
 
   extend type Query {
+    """
+    List all Terraform-managed resources tracked in a workspace's state.
+    """
     workspaceResources(
       workspaceId: ID!
       filter: WorkspaceResourceFilter

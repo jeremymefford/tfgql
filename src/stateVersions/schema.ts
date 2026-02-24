@@ -2,7 +2,7 @@ import { gql } from "graphql-tag";
 
 const stateVersionsSchema = gql`
   """
-  Remote Terraform state version data and metadata.
+  An instance of Terraform state data for a workspace. State versions contain metadata about the state, its properties, and download URLs. They do not directly contain the stored state itself.
   """
   type StateVersion {
     id: ID!
@@ -48,12 +48,21 @@ const stateVersionsSchema = gql`
   }
 
   extend type Query {
+    """
+    List state versions for a specific workspace.
+    """
     stateVersions(
       orgName: String!
       workspaceName: String!
       filter: StateVersionFilter
     ): [StateVersion!]!
+    """
+    Look up a single state version by ID.
+    """
     stateVersion(id: ID!): StateVersion
+    """
+    Get the current (most recent) state version for a workspace.
+    """
     workspaceCurrentStateVersion(workspaceId: ID!): StateVersion
   }
 `;

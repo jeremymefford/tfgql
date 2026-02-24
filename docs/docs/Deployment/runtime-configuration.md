@@ -9,6 +9,7 @@ with defaults and notes about when they are required.
 |----------|-------------|---------|----------|
 | `TFGQL_JWT_ENCRYPTION_KEY` | Symmetric key used to encrypt issued JWTs. Provide a 32-byte Base64/hex string for stable tokens. | — | ❌ (auto-generated in-memory when omitted) |
 | `TFGQL_AUTH_TOKEN_TTL` | JWT lifetime (seconds). Controls how long exchanged Terraform tokens remain valid. | `2600000` | ❌ |
+| `TFGQL_DOMAIN` | Allowed CORS origins. Localhost / 127.0.0.1 (any port) are always permitted. Set to `*` to allow all origins, or a comma-separated list of domain names (e.g. `example.com,app.example.com`). Plain domain names automatically match both HTTP and HTTPS on any port; full URLs like `https://example.com` are also accepted and matched exactly. | localhost only | ❌ |
 | `TFE_BASE_URL` | Base URL for the Terraform API. Automatically normalized to end with `/api/v2`. | `https://app.terraform.io/api/v2` | ❌ |
 | `TFGQL_BATCH_SIZE` | Maximum concurrency for GraphQL-side batching. | `10` | ❌ |
 | `TFGQL_PAGE_SIZE` | Maximum items requested per page from Terraform APIs. | `100` (max: 100) | ❌ |

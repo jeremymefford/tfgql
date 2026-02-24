@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const stateVersionOutputsSchema = gql`
+  """
+  An output value from a Terraform state version. Contains the output name, type, value, and sensitivity flag.
+  """
   type StateVersionOutput {
     id: ID!
     name: String!
@@ -23,11 +26,20 @@ const stateVersionOutputsSchema = gql`
   }
 
   extend type Query {
+    """
+    List outputs for a specific state version.
+    """
     stateVersionOutputs(
       stateVersionId: ID!
       filter: StateVersionOutputFilter
     ): [StateVersionOutput!]!
+    """
+    Look up a single state version output by ID.
+    """
     stateVersionOutput(id: ID!): StateVersionOutput
+    """
+    Search state version outputs across all workspaces in the selected organizations. Useful for finding cross-workspace output dependencies.
+    """
     searchStateVersionOutputs(
       includeOrgs: [String!]
       excludeOrgs: [String!]

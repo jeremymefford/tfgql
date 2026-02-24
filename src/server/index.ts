@@ -35,18 +35,32 @@ export async function startServer(): Promise<void> {
     maxDepth: { n: 10 },
     maxAliases: { n: 20 },
     maxDirectives: { n: 50 },
-    costLimit: { maxCost: 20000 },
+    costLimit: {
+      maxCost: 5000,
+      objectCost: 3,
+      scalarCost: 1,
+      depthCostFactor: 1.5,
+      ignoreIntrospection: true,
+    },
   });
   const protection = armor.protect();
 
   const fastify = createFastifyInstance();
 
   await fastify.register(fastifyCors, {
-    origin: true,
-    credentials: true,
+    origin: applicationConfiguration.corsOrigin,
   });
 
-  registerAuthRoutes(fastify);
+  if (applicationConfiguration.serverTlsConfig) {
+    fastify.addHook("onSend", async (_request, reply) => {
+      reply.header(
+        "Strict-Transport-Security",
+        "max-age=31536000; includeSubDomains",
+      );
+    });
+  }
+
+  await registerAuthRoutes(fastify);
   registerGraphiQLAssets(fastify);
 
   fastify.get("/health", async () => ({

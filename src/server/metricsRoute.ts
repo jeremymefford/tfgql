@@ -31,8 +31,21 @@ const metricsCache = new Map<
 
 const MAX_CACHE_ENTRIES = 100;
 
-function getCacheTtlMs(): number {
-  return applicationConfiguration.metricsCacheTtlSeconds * 1000;
+/** Global in-flight promise — only one metrics collection runs at a time. */
+let inflightCollection: Promise<{ text: string; durationMs: number }> | null =
+  null;
+
+/** Dynamic cache TTL override (in ms) when processing exceeds configured TTL */
+let adaptiveCacheTtlMs: number | null = null;
+
+/** Last observed metrics processing duration in seconds */
+let lastMetricsDurationSeconds: number = 0;
+
+function getEffectiveCacheTtlMs(): number {
+  const configuredMs = applicationConfiguration.metricsCacheTtlSeconds * 1000;
+  return adaptiveCacheTtlMs != null
+    ? Math.max(adaptiveCacheTtlMs, configuredMs)
+    : configuredMs;
 }
 
 /** Remove expired entries and enforce size cap. */
@@ -108,7 +121,7 @@ export function registerMetricsRoute(
       updateLogContext({ tokenHash: verifiedClaims.tokenHash });
 
       // --- check cache ---
-      const cacheTtl = getCacheTtlMs();
+      const cacheTtl = getEffectiveCacheTtlMs();
       const cacheKey = verifiedClaims.tokenHash;
       const cached = metricsCache.get(cacheKey);
       if (cached) {
@@ -119,67 +132,126 @@ export function registerMetricsRoute(
         metricsCache.delete(cacheKey);
       }
 
-      // --- build context and execute ---
-      const requestLogger = logger;
-      const ctx = await buildContext(requestLogger, verifiedClaims.tfcToken);
-
-      const config = loadMetricDefinitions();
-      const families: RenderedMetricFamily[] = [];
-
-      for (const definition of config.metrics) {
-        try {
-          const result = await apolloServer.executeOperation(
-            {
-              query: definition.query,
-              variables: { ...definition.variables },
-            },
-            { contextValue: ctx },
-          );
-
-          if (result.body.kind !== "single") continue;
-
-          const { data, errors } = result.body.singleResult;
-          if (errors && errors.length > 0) {
-            requestLogger.warn(
-              { metric: definition.name, errors },
-              "Metric query returned errors",
-            );
-          }
-
-          const samples = data
-            ? extractSamples(
-                definition,
-                data as Record<string, unknown>,
-              )
-            : [];
-
-          families.push({
-            name: definition.name,
-            help: definition.help,
-            type: definition.type,
-            samples,
-          });
-        } catch (error) {
-          requestLogger.error(
-            { metric: definition.name, err: error },
-            "Failed to execute metric query",
-          );
-        }
+      // --- coalesce all concurrent requests behind a single global collection ---
+      if (!inflightCollection) {
+        inflightCollection = collectMetrics(
+          apolloServer,
+          verifiedClaims.tfcToken,
+        ).finally(() => {
+          inflightCollection = null;
+        });
       }
 
-      const text = renderExposition(families);
+      const { text, durationMs } = await inflightCollection;
+
+      // --- adapt cache TTL if processing is slower than configured TTL ---
+      const configuredTtlMs =
+        applicationConfiguration.metricsCacheTtlSeconds * 1000;
+      if (durationMs > configuredTtlMs) {
+        const newTtl = Math.ceil(durationMs * 1.2);
+        if (adaptiveCacheTtlMs == null || newTtl !== adaptiveCacheTtlMs) {
+          logger.warn(
+            {
+              durationMs,
+              configuredTtlMs,
+              adaptiveCacheTtlMs: newTtl,
+            },
+            "Metrics collection slower than cache TTL, adapting TTL to 120% of processing time",
+          );
+        }
+        adaptiveCacheTtlMs = newTtl;
+      } else {
+        adaptiveCacheTtlMs = null;
+      }
+
+      // --- append self-metric for processing duration ---
+      const selfMetric = renderExposition([
+        {
+          name: "tfgql_metrics_collection_duration_seconds",
+          help: "Time taken to collect and render all metrics",
+          type: "gauge",
+          samples: [
+            {
+              name: "tfgql_metrics_collection_duration_seconds",
+              labels: {},
+              value: lastMetricsDurationSeconds,
+            },
+          ],
+        },
+      ]);
+      const fullText = text + selfMetric;
 
       // --- cache result ---
-      if (cacheTtl > 0) {
+      const effectiveTtl = getEffectiveCacheTtlMs();
+      if (effectiveTtl > 0) {
         evictStaleEntries();
         metricsCache.set(cacheKey, {
-          text,
-          expiresAt: Date.now() + cacheTtl,
+          text: fullText,
+          expiresAt: Date.now() + effectiveTtl,
         });
       }
 
       reply.type(PROMETHEUS_CONTENT_TYPE);
-      return text;
+      return fullText;
     },
   );
+}
+
+async function collectMetrics(
+  apolloServer: ApolloServer<Context>,
+  tfcToken: string,
+): Promise<{ text: string; durationMs: number }> {
+  const startTime = performance.now();
+  const requestLogger = logger;
+  const ctx = await buildContext(requestLogger, tfcToken);
+
+  const config = loadMetricDefinitions();
+  const families: RenderedMetricFamily[] = [];
+
+  for (const definition of config.metrics) {
+    try {
+      const result = await apolloServer.executeOperation(
+        {
+          query: definition.query,
+          variables: { ...definition.variables },
+        },
+        { contextValue: ctx },
+      );
+
+      if (result.body.kind !== "single") continue;
+
+      const { data, errors } = result.body.singleResult;
+      if (errors && errors.length > 0) {
+        requestLogger.warn(
+          { metric: definition.name, errors },
+          "Metric query returned errors",
+        );
+      }
+
+      const samples = data
+        ? extractSamples(
+            definition,
+            data as Record<string, unknown>,
+          )
+        : [];
+
+      families.push({
+        name: definition.name,
+        help: definition.help,
+        type: definition.type,
+        samples,
+      });
+    } catch (error) {
+      requestLogger.error(
+        { metric: definition.name, err: error },
+        "Failed to execute metric query",
+      );
+    }
+  }
+
+  const text = renderExposition(families);
+  const durationMs = performance.now() - startTime;
+  lastMetricsDurationSeconds = durationMs / 1000;
+
+  return { text, durationMs };
 }

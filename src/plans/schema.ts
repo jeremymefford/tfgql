@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const plansSchema = gql`
+  """
+  Represents the execution plan of a run in a Terraform workspace. Contains resource change counts, status, and optional structured JSON output.
+  """
   type Plan {
     id: ID!
     mode: String!

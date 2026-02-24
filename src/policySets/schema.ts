@@ -63,11 +63,17 @@ const policySetsSchema = gql`
   }
 
   extend type Query {
+    """
+    List all policy sets across the selected organizations.
+    """
     policySets(
       includeOrgs: [String!]
       excludeOrgs: [String!]
       filter: PolicySetFilter
     ): [PolicySet!]!
+    """
+    Look up a single policy set by ID.
+    """
     policySet(id: ID!): PolicySet
   }
 `;

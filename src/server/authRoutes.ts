@@ -1,15 +1,23 @@
 import type { FastifyInstance } from "fastify";
+import fastifyRateLimit from "@fastify/rate-limit";
 import { isAxiosError } from "axios";
 import { logger } from "../common/logger";
+import { applicationConfiguration } from "../common/conf";
 import {
   mintJwt,
   validateTfcToken,
   TokenValidationError,
 } from "../common/auth/tokenService";
 
-export function registerAuthRoutes(
+export async function registerAuthRoutes(
   fastify: FastifyInstance<any, any, any, any, any>,
-): void {
+): Promise<void> {
+  await fastify.register(fastifyRateLimit, {
+    max: applicationConfiguration.authRateLimitMax,
+    timeWindow: applicationConfiguration.authRateLimitWindowMs,
+    keyGenerator: (request) => request.ip,
+  });
+
   type AuthTokenRequest = {
     tfcToken?: string;
     infinite?: boolean;

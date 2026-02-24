@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const agentTokensSchema = gql`
+  """
+  An authentication token used by agents to register with an agent pool.
+  """
   type AgentToken {
     id: ID!
     poolId: String
@@ -24,7 +27,13 @@ const agentTokensSchema = gql`
   }
 
   extend type Query {
+    """
+    List all authentication tokens for a specific agent pool.
+    """
     agentTokens(poolId: ID!, filter: AgentTokenFilter): [AgentToken!]!
+    """
+    Look up a single agent token by ID.
+    """
     agentToken(id: ID!): AgentToken
   }
 `;

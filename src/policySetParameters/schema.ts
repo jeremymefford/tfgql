@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const policySetParametersSchema = gql`
+  """
+  A key/value pair sent to the Sentinel runtime during policy checks. Parameters help avoid hardcoding sensitive values into policies.
+  """
   type PolicySetParameter {
     id: ID!
     key: String!
@@ -23,6 +26,9 @@ const policySetParametersSchema = gql`
   }
 
   extend type Query {
+    """
+    List all parameters for a specific policy set.
+    """
     policySetParameters(
       policySetId: ID!
       filter: PolicySetParameterFilter

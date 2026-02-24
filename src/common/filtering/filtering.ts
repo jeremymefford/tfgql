@@ -12,20 +12,29 @@ const TERRAFORM_VERSION_REGEX =
 const ISO_DATE_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})$/;
 
+const MAX_FILTER_NESTING_DEPTH = 10;
+
 export function evaluateWhereClause<T, TFilter>(
   where: WhereClause<T, TFilter> | undefined,
   obj: T,
+  _depth: number = 0,
 ): boolean {
   if (!where) return true;
   if (!obj) return false;
 
+  if (_depth > MAX_FILTER_NESTING_DEPTH) {
+    throw new Error(
+      `Filter nesting depth exceeds maximum of ${MAX_FILTER_NESTING_DEPTH}`,
+    );
+  }
+
   const logical = {
     _and: (clauses: WhereClause<T, TFilter>[]) =>
-      clauses.every((clause) => evaluateWhereClause(clause, obj)),
+      clauses.every((clause) => evaluateWhereClause(clause, obj, _depth + 1)),
     _or: (clauses: WhereClause<T, TFilter>[]) =>
-      clauses.some((clause) => evaluateWhereClause(clause, obj)),
+      clauses.some((clause) => evaluateWhereClause(clause, obj, _depth + 1)),
     _not: (clause: WhereClause<T, TFilter>) =>
-      !evaluateWhereClause(clause, obj),
+      !evaluateWhereClause(clause, obj, _depth + 1),
   };
 
   for (const key in where) {
@@ -48,7 +57,7 @@ export function evaluateWhereClause<T, TFilter>(
         !Array.isArray(value) &&
         typeof filter === "object"
       ) {
-        if (!evaluateWhereClause(filter as WhereClause<any>, value))
+        if (!evaluateWhereClause(filter as WhereClause<any>, value, _depth + 1))
           return false;
         continue;
       }

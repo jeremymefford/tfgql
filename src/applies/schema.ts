@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const appliesSchema = gql`
+  """
+  Represents the results of applying a Terraform run's execution plan. Contains resource change counts, status, and log output.
+  """
   type Apply {
     id: ID!
     mode: String
@@ -38,10 +41,25 @@ const appliesSchema = gql`
   }
 
   extend type Query {
+    """
+    Get the apply for a specific run.
+    """
     applyForRun(runId: ID!): Apply
+    """
+    Look up a single apply by ID.
+    """
     apply(id: ID!): Apply
+    """
+    List all applies for runs within a workspace.
+    """
     appliesForWorkspace(workspaceId: ID!, filter: ApplyFilter): [Apply!]!
+    """
+    List all applies for runs across all workspaces in a project.
+    """
     appliesForProject(projectId: ID!, filter: ApplyFilter): [Apply!]!
+    """
+    List all applies for runs across all workspaces in an organization.
+    """
     appliesForOrganization(organizationId: ID!, filter: ApplyFilter): [Apply!]!
   }
 `;

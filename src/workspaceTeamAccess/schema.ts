@@ -1,6 +1,9 @@
 import { gql } from "graphql-tag";
 
 const workspaceTeamAccessSchema = gql`
+  """
+  Associates a team with a workspace and defines the team's permission level for runs, variables, state, and other workspace operations.
+  """
   type WorkspaceTeamAccess {
     id: ID!
     access: String!
@@ -32,14 +35,23 @@ const workspaceTeamAccessSchema = gql`
   }
 
   extend type Query {
+    """
+    List all team access grants for a specific workspace.
+    """
     workspaceTeamAccessByWorkspace(
       workspaceId: ID!
       filter: WorkspaceTeamAccessFilter
     ): [WorkspaceTeamAccess!]!
+    """
+    List all workspace access grants for a specific team.
+    """
     workspaceTeamAccessByTeam(
       teamId: ID!
       filter: WorkspaceTeamAccessFilter
     ): [WorkspaceTeamAccess!]!
+    """
+    Look up a single workspace team access grant by ID.
+    """
     workspaceTeamAccessById(id: ID!): WorkspaceTeamAccess
   }
 `;

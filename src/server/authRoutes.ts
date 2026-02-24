@@ -10,10 +10,16 @@ import {
 export function registerAuthRoutes(
   fastify: FastifyInstance<any, any, any, any, any>,
 ): void {
-  fastify.post<{ Body: { tfcToken?: string } }>(
+  type AuthTokenRequest = {
+    tfcToken?: string;
+    infinite?: boolean;
+  };
+
+  fastify.post<{ Body: AuthTokenRequest }>(
     "/auth/token",
     async (request, reply) => {
-      const tfcToken = request.body?.tfcToken?.trim();
+      const { tfcToken: rawTfcToken, infinite } = request.body;
+      const tfcToken = rawTfcToken?.trim();
       if (!tfcToken) {
         reply.code(400);
         return { error: "tfcToken is required" };
@@ -21,11 +27,13 @@ export function registerAuthRoutes(
 
       try {
         await validateTfcToken(tfcToken);
-        const minted = await mintJwt(tfcToken);
+        const minted = await mintJwt(tfcToken, {
+          infinite: infinite === true,
+        });
         reply.code(200);
         return {
           token: minted.token,
-          expiresAt: minted.expiresAt.toISOString(),
+          expiresAt: minted.expiresAt?.toISOString() ?? null,
         };
       } catch (error) {
         if (error instanceof TokenValidationError) {

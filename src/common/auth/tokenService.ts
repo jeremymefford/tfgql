@@ -60,12 +60,17 @@ function padBase64(value: string): string {
 
 export interface MintedToken {
   token: string;
-  expiresAt: Date;
+  expiresAt: Date | null;
+}
+
+export interface MintJwtOptions {
+  infinite?: boolean;
+  ttlSeconds?: number;
 }
 
 export interface VerifiedTokenClaims {
   tfcToken: string;
-  exp: number;
+  exp?: number;
   iat: number;
   tokenHash: string;
 }
@@ -103,19 +108,37 @@ export async function validateTfcToken(tfcToken: string): Promise<void> {
   }
 }
 
-export async function mintJwt(tfcToken: string): Promise<MintedToken> {
+export async function mintJwt(
+  tfcToken: string,
+  options?: MintJwtOptions,
+): Promise<MintedToken> {
   if (!tfcToken || typeof tfcToken !== "string") {
     throw new Error("Cannot mint JWT without TFC token");
   }
 
-  const ttlSeconds = Math.max(1, applicationConfiguration.authTokenTtlSeconds);
-  const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+  const isInfinite = options?.infinite === true;
+  const ttlSeconds = isInfinite
+    ? null
+    : Math.max(
+        1,
+        Math.floor(
+          options?.ttlSeconds ?? applicationConfiguration.authTokenTtlSeconds,
+        ),
+      );
 
-  const token = await new EncryptJWT({ tfcToken })
+  const expiresAt = ttlSeconds != null
+    ? new Date(Date.now() + ttlSeconds * 1000)
+    : null;
+
+  let tokenBuilder = new EncryptJWT({ tfcToken })
     .setProtectedHeader({ alg: "dir", enc: "A256GCM", typ: "JWT" })
-    .setIssuedAt()
-    .setExpirationTime(`+${ttlSeconds}s`)
-    .encrypt(encryptionKey);
+    .setIssuedAt();
+
+  if (ttlSeconds != null) {
+    tokenBuilder = tokenBuilder.setExpirationTime(`+${ttlSeconds}s`);
+  }
+
+  const token = await tokenBuilder.encrypt(encryptionKey);
 
   return {
     token,
@@ -145,8 +168,11 @@ export async function verifyJwt(token: string): Promise<VerifiedTokenClaims> {
     throw new Error("Token missing issued-at claim");
   }
 
-  if (typeof typedPayload.exp !== "number") {
-    throw new Error("Token missing expiration claim");
+  if (
+    typedPayload.exp !== undefined &&
+    typeof typedPayload.exp !== "number"
+  ) {
+    throw new Error("Invalid expiration claim");
   }
 
   const tfcToken = typedPayload.tfcToken;

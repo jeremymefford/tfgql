@@ -1,5 +1,8 @@
 import { readFileSync } from "fs";
 
+const MIN_METRICS_CACHE_TTL_SECONDS_TFC = 600;
+const MIN_METRICS_CACHE_TTL_SECONDS_TFE = 120;
+
 export interface ServerTlsConfig {
   cert: string;
   key: string;
@@ -19,6 +22,9 @@ export class Config {
   readonly serverTlsConfig?: ServerTlsConfig;
   readonly authTokenTtlSeconds: number;
   readonly jwtEncryptionKeyMaterial?: string;
+  readonly metricsEnabled: boolean;
+  readonly metricsConfigPath?: string;
+  readonly metricsCacheTtlSeconds: number;
 
   constructor(env = process.env) {
     let baseUrl = env.TFE_BASE_URL || "https://app.terraform.io/api/v2";
@@ -59,6 +65,29 @@ export class Config {
       2600000,
     ); // default 30 days
     this.jwtEncryptionKeyMaterial = env.TFGQL_JWT_ENCRYPTION_KEY;
+
+    this.metricsEnabled =
+      (env.TFGQL_METRICS_ENABLED ?? "true").toLowerCase() !== "false";
+    const metricsPath = env.TFGQL_METRICS_CONFIG?.trim();
+    this.metricsConfigPath = metricsPath || undefined;
+    const rawMetricsCacheTtlSeconds = env.TFGQL_METRICS_CACHE_TTL;
+    const configuredMetricsCacheTtlSeconds = this.parsePositiveNumber(
+      rawMetricsCacheTtlSeconds,
+      60,
+    );
+    const minimumMetricsCacheTtlSeconds =
+      this.deploymentTarget === "tfc"
+        ? MIN_METRICS_CACHE_TTL_SECONDS_TFC
+        : MIN_METRICS_CACHE_TTL_SECONDS_TFE;
+    this.metricsCacheTtlSeconds = Math.max(
+      configuredMetricsCacheTtlSeconds,
+      minimumMetricsCacheTtlSeconds,
+    );
+    this.warnIfMetricsCacheTtlBelowMinimum(
+      rawMetricsCacheTtlSeconds,
+      minimumMetricsCacheTtlSeconds,
+      this.metricsCacheTtlSeconds,
+    );
 
     const tlsCertPath = this.normalizePath(env.TFGQL_SERVER_TLS_CERT_FILE);
     const tlsKeyPath = this.normalizePath(env.TFGQL_SERVER_TLS_KEY_FILE);
@@ -103,6 +132,21 @@ export class Config {
   private normalizePath(pathValue: string | undefined): string | undefined {
     const trimmed = pathValue?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private warnIfMetricsCacheTtlBelowMinimum(
+    rawValue: string | undefined,
+    minimumValue: number,
+    effectiveValue: number,
+  ): void {
+    if (rawValue === undefined) return;
+    const configured = Number(rawValue);
+    if (!Number.isFinite(configured) || configured < 0) return;
+    if (configured >= minimumValue) return;
+
+    console.warn(
+      `TFGQL_METRICS_CACHE_TTL is set to ${configured}s, below the enforced minimum of ${minimumValue}s for ${this.deploymentTarget.toUpperCase()}. Using ${effectiveValue}s.`,
+    );
   }
 
   private readFileOrThrow(path: string, envVar: string): string {

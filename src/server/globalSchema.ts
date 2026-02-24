@@ -67,6 +67,8 @@ import explorerSchema from "../explorer/schema";
 import adminSchema from "../admin/schema";
 import policyCheckSchema from "../policyChecks/schema";
 import logSchema from "../common/log/schema";
+import prometheusSchema from "../prometheus/schema";
+import { resolvers as prometheusResolvers } from "../prometheus/resolvers";
 
 // Base schema definitions for root types and custom scalar
 const baseSchema = gql`
@@ -121,6 +123,7 @@ export const typeDefs = [
   adminSchema,
   policyCheckSchema,
   logSchema,
+  prometheusSchema,
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -158,6 +161,7 @@ const baseResolvers = {
     ...teamAccessResolvers.Query,
     ...explorerResolvers.Query,
     ...adminResolvers.Query,
+    ...prometheusResolvers.Query,
   },
   Organization: {
     ...organizationsResolvers.Organization,

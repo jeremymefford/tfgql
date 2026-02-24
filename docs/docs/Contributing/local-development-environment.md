@@ -47,7 +47,7 @@ npm install
 npm start
 ```
 
-The API will be available at `http://localhost:4000/graphql`.
+The GraphiQL IDE will be available at `http://localhost:4000/`. The GraphQL endpoint itself is at `http://localhost:4000/graphql`.
 
 ---
 

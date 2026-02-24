@@ -11,7 +11,14 @@ RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY . .
 RUN npm run compile
 
-# 2) Runtime: only production deps + compiled output
+# 2) Prod deps: install production dependencies once
+FROM --platform=$BUILDPLATFORM node:24-alpine AS prod-deps
+WORKDIR /app
+
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund
+
+# 3) Runtime: official Node image with only runtime deps + compiled output
 FROM --platform=$TARGETPLATFORM node:24-alpine AS runtime
 
 ARG VERSION="0.0.0"
@@ -28,12 +35,11 @@ LABEL org.opencontainers.image.title="tfgql" \
 
 WORKDIR /app
 
-RUN apk update && apk upgrade \
-    && apk add --no-cache tini \
-    && mkdir -p /app/tmp \
-    && chown -R node:node /app \
-    && chgrp -R 0 /app \
-    && chmod -R g=u /app
+RUN apk add --no-cache tini \
+    && rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx \
+    && rm -rf /usr/local/lib/node_modules/corepack \
+    && rm -f /usr/local/bin/corepack
 
 # Default runtime configuration (override at run time as needed)
 ENV NODE_ENV=production \
@@ -48,10 +54,8 @@ ENV NODE_ENV=production \
     PORT=4000 \
     NODE_OPTIONS=--enable-source-maps
 
-COPY --chown=node:node package*.json ./
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
-
-# Copy compiled application only
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/package*.json ./
 COPY --from=builder --chown=node:node /app/dist ./dist
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

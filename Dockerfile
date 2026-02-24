@@ -57,6 +57,7 @@ ENV NODE_ENV=production \
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/package*.json ./
 COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/docs/static/img/logo.svg ./docs/static/img/logo.svg
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD ["node", "-e", "const p=(process.env.PORT||'4000'); const u='http://127.0.0.1:'+p+'/health'; fetch(u).then(r=>r.ok?r.json():Promise.reject()).then(j=>{if(!(j&&j.status==='ok'))process.exit(1)}).catch(()=>process.exit(1))"]

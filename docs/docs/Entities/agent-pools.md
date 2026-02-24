@@ -45,6 +45,7 @@ query AllAgentPools {
 | `name` | `String!` | Pool name |
 | `createdAt` | `DateTime!` | When the pool was created |
 | `organizationScoped` | `Boolean!` | Whether the pool is available to all workspaces in the org |
+| `organizationName` | `String` | The name of the organization this agent pool belongs to |
 | `agentCount` | `Int!` | Number of agents currently in the pool |
 | `workspaces` | `[Workspace!]!` | Workspaces assigned to this pool |
 | `allowedWorkspaces` | `[Workspace!]!` | Workspaces explicitly allowed to use this pool |

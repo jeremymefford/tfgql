@@ -1,6 +1,6 @@
 {
   "name": "tfgql",
-  "version": "0.5.11",
+  "version": "0.6.0",
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc",

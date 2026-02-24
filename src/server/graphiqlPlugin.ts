@@ -274,6 +274,61 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin<Context> {
       tokenInput.focus();
     }
 
+    // Schema Visualizer sidebar plugin
+    var voyagerPlugin = {
+      title: 'Schema Visualizer',
+      icon: function() {
+        return React.createElement('svg', {
+          viewBox: '0 0 24 24',
+          fill: 'none',
+          stroke: 'currentColor',
+          strokeWidth: '1.5',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+          width: '1em',
+          height: '1em',
+        }, [
+          React.createElement('circle', { key: '1', cx: '6', cy: '6', r: '2.5' }),
+          React.createElement('circle', { key: '2', cx: '18', cy: '6', r: '2.5' }),
+          React.createElement('circle', { key: '3', cx: '6', cy: '18', r: '2.5' }),
+          React.createElement('circle', { key: '4', cx: '18', cy: '18', r: '2.5' }),
+          React.createElement('line', { key: '5', x1: '8.5', y1: '6', x2: '15.5', y2: '6' }),
+          React.createElement('line', { key: '6', x1: '6', y1: '8.5', x2: '6', y2: '15.5' }),
+          React.createElement('line', { key: '7', x1: '18', y1: '8.5', x2: '18', y2: '15.5' }),
+          React.createElement('line', { key: '8', x1: '8.5', y1: '18', x2: '15.5', y2: '18' }),
+          React.createElement('line', { key: '9', x1: '8', y1: '8', x2: '16', y2: '16' }),
+        ]);
+      },
+      content: function() {
+        return React.createElement('div', {
+          style: { padding: '20px', fontFamily: 'system-ui, -apple-system, sans-serif' },
+        }, [
+          React.createElement('h3', {
+            key: 'title',
+            style: { margin: '0 0 8px', fontSize: '15px' },
+          }, 'Schema Visualizer'),
+          React.createElement('p', {
+            key: 'desc',
+            style: { margin: '0 0 16px', fontSize: '13px', color: '#999', lineHeight: '1.4' },
+          }, 'Explore the schema as an interactive graph powered by GraphQL Voyager.'),
+          React.createElement('a', {
+            key: 'link',
+            href: '/voyager',
+            style: {
+              display: 'inline-block',
+              padding: '8px 16px',
+              background: '#e535ab',
+              color: '#fff',
+              borderRadius: '4px',
+              textDecoration: 'none',
+              fontSize: '13px',
+              fontWeight: '600',
+            },
+          }, 'Open Schema Visualizer'),
+        ]);
+      },
+    };
+
     // Render GraphiQL
     const root = ReactDOM.createRoot(document.getElementById('graphiql'));
     root.render(
@@ -281,6 +336,7 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin<Context> {
         defaultQuery: defaultQuery,
         fetcher: authFetcher,
         defaultEditorToolsVisibility: true,
+        plugins: [voyagerPlugin],
       }),
     );
   })();

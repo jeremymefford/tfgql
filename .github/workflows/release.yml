@@ -151,9 +151,10 @@ jobs:
     environment:
       name: prod
     steps:
-      - name: Checkout
+      - name: Checkout release commit
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -190,9 +191,10 @@ jobs:
     environment:
       name: prod
     steps:
-      - name: Checkout
+      - name: Checkout release commit
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -225,9 +227,10 @@ jobs:
     environment:
       name: prod
     steps:
-      - name: Checkout
+      - name: Checkout release commit
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -261,9 +264,10 @@ jobs:
     environment:
       name: prod
     steps:
-      - name: Checkout
+      - name: Checkout release commit
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -368,9 +372,10 @@ jobs:
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout release commit
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Set up QEMU (multi-arch)

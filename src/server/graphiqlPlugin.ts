@@ -26,6 +26,7 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin<Context> {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'" />
   <title>tfgql — GraphiQL</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/graphiql-assets/graphiql.min.css" />
   <style>
     body { margin: 0; height: 100vh; font-family: system-ui, -apple-system, sans-serif; }

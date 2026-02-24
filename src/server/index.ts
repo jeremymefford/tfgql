@@ -67,6 +67,18 @@ export async function startServer(): Promise<void> {
     status: "ok",
   }));
 
+  fastify.get("/favicon.svg", async (_request, reply) => {
+    const svgPath = path.join(process.cwd(), "docs", "static", "img", "logo.svg");
+    try {
+      const data = await readFile(svgPath);
+      reply.type("image/svg+xml");
+      reply.header("Cache-Control", "public, max-age=86400, immutable");
+      return data;
+    } catch {
+      reply.code(404).send("Favicon not found");
+    }
+  });
+
   const landingPagePlugin = graphiqlLandingPagePlugin();
 
   const server = new ApolloServer<Context>({

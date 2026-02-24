@@ -121,7 +121,6 @@ export function registerMetricsRoute(
       updateLogContext({ tokenHash: verifiedClaims.tokenHash });
 
       // --- check cache ---
-      const cacheTtl = getEffectiveCacheTtlMs();
       const cacheKey = verifiedClaims.tokenHash;
       const cached = metricsCache.get(cacheKey);
       if (cached) {

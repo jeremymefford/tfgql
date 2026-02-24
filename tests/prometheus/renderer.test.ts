@@ -172,7 +172,7 @@ describe("renderExposition", () => {
     ];
 
     const result = renderExposition(families);
-    expect(result).toContain("# TYPE agent_info info");
+    expect(result).toContain("# TYPE agent_info gauge");
     expect(result).toContain(
       'agent_info{agent="worker-1",status="idle"} 1',
     );

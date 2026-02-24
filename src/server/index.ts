@@ -5,6 +5,7 @@ import Fastify, {
   type FastifyReply,
   type FastifyRequest,
 } from "fastify";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { loadBundledAsset } from "./assetLoader";
 import fastifyCors from "@fastify/cors";
@@ -30,8 +31,17 @@ import { graphiqlLandingPagePlugin } from "./graphiqlPlugin";
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
  */
-/** Project root — two levels up from src/server/ (or dist/server/). */
-const projectRoot = path.resolve(__dirname, "..", "..");
+/** Project root — walks up from __dirname until we find package.json. */
+const projectRoot = (() => {
+  let dir = __dirname;
+  for (let i = 0; i < 5; i++) {
+    if (existsSync(path.join(dir, "package.json"))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return dir;
+})();
 
 export async function startServer(): Promise<void> {
   const armor = new ApolloArmor({

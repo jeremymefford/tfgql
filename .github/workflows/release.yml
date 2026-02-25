@@ -144,7 +144,7 @@ jobs:
         uses: actions/deploy-pages@v4
         id: deploy
 
-  build-linux:
+  build-linux-x64:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
@@ -165,23 +165,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build SEA binaries (linux)
-        env:
-          SEA_TARGETS: linux-arm64,linux-x64
-        run: npm run build:sea
+      - name: Build SEA binary (linux x64)
+        run: npm run build:sea -- --scope=current
 
-      - name: Package binaries
+      - name: Package binary
         run: |
           mkdir -p release-artifacts
-          for name in tfgql-linux-arm64 tfgql-linux-x64; do
-            tar -C build/sea/binaries -czf release-artifacts/${name}.tar.gz ${name}
-            sha256sum release-artifacts/${name}.tar.gz > release-artifacts/${name}.tar.gz.sha256
-          done
+          tar -C build/sea/binaries -czf release-artifacts/tfgql-linux-x64.tar.gz tfgql-linux-x64
+          sha256sum release-artifacts/tfgql-linux-x64.tar.gz > release-artifacts/tfgql-linux-x64.tar.gz.sha256
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sea-linux
+          name: sea-linux-x64
           path: release-artifacts
 
       - name: Set up Buildx
@@ -194,31 +190,97 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push Docker images (amd64 + arm64)
+      - name: Build & push Docker image (amd64)
         run: |
           VERSION=${{ needs.prepare-release.outputs.version }}
           VCS_REF=${{ github.sha }}
           BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           IMAGE=ghcr.io/${{ github.repository }}
 
-          for arch in amd64 arm64; do
-            src=build/sea/binaries/tfgql-linux-$([ "$arch" = "amd64" ] && echo x64 || echo arm64)
-            ctx=$(mktemp -d)
-            cp Dockerfile "$ctx/"
-            cp "$src" "$ctx/tfgql-linux-${arch}"
+          ctx=$(mktemp -d)
+          cp Dockerfile "$ctx/"
+          cp build/sea/binaries/tfgql-linux-x64 "$ctx/tfgql-linux-amd64"
 
-            docker buildx build \
-              --platform "linux/${arch}" \
-              --build-arg VERSION="$VERSION" \
-              --build-arg VCS_REF="$VCS_REF" \
-              --build-arg BUILD_DATE="$BUILD_DATE" \
-              --tag "${IMAGE}:v${VERSION}-${arch}" \
-              --provenance=true --sbom=true \
-              --push \
-              "$ctx"
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg VERSION="$VERSION" \
+            --build-arg VCS_REF="$VCS_REF" \
+            --build-arg BUILD_DATE="$BUILD_DATE" \
+            --tag "${IMAGE}:v${VERSION}-amd64" \
+            --provenance=true --sbom=true \
+            --push \
+            "$ctx"
 
-            rm -rf "$ctx"
-          done
+          rm -rf "$ctx"
+
+  build-linux-arm64:
+    needs: prepare-release
+    if: needs.prepare-release.outputs.should_release == 'true'
+    runs-on: ubuntu-24.04-arm
+    environment:
+      name: prod
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build SEA binary (linux arm64)
+        run: npm run build:sea -- --scope=current
+
+      - name: Package binary
+        run: |
+          mkdir -p release-artifacts
+          tar -C build/sea/binaries -czf release-artifacts/tfgql-linux-arm64.tar.gz tfgql-linux-arm64
+          sha256sum release-artifacts/tfgql-linux-arm64.tar.gz > release-artifacts/tfgql-linux-arm64.tar.gz.sha256
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sea-linux-arm64
+          path: release-artifacts
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image (arm64)
+        run: |
+          VERSION=${{ needs.prepare-release.outputs.version }}
+          VCS_REF=${{ github.sha }}
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          IMAGE=ghcr.io/${{ github.repository }}
+
+          ctx=$(mktemp -d)
+          cp Dockerfile "$ctx/"
+          cp build/sea/binaries/tfgql-linux-arm64 "$ctx/tfgql-linux-arm64"
+
+          docker buildx build \
+            --platform linux/arm64 \
+            --build-arg VERSION="$VERSION" \
+            --build-arg VCS_REF="$VCS_REF" \
+            --build-arg BUILD_DATE="$BUILD_DATE" \
+            --tag "${IMAGE}:v${VERSION}-arm64" \
+            --provenance=true --sbom=true \
+            --push \
+            "$ctx"
+
+          rm -rf "$ctx"
 
   build-macos-arm:
     needs: prepare-release
@@ -294,7 +356,7 @@ jobs:
           path: release-artifacts
 
   publish-release:
-    needs: [prepare-release, build-linux, build-macos-arm, build-macos-intel]
+    needs: [prepare-release, build-linux-x64, build-linux-arm64, build-macos-arm, build-macos-intel]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     environment:
@@ -327,10 +389,16 @@ jobs:
       - name: Disable commit signing when no GPG key
         run: git config commit.gpgsign false
 
-      - name: Download Linux artifacts
+      - name: Download Linux x64 artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sea-linux
+          name: sea-linux-x64
+          path: release-artifacts
+
+      - name: Download Linux arm64 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sea-linux-arm64
           path: release-artifacts
 
       - name: Download macOS arm artifacts
@@ -404,7 +472,7 @@ jobs:
           fi
 
   publish-image:
-    needs: [prepare-release, build-linux]
+    needs: [prepare-release, build-linux-x64, build-linux-arm64]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:

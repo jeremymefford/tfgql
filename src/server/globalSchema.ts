@@ -69,6 +69,19 @@ import policyCheckSchema from "../policyChecks/schema";
 import logSchema from "../common/log/schema";
 import prometheusSchema from "../prometheus/schema";
 import { resolvers as prometheusResolvers } from "../prometheus/resolvers";
+import { resolvers as registryResolvers } from "../registry/resolvers";
+import { resolvers as registryModulesResolvers } from "../registryModules/resolvers";
+import { resolvers as registryProvidersResolvers } from "../registryProviders/resolvers";
+import { resolvers as registryProviderVersionsResolvers } from "../registryProviderVersions/resolvers";
+import { resolvers as registryProviderPlatformsResolvers } from "../registryProviderPlatforms/resolvers";
+import { resolvers as registryGpgKeysResolvers } from "../registryGpgKeys/resolvers";
+import registrySchema from "../registry/schema";
+import registryModulesSchema from "../registryModules/schema";
+import registryProvidersSchema from "../registryProviders/schema";
+import registryProviderVersionsSchema from "../registryProviderVersions/schema";
+import registryProviderPlatformsSchema from "../registryProviderPlatforms/schema";
+import registryGpgKeysSchema from "../registryGpgKeys/schema";
+import registryTestsSchema from "../registryTests/schema";
 
 // Base schema definitions for root types and custom scalar
 const baseSchema = gql`
@@ -124,6 +137,13 @@ export const typeDefs = [
   policyCheckSchema,
   logSchema,
   prometheusSchema,
+  registryProviderPlatformsSchema,
+  registryProviderVersionsSchema,
+  registryProvidersSchema,
+  registryModulesSchema,
+  registryGpgKeysSchema,
+  registryTestsSchema,
+  registrySchema,
 ];
 
 /** Combined resolvers for all types (queries, mutations, and custom scalars) */
@@ -162,6 +182,7 @@ const baseResolvers = {
     ...explorerResolvers.Query,
     ...adminResolvers.Query,
     ...prometheusResolvers.Query,
+    ...registryResolvers.Query,
   },
   Organization: {
     ...organizationsResolvers.Organization,
@@ -237,6 +258,24 @@ const baseResolvers = {
   },
   StateVersionOutput: {
     ...stateVersionOutputsResolvers.StateVersionOutput,
+  },
+  Registry: {
+    ...registryResolvers.Registry,
+  },
+  RegistryModule: {
+    ...registryModulesResolvers.RegistryModule,
+  },
+  RegistryProvider: {
+    ...registryProvidersResolvers.RegistryProvider,
+  },
+  RegistryProviderVersion: {
+    ...registryProviderVersionsResolvers.RegistryProviderVersion,
+  },
+  RegistryProviderPlatform: {
+    ...registryProviderPlatformsResolvers.RegistryProviderPlatform,
+  },
+  RegistryGpgKey: {
+    ...registryGpgKeysResolvers.RegistryGpgKey,
   },
 };
 

@@ -248,12 +248,29 @@ async function copyGraphiQLAssets(bundleDir) {
   log(`Copied ${assets.length} GraphiQL static assets to bundle`);
 }
 
+async function copyVoyagerAssets(bundleDir) {
+  const assetsDir = path.join(bundleDir, "voyager-assets");
+  await mkdir(assetsDir, { recursive: true });
+
+  const assets = [
+    { src: path.join(rootDir, "node_modules", "graphql-voyager", "dist", "voyager.standalone.js"), dest: "voyager.standalone.js" },
+    { src: path.join(rootDir, "node_modules", "graphql-voyager", "dist", "voyager.css"), dest: "voyager.css" },
+  ];
+
+  for (const asset of assets) {
+    await cp(asset.src, path.join(assetsDir, asset.dest));
+  }
+
+  log(`Copied ${assets.length} Voyager static assets to bundle`);
+}
+
 async function prepareRuntime() {
   log("Compiling TypeScript sources");
   run("npm run compile", { cwd: rootDir });
 
   const bundleDir = await buildBundle();
   await copyGraphiQLAssets(bundleDir);
+  await copyVoyagerAssets(bundleDir);
 
   log("Preparing SEA runtime directory");
   await copyFile(path.join(rootDir, "package.json"), path.join(runtimeDir, "package.json"));

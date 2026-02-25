@@ -38,6 +38,12 @@ import { AdminAPI } from "../admin/dataSource";
 import { TaskStagesAPI } from "../taskStages/dataSource";
 import { PolicySetOutcomesAPI } from "../policySetOutcomes/dataSource";
 import { LogsAPI } from "../logs/dataSource";
+import { RegistryModulesAPI } from "../registryModules/dataSource";
+import { RegistryProvidersAPI } from "../registryProviders/dataSource";
+import { RegistryProviderVersionsAPI } from "../registryProviderVersions/dataSource";
+import { RegistryProviderPlatformsAPI } from "../registryProviderPlatforms/dataSource";
+import { RegistryGpgKeysAPI } from "../registryGpgKeys/dataSource";
+import { RegistryTestsAPI } from "../registryTests/dataSource";
 
 /** GraphQL context type */
 export interface Context {
@@ -77,6 +83,12 @@ export interface Context {
     policySetOutcomesAPI: PolicySetOutcomesAPI;
     policyChecksAPI: PolicyChecksAPI;
     logsAPI: LogsAPI;
+    registryModulesAPI: RegistryModulesAPI;
+    registryProvidersAPI: RegistryProvidersAPI;
+    registryProviderVersionsAPI: RegistryProviderVersionsAPI;
+    registryProviderPlatformsAPI: RegistryProviderPlatformsAPI;
+    registryGpgKeysAPI: RegistryGpgKeysAPI;
+    registryTestsAPI: RegistryTestsAPI;
   };
   requestCache: RequestCache;
   logger: Logger;
@@ -137,6 +149,12 @@ export async function buildContext(
       policySetOutcomesAPI: new PolicySetOutcomesAPI(httpClient),
       policyChecksAPI: new PolicyChecksAPI(httpClient, requestCache),
       logsAPI: new LogsAPI(httpClient, requestCache),
+      registryModulesAPI: new RegistryModulesAPI(httpClient, requestCache),
+      registryProvidersAPI: new RegistryProvidersAPI(httpClient, requestCache),
+      registryProviderVersionsAPI: new RegistryProviderVersionsAPI(httpClient, requestCache),
+      registryProviderPlatformsAPI: new RegistryProviderPlatformsAPI(httpClient, requestCache),
+      registryGpgKeysAPI: new RegistryGpgKeysAPI(httpClient, requestCache),
+      registryTestsAPI: new RegistryTestsAPI(httpClient, requestCache),
     },
     requestCache,
     logger: baseLogger,

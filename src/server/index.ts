@@ -27,6 +27,7 @@ import { registerAuthRoutes } from "./authRoutes";
 import { registerMetricsRoute } from "./metricsRoute";
 import { setApolloServer } from "../prometheus/resolvers";
 import { graphiqlLandingPagePlugin } from "./graphiqlPlugin";
+import { registerVoyagerRoute } from "./voyagerPlugin";
 
 /**
  * Initialize and start the Apollo GraphQL server (standalone HTTP/HTTPS server).
@@ -75,6 +76,8 @@ export async function startServer(): Promise<void> {
 
   await registerAuthRoutes(fastify);
   registerGraphiQLAssets(fastify);
+  registerVoyagerAssets(fastify);
+  registerVoyagerRoute(fastify);
 
   fastify.get("/health", async () => ({
     status: "ok",
@@ -192,6 +195,52 @@ function registerGraphiQLAssets(
           `Unable to read GraphiQL asset ${request.params.asset}`,
         );
         reply.code(500).send("GraphiQL asset unavailable");
+        return;
+      }
+    },
+  );
+}
+
+function registerVoyagerAssets(
+  fastify: FastifyInstance<any, any, any, any, any>,
+): void {
+  const nodeModules = path.join(projectRoot, "node_modules");
+  const assets: Record<
+    string,
+    { bundleRelPath: string; devAbsPath: string; contentType: string }
+  > = {
+    "voyager.standalone.js": {
+      bundleRelPath: "voyager-assets/voyager.standalone.js",
+      devAbsPath: path.join(nodeModules, "graphql-voyager", "dist", "voyager.standalone.js"),
+      contentType: "application/javascript; charset=utf-8",
+    },
+    "voyager.css": {
+      bundleRelPath: "voyager-assets/voyager.css",
+      devAbsPath: path.join(nodeModules, "graphql-voyager", "dist", "voyager.css"),
+      contentType: "text/css; charset=utf-8",
+    },
+  };
+
+  fastify.get<{ Params: { asset: string } }>(
+    "/voyager-assets/:asset",
+    async (request, reply) => {
+      const asset = assets[request.params.asset];
+      if (!asset) {
+        reply.code(404).send("Asset not found");
+        return;
+      }
+
+      try {
+        const data = await loadBundledAsset(asset.bundleRelPath, asset.devAbsPath);
+        reply.type(asset.contentType);
+        reply.header("Cache-Control", "public, max-age=86400, immutable");
+        return data;
+      } catch (error) {
+        logger.warn(
+          { err: error },
+          `Unable to read Voyager asset ${request.params.asset}`,
+        );
+        reply.code(500).send("Voyager asset unavailable");
         return;
       }
     },

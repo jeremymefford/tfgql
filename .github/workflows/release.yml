@@ -184,6 +184,42 @@ jobs:
           name: sea-linux
           path: release-artifacts
 
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker images (amd64 + arm64)
+        run: |
+          VERSION=${{ needs.prepare-release.outputs.version }}
+          VCS_REF=${{ github.sha }}
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          IMAGE=ghcr.io/${{ github.repository }}
+
+          for arch in amd64 arm64; do
+            src=build/sea/binaries/tfgql-linux-$([ "$arch" = "amd64" ] && echo x64 || echo arm64)
+            ctx=$(mktemp -d)
+            cp Dockerfile "$ctx/"
+            cp "$src" "$ctx/tfgql-linux-${arch}"
+
+            docker buildx build \
+              --platform "linux/${arch}" \
+              --build-arg VERSION="$VERSION" \
+              --build-arg VCS_REF="$VCS_REF" \
+              --build-arg BUILD_DATE="$BUILD_DATE" \
+              --tag "${IMAGE}:v${VERSION}-${arch}" \
+              --provenance=true --sbom=true \
+              --push \
+              "$ctx"
+
+            rm -rf "$ctx"
+          done
+
   build-macos-arm:
     needs: prepare-release
     if: needs.prepare-release.outputs.should_release == 'true'
@@ -368,19 +404,10 @@ jobs:
           fi
 
   publish-image:
-    needs: prepare-release
+    needs: [prepare-release, build-linux]
     if: needs.prepare-release.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout release commit
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Set up QEMU (multi-arch)
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -391,42 +418,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta (tags & labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ghcr.io/${{ github.repository }}
-          tags: |
-            type=raw,value=v${{ needs.prepare-release.outputs.version }}
-            type=raw,value=latest
-            type=sha
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-
-      - name: Set build metadata
-        id: build_meta
+      - name: Create and push multi-arch manifest
+        id: manifest
         run: |
-          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
+          IMAGE=ghcr.io/${{ github.repository }}
+          VERSION=${{ needs.prepare-release.outputs.version }}
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
 
-      - name: Build & push (multi-arch, SBOM, provenance)
-        id: build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          provenance: true
-          sbom: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ needs.prepare-release.outputs.version }}
-            VCS_REF=${{ github.sha }}
-            BUILD_DATE=${{ steps.build_meta.outputs.build_date }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          for tag in "v${VERSION}" "latest" "sha-${SHA_SHORT}"; do
+            docker buildx imagetools create \
+              --tag "${IMAGE}:${tag}" \
+              "${IMAGE}:v${VERSION}-amd64" \
+              "${IMAGE}:v${VERSION}-arm64"
+          done
+
+          DIGEST=$(docker buildx imagetools inspect "${IMAGE}:v${VERSION}" --format '{{.Manifest.Digest}}')
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
@@ -435,14 +442,16 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "1"
         run: |
-          echo "${{ steps.meta.outputs.tags }}" | tr ' ' '\n' | while read -r tag; do
-            [ -z "$tag" ] && continue
-            cosign sign --yes "$tag"
+          IMAGE=ghcr.io/${{ github.repository }}
+          VERSION=${{ needs.prepare-release.outputs.version }}
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          for tag in "v${VERSION}" "latest" "sha-${SHA_SHORT}"; do
+            cosign sign --yes "${IMAGE}:${tag}"
           done
 
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v3
         with:
           subject-name: ghcr.io/${{ github.repository }}
-          subject-digest: ${{ steps.build.outputs.digest }}
+          subject-digest: ${{ steps.manifest.outputs.digest }}
           push-to-registry: true

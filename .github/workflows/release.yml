@@ -432,7 +432,7 @@ jobs:
               "${IMAGE}:v${VERSION}-arm64"
           done
 
-          DIGEST=$(docker buildx imagetools inspect "${IMAGE}:v${VERSION}" --format '{{.Manifest.Digest}}')
+          DIGEST=$(docker buildx imagetools inspect "${IMAGE}:v${VERSION}" --format '{{.Digest}}')
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Install Cosign

@@ -432,7 +432,7 @@ jobs:
               "${IMAGE}:v${VERSION}-arm64"
           done
 
-          DIGEST=$(docker buildx imagetools inspect "${IMAGE}:v${VERSION}" --format '{{.Digest}}')
+          DIGEST="sha256:$(docker buildx imagetools inspect "${IMAGE}:v${VERSION}" --raw | sha256sum | awk '{print $1}')"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Install Cosign

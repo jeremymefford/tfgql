@@ -112,12 +112,8 @@ const registryModulesSchema = gql`
     id: ID!
     """The module name."""
     name: String!
-    """The namespace (typically the organization name)."""
-    namespace: String!
     """The provider this module is associated with (e.g. 'aws', 'azurerm')."""
     provider: String!
-    """The registry name ('private' or 'public')."""
-    registryName: String!
     """The current status of the module."""
     status: String!
     """Version statuses for all published versions of this module."""
@@ -130,8 +126,8 @@ const registryModulesSchema = gql`
     publishingMechanism: String
     """Whether this is a no-code module."""
     noCode: Boolean
-    """The name of the owning organization."""
-    organizationName: String
+    """The owning organization (called 'namespace' in the registry API)."""
+    organization: Organization
     """Permission flags for the current user."""
     permissions: RegistryModulePermissions!
     """VCS repository configuration, if applicable."""
@@ -154,9 +150,7 @@ const registryModulesSchema = gql`
 
     id: StringComparisonExp
     name: StringComparisonExp
-    namespace: StringComparisonExp
     provider: StringComparisonExp
-    registryName: StringComparisonExp
     status: StringComparisonExp
     createdAt: DateTimeComparisonExp
     updatedAt: DateTimeComparisonExp

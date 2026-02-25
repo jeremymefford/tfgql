@@ -4,6 +4,7 @@ import {
   RegistryModuleVersionDetail,
   RegistryModuleVersionDetailFilter,
 } from "./types";
+import { Organization } from "../organizations/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { evaluateWhereClause } from "../common/filtering/filtering";
 import {
@@ -15,6 +16,16 @@ import {
 
 export const resolvers = {
   RegistryModule: {
+    organization: async (
+      parent: RegistryModule,
+      _: unknown,
+      ctx: Context,
+    ): Promise<Organization | null> => {
+      if (!parent.organizationName) return null;
+      return ctx.dataSources.organizationsAPI.getOrganization(
+        parent.organizationName,
+      );
+    },
     versions: async (
       parent: RegistryModule,
       { filter }: { filter?: RegistryModuleVersionDetailFilter },

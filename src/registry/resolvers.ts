@@ -6,6 +6,7 @@ import {
   RegistryProvider,
 } from "../registryProviders/types";
 import { RegistryGpgKeyFilter, RegistryGpgKey } from "../registryGpgKeys/types";
+import { Organization } from "../organizations/types";
 import { gatherAsyncGeneratorPromises } from "../common/streamPages";
 import { coalesceOrgs } from "../common/orgHelper";
 
@@ -27,6 +28,15 @@ export const resolvers = {
     },
   },
   Registry: {
+    organization: async (
+      parent: Registry,
+      _: unknown,
+      ctx: Context,
+    ): Promise<Organization | null> => {
+      return ctx.dataSources.organizationsAPI.getOrganization(
+        parent.organizationName,
+      );
+    },
     modules: async (
       parent: Registry,
       { filter }: { filter?: RegistryModuleFilter },

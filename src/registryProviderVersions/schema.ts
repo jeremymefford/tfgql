@@ -38,6 +38,10 @@ const registryProviderVersionsSchema = gql`
     shasumsSigDownloadUrl: String
     """Permission flags for the current user."""
     permissions: RegistryProviderVersionPermissions!
+    """The parent registry provider for this version."""
+    registryProvider: RegistryProvider
+    """The GPG key used to sign this version."""
+    gpgKey: RegistryGpgKey
     """Platform-specific binaries available for this version."""
     platforms(filter: RegistryProviderPlatformFilter): [RegistryProviderPlatform!]!
   }

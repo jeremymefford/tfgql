@@ -14,8 +14,8 @@ const registryGpgKeysSchema = gql`
     createdAt: DateTime!
     """The GPG key fingerprint/ID."""
     keyId: String!
-    """The namespace (organization) this key belongs to."""
-    namespace: String!
+    """The organization this GPG key belongs to (called 'namespace' in the registry API)."""
+    organization: Organization
     """The source of the key."""
     source: String!
     """URL of the key source, if applicable."""
@@ -36,7 +36,6 @@ const registryGpgKeysSchema = gql`
 
     id: StringComparisonExp
     keyId: StringComparisonExp
-    namespace: StringComparisonExp
     source: StringComparisonExp
     createdAt: DateTimeComparisonExp
     updatedAt: DateTimeComparisonExp

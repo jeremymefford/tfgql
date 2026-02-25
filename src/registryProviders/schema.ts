@@ -18,16 +18,12 @@ const registryProvidersSchema = gql`
     id: ID!
     """The provider name (e.g. 'aws', 'azurerm')."""
     name: String!
-    """The namespace (typically the organization name)."""
-    namespace: String!
-    """The registry name ('private' or 'public')."""
-    registryName: String!
     """Timestamp when the provider was created."""
     createdAt: DateTime!
     """Timestamp when the provider was last updated."""
     updatedAt: DateTime!
-    """The name of the owning organization."""
-    organizationName: String
+    """The owning organization (called 'namespace' in the registry API)."""
+    organization: Organization
     """Permission flags for the current user."""
     permissions: RegistryProviderPermissions!
     """All published versions of this provider."""
@@ -44,8 +40,6 @@ const registryProvidersSchema = gql`
 
     id: StringComparisonExp
     name: StringComparisonExp
-    namespace: StringComparisonExp
-    registryName: StringComparisonExp
     createdAt: DateTimeComparisonExp
     updatedAt: DateTimeComparisonExp
   }

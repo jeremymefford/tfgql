@@ -59,4 +59,25 @@ export class RegistryProviderVersionsAPI {
           }),
     );
   }
+
+  async getRegistryProviderVersionById(
+    id: string,
+  ): Promise<RegistryProviderVersion | null> {
+    return this.requestCache.getOrSet<RegistryProviderVersion | null>(
+      "registryProviderVersionById",
+      id,
+      async () =>
+        this.httpClient
+          .get<RegistryProviderVersionResponse>(
+            `/registry-provider-versions/${id}`,
+          )
+          .then((res) => registryProviderVersionMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          }),
+    );
+  }
 }

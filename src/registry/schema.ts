@@ -6,8 +6,8 @@ const registrySchema = gql`
   Provides a unified entry point for modules, providers, and GPG keys.
   """
   type Registry {
-    """The name of the organization this registry belongs to."""
-    organizationName: String!
+    """The organization this registry belongs to (called 'namespace' in the registry API)."""
+    organization: Organization
     """Private registry modules for this organization."""
     modules(filter: RegistryModuleFilter): [RegistryModule!]!
     """Private registry providers for this organization."""

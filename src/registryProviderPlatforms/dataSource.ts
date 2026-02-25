@@ -43,15 +43,20 @@ export class RegistryProviderPlatformsAPI {
     versionId: string,
     filter?: RegistryProviderPlatformFilter,
   ): AsyncGenerator<RegistryProviderPlatform[], void, unknown> {
-    // The TFC API exposes a related link on the version's platforms relationship.
-    // We fetch the version to get the self link, then derive the platforms URL.
-    // Alternatively, use the direct version endpoint's related platforms link.
     try {
-      const versionRes = await this.httpClient.get(
-        `/registry-provider-versions/${versionId}`,
+      const platformsLink = await this.requestCache.getOrSet<string | null>(
+        "registryProviderVersionPlatformsLink",
+        versionId,
+        async () => {
+          const versionRes = await this.httpClient.get(
+            `/registry-provider-versions/${versionId}`,
+          );
+          return (
+            versionRes.data?.data?.relationships?.platforms?.links?.related ??
+            null
+          );
+        },
       );
-      const platformsLink =
-        versionRes.data?.data?.relationships?.platforms?.links?.related;
       if (platformsLink) {
         yield* streamPages<
           RegistryProviderPlatform,

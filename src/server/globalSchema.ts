@@ -73,6 +73,8 @@ import { resolvers as registryResolvers } from "../registry/resolvers";
 import { resolvers as registryModulesResolvers } from "../registryModules/resolvers";
 import { resolvers as registryProvidersResolvers } from "../registryProviders/resolvers";
 import { resolvers as registryProviderVersionsResolvers } from "../registryProviderVersions/resolvers";
+import { resolvers as registryProviderPlatformsResolvers } from "../registryProviderPlatforms/resolvers";
+import { resolvers as registryGpgKeysResolvers } from "../registryGpgKeys/resolvers";
 import registrySchema from "../registry/schema";
 import registryModulesSchema from "../registryModules/schema";
 import registryProvidersSchema from "../registryProviders/schema";
@@ -268,6 +270,12 @@ const baseResolvers = {
   },
   RegistryProviderVersion: {
     ...registryProviderVersionsResolvers.RegistryProviderVersion,
+  },
+  RegistryProviderPlatform: {
+    ...registryProviderPlatformsResolvers.RegistryProviderPlatform,
+  },
+  RegistryGpgKey: {
+    ...registryGpgKeysResolvers.RegistryGpgKey,
   },
 };
 

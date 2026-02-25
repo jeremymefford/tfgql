@@ -32,6 +32,8 @@ const registryProviderPlatformsSchema = gql`
     providerBinaryDownloadUrl: String
     """Permission flags for the current user."""
     permissions: RegistryProviderPlatformPermissions!
+    """The parent registry provider version for this platform."""
+    registryProviderVersion: RegistryProviderVersion
   }
 
   """

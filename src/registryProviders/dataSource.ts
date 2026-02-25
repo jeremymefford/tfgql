@@ -52,4 +52,23 @@ export class RegistryProvidersAPI {
           }),
     );
   }
+
+  async getRegistryProviderById(
+    id: string,
+  ): Promise<RegistryProvider | null> {
+    return this.requestCache.getOrSet<RegistryProvider | null>(
+      "registryProviderById",
+      id,
+      async () =>
+        this.httpClient
+          .get<RegistryProviderResponse>(`/registry-providers/${id}`)
+          .then((res) => registryProviderMapper.map(res.data.data))
+          .catch((err) => {
+            if (isNotFound(err)) {
+              return null;
+            }
+            throw err;
+          }),
+    );
+  }
 }
